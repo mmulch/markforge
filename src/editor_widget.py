@@ -1,0 +1,142 @@
+"""Editor-Widget mit Zeilennummern und Markdown-Syntaxhervorhebung."""
+
+from __future__ import annotations
+
+from PyQt6.QtCore import QRect, QSize, Qt
+from PyQt6.QtGui import (
+    QColor,
+    QFont,
+    QPainter,
+    QPalette,
+    QTextCharFormat,
+    QTextFormat,
+    QTextOption,
+)
+from PyQt6.QtWidgets import QPlainTextEdit, QTextEdit, QWidget
+
+from highlighter import MarkdownHighlighter
+
+
+class _LineNumberArea(QWidget):
+    """Schmaler Bereich links vom Editor für Zeilennummern."""
+
+    def __init__(self, editor: EditorWidget) -> None:
+        super().__init__(editor)
+        self._editor = editor
+
+    def sizeHint(self) -> QSize:
+        return QSize(self._editor.line_number_area_width(), 0)
+
+    def paintEvent(self, event) -> None:  # type: ignore[override]
+        self._editor._paint_line_numbers(event)
+
+
+class EditorWidget(QPlainTextEdit):
+    """Klartext-Editor mit Zeilennummern, Zeilenhervorhebung und Markdown-Highlighting."""
+
+    _BG        = QColor("#1e1e1e")
+    _FG        = QColor("#d4d4d4")
+    _GUTTER_BG = QColor("#252526")
+    _GUTTER_FG = QColor("#858585")
+    _LINE_HL   = QColor("#2a2a2a")
+
+    def __init__(self) -> None:
+        super().__init__()
+        self._gutter = _LineNumberArea(self)
+        self._highlighter = MarkdownHighlighter(self.document())
+
+        self._apply_theme()
+
+        self.blockCountChanged.connect(self._update_gutter_width)
+        self.updateRequest.connect(self._update_gutter)
+        self.cursorPositionChanged.connect(self._highlight_current_line)
+
+        self._update_gutter_width(0)
+        self._highlight_current_line()
+
+    # ── Erscheinungsbild ──────────────────────────────────────────────────────
+
+    def _apply_theme(self) -> None:
+        font = QFont("Monospace", 12)
+        font.setStyleHint(QFont.StyleHint.Monospace)
+        self.setFont(font)
+        self.setTabStopDistance(40.0)
+        self.setWordWrapMode(QTextOption.WrapMode.WordWrap)
+
+        pal = self.palette()
+        pal.setColor(QPalette.ColorRole.Base, self._BG)
+        pal.setColor(QPalette.ColorRole.Text, self._FG)
+        self.setPalette(pal)
+
+    # ── Öffentliche API ───────────────────────────────────────────────────────
+
+    def set_word_wrap(self, enabled: bool) -> None:
+        mode = QTextOption.WrapMode.WordWrap if enabled else QTextOption.WrapMode.NoWrap
+        self.setWordWrapMode(mode)
+
+    # ── Zeilennummern ─────────────────────────────────────────────────────────
+
+    def line_number_area_width(self) -> int:
+        digits = max(1, len(str(self.blockCount())))
+        return 16 + self.fontMetrics().horizontalAdvance("9") * digits
+
+    def _update_gutter_width(self, _: int) -> None:
+        self.setViewportMargins(self.line_number_area_width(), 0, 0, 0)
+
+    def _update_gutter(self, rect: QRect, dy: int) -> None:
+        if dy:
+            self._gutter.scroll(0, dy)
+        else:
+            self._gutter.update(0, rect.y(), self._gutter.width(), rect.height())
+        if rect.contains(self.viewport().rect()):
+            self._update_gutter_width(0)
+
+    def resizeEvent(self, event) -> None:  # type: ignore[override]
+        super().resizeEvent(event)
+        cr = self.contentsRect()
+        self._gutter.setGeometry(
+            QRect(cr.left(), cr.top(), self.line_number_area_width(), cr.height())
+        )
+
+    def _paint_line_numbers(self, event) -> None:
+        painter = QPainter(self._gutter)
+        painter.fillRect(event.rect(), self._GUTTER_BG)
+        painter.setPen(self._GUTTER_FG)
+        painter.setFont(self.font())
+
+        fh    = self.fontMetrics().height()
+        block = self.firstVisibleBlock()
+        num   = block.blockNumber()
+        top   = round(
+            self.blockBoundingGeometry(block).translated(self.contentOffset()).top()
+        )
+        bot = top + round(self.blockBoundingRect(block).height())
+
+        while block.isValid() and top <= event.rect().bottom():
+            if block.isVisible() and bot >= event.rect().top():
+                painter.drawText(
+                    0,
+                    top,
+                    self._gutter.width() - 6,
+                    fh,
+                    Qt.AlignmentFlag.AlignRight,
+                    str(num + 1),
+                )
+            block = block.next()
+            top   = bot
+            bot   = top + round(self.blockBoundingRect(block).height())
+            num  += 1
+
+    # ── Aktuelle Zeile hervorheben ────────────────────────────────────────────
+
+    def _highlight_current_line(self) -> None:
+        if self.isReadOnly():
+            return
+        sel = QTextEdit.ExtraSelection()
+        fmt = QTextCharFormat()
+        fmt.setBackground(self._LINE_HL)
+        fmt.setProperty(QTextFormat.Property.FullWidthSelection, True)
+        sel.format = fmt
+        sel.cursor = self.textCursor()
+        sel.cursor.clearSelection()
+        self.setExtraSelections([sel])

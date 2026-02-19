@@ -1,0 +1,27 @@
+# CMake Build-Verzeichnis
+build/
+
+# Python Bytecode
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Claude Code Konfiguration
+.claude/
+
+# Python virtuelle Umgebungen
+venv/
+.venv/
+env/
+
+# Editor/IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Betriebssystem
+.DS_Store
+Thumbs.db
