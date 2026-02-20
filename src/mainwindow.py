@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import os
 
-from PyQt6.QtCore import QEventLoop, QSettings, QThread, QTimer, Qt, QUrl, pyqtSignal
+from PyQt6.QtCore import QSettings, QThread, QTimer, Qt, QUrl, pyqtSignal
 from PyQt6.QtGui import QAction, QKeySequence
 from PyQt6.QtWidgets import (
     QApplication,
@@ -58,6 +58,10 @@ class MainWindow(QMainWindow):
         self._draft_name: str | None = None
         self._modified = False
         self._settings = QSettings("MarkdownEditor", "MarkdownEditor")
+
+        self._pdf_worker:      _PdfWorker | None      = None
+        self._pdf_progress:    QProgressDialog | None = None
+        self._pdf_output_path: str                    = ""
 
         self._build_ui()
         self._build_menu()
@@ -257,7 +261,7 @@ class MainWindow(QMainWindow):
         self._editor.setEnabled(active)
         self._editor.setPlaceholderText(
             "" if active
-            else tr("Open or create a Markdown file to start editing.")
+            else "\n" + tr("Open or create a Markdown file to start editing.")
         )
         for act in (
             self._act_save, self._act_save_as, self._act_export_pdf,
@@ -290,13 +294,18 @@ class MainWindow(QMainWindow):
         name = name.strip()
         if "." not in name:
             name += ".md"
-        self._editor.clear()
-        self._file       = None
-        self._draft_name = name
-        self._modified   = False
-        self._set_editor_active(True)
-        self._update_title()
-        self._refresh_preview()
+        full_path = os.path.join(save_dir, name)
+        if not os.path.exists(full_path):
+            try:
+                with open(full_path, "w", encoding="utf-8"):
+                    pass
+            except OSError as exc:
+                QMessageBox.critical(
+                    self, tr("Error"),
+                    tr("Could not create file:\n{exc}", exc=exc),
+                )
+                return
+        self._load(full_path)
 
     def _open(self) -> None:
         if not self._maybe_save():
@@ -320,80 +329,105 @@ class MainWindow(QMainWindow):
             self._act_filetree.setChecked(True)
 
     def _import_pdf(self) -> None:
+        if self._pdf_worker is not None:
+            return  # import already running
         if not self._maybe_save():
             return
-        path, _ = QFileDialog.getOpenFileName(
+
+        # ── Step 1: choose PDF ─────────────────────────────────────────────
+        pdf_path, _ = QFileDialog.getOpenFileName(
             self,
             tr("Import PDF"),
             "",
             tr("PDF files (*.pdf);;All files (*)"),
         )
-        if not path:
+        if not pdf_path:
             return
 
-        # ── Progress dialog (indeterminate / marquee) ──────────────────────
-        progress = QProgressDialog(
+        # ── Step 2: choose output file name ───────────────────────────────
+        save_dir   = self._file_tree._root_dir or os.getcwd()
+        draft_name = os.path.splitext(os.path.basename(pdf_path))[0] + ".md"
+        name, ok = QInputDialog.getText(
+            self, tr("Import PDF"),
+            tr("File name:\nFolder: {path}", path=save_dir),
+            text=draft_name,
+        )
+        if not ok or not name.strip():
+            return
+        name = name.strip()
+        if "." not in name:
+            name += ".md"
+        self._pdf_output_path = os.path.join(save_dir, name)
+
+        # ── Step 3: show progress dialog and start worker ─────────────────
+        self._pdf_progress = QProgressDialog(
             tr("Importing PDF …"), tr("Cancel"), 0, 0, self
         )
-        progress.setWindowTitle(tr("Import PDF"))
-        progress.setWindowModality(Qt.WindowModality.ApplicationModal)
-        progress.setMinimumDuration(0)
-        progress.setValue(0)
+        self._pdf_progress.setWindowTitle(tr("Import PDF"))
+        self._pdf_progress.setWindowModality(Qt.WindowModality.ApplicationModal)
+        self._pdf_progress.setAutoClose(False)
+        self._pdf_progress.setAutoReset(False)
+        self._pdf_progress.canceled.connect(self._on_pdf_canceled)
+        self._pdf_progress.show()
 
-        # ── Worker thread ──────────────────────────────────────────────────
-        worker = _PdfWorker(path, self)
-        loop   = QEventLoop()
+        self._pdf_worker = _PdfWorker(pdf_path, self)
+        self._pdf_worker.finished.connect(self._on_pdf_done)
+        self._pdf_worker.failed.connect(self._on_pdf_failed)
+        self._pdf_worker.start()
 
-        _result:   list[str | None]         = [None]
-        _error:    list[tuple | None]        = [None]
-        _canceled: list[bool]               = [False]
+    def _on_pdf_done(self, md: str) -> None:
+        """Called in the main thread when PDF conversion succeeds."""
+        self._pdf_progress.close()
+        self._pdf_progress = None
+        self._pdf_worker   = None
 
-        def _done(md: str) -> None:
-            _result[0] = md
-            loop.quit()
-
-        def _fail(msg: str, is_import: bool) -> None:
-            _error[0] = (msg, is_import)
-            loop.quit()
-
-        def _cancel() -> None:
-            _canceled[0] = True
-            worker.terminate()
-            worker.wait()
-            loop.quit()
-
-        worker.finished.connect(_done)
-        worker.failed.connect(_fail)
-        progress.canceled.connect(_cancel)
-        worker.start()
-        loop.exec()
-        progress.close()
-
-        if _canceled[0]:
+        if not md:
+            QMessageBox.critical(
+                self, tr("Error"),
+                tr("The PDF could not be converted (no readable text found)."),
+            )
             return
 
-        if _error[0] is not None:
-            msg, is_import = _error[0]
-            if is_import:
-                QMessageBox.critical(
-                    self, tr("Error"),
-                    tr("pymupdf4llm is not installed.\nInstall it with: pip install pymupdf4llm"),
-                )
-            else:
-                QMessageBox.critical(
-                    self, tr("Error"),
-                    tr("Could not import PDF:\n{exc}", exc=msg),
-                )
+        try:
+            with open(self._pdf_output_path, "w", encoding="utf-8") as fh:
+                fh.write(md)
+        except OSError as exc:
+            QMessageBox.critical(
+                self, tr("Error"),
+                tr("Could not write file:\n{exc}", exc=exc),
+            )
             return
 
-        draft_name = os.path.splitext(os.path.basename(path))[0] + ".md"
-        self._editor.setPlainText(_result[0])
-        self._file       = None
-        self._draft_name = draft_name
-        self._modified   = True
-        self._set_editor_active(True)
-        self._update_title()
-        self._refresh_preview()
+        self._load(self._pdf_output_path)
+
+    def _on_pdf_failed(self, msg: str, is_import: bool) -> None:
+        """Called in the main thread when PDF conversion fails."""
+        self._pdf_progress.close()
+        self._pdf_progress = None
+        self._pdf_worker   = None
+
+        if is_import:
+            QMessageBox.critical(
+                self, tr("Error"),
+                tr("pymupdf4llm is not installed.\nInstall it with: pip install pymupdf4llm"),
+            )
+        else:
+            QMessageBox.critical(
+                self, tr("Error"),
+                tr("Could not import PDF:\n{exc}", exc=msg),
+            )
+
+    def _on_pdf_canceled(self) -> None:
+        """Called when the user clicks Cancel in the progress dialog."""
+        if self._pdf_worker is not None:
+            self._pdf_worker.finished.disconnect(self._on_pdf_done)
+            self._pdf_worker.failed.disconnect(self._on_pdf_failed)
+            self._pdf_worker.terminate()
+            self._pdf_worker.wait()
+            self._pdf_worker = None
+        if self._pdf_progress is not None:
+            self._pdf_progress.close()
+            self._pdf_progress = None
 
     def _load(self, path: str) -> None:
         try:
@@ -410,6 +444,7 @@ class MainWindow(QMainWindow):
         self._set_editor_active(True)
         self._update_title()
         self._file_tree.set_root(os.path.dirname(os.path.abspath(path)))
+        self._file_tree.select_file(path)
         self._refresh_preview()
 
     def _save(self) -> None:
@@ -437,11 +472,16 @@ class MainWindow(QMainWindow):
                 self, tr("Error"), tr("Could not save file:\n{exc}", exc=exc)
             )
             return
+        prev_file        = self._file
         self._file       = path
         self._draft_name = None
         self._modified   = False
         self._update_title()
         self.statusBar().showMessage(tr("Saved."), 3000)
+        if prev_file is None:
+            # First save of a new or imported document → update the tree
+            self._file_tree.set_root(os.path.dirname(os.path.abspath(path)))
+            self._file_tree.select_file(path)
 
     def _export_pdf(self) -> None:
         default = ""
@@ -509,6 +549,9 @@ class MainWindow(QMainWindow):
         if not self._maybe_save():
             event.ignore()
             return
+        if self._pdf_worker is not None:
+            self._pdf_worker.terminate()
+            self._pdf_worker.wait()
         self._settings.setValue("geometry", self.saveGeometry())
         self._settings.setValue("splitter", self._splitter.sizes())
         self._settings.setValue("outer_splitter", self._outer_splitter.sizes())

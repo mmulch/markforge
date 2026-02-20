@@ -16,6 +16,7 @@ __pycache__/
 
 # Claude Code Konfiguration
 .claude/
+CLAUDE.md
 
 # Python virtuelle Umgebungen
 venv/

@@ -5,7 +5,7 @@ from __future__ import annotations
 import fnmatch
 import os
 
-from PyQt6.QtCore import Qt, QSortFilterProxyModel, pyqtSignal
+from PyQt6.QtCore import Qt, QSortFilterProxyModel, QTimer, pyqtSignal
 from PyQt6.QtGui import QFileSystemModel
 from PyQt6.QtWidgets import (
     QFileDialog,
@@ -74,7 +74,8 @@ class FileTreeWidget(QWidget):
         super().__init__()
         self.setMinimumWidth(150)
         self.setMaximumWidth(420)
-        self._root_dir = ""
+        self._root_dir       = ""
+        self._pending_select = ""
         self._build_ui()
 
     # ── UI setup ──────────────────────────────────────────────────────────────
@@ -142,7 +143,17 @@ class FileTreeWidget(QWidget):
 
         self._proxy.set_root(self._root_dir)
         self._fs_model.setRootPath(self._root_dir)
+
+        # Explicitly kick off loading — without this the model waits until the
+        # view requests children, but the view won't do so if the root index
+        # hasn't been set yet (chicken-and-egg on first visit).
+        root_src_idx = self._fs_model.index(self._root_dir)
+        if self._fs_model.canFetchMore(root_src_idx):
+            self._fs_model.fetchMore(root_src_idx)
+
         self._apply_root_index()
+        QTimer.singleShot(0,   self._apply_root_index)
+        QTimer.singleShot(300, self._apply_root_index)  # extra fallback
 
         label = os.path.basename(self._root_dir) or self._root_dir
         self._dir_label.setText(label)
@@ -154,13 +165,41 @@ class FileTreeWidget(QWidget):
         """Sets the tree view root index to the proxy index of the root directory."""
         src_idx   = self._fs_model.index(self._root_dir)
         proxy_idx = self._proxy.mapFromSource(src_idx)
+        print(f"[tree] _apply_root_index root={self._root_dir!r} "
+              f"src_valid={src_idx.isValid()} proxy_valid={proxy_idx.isValid()} "
+              f"src_rows={self._fs_model.rowCount(src_idx)} "
+              f"proxy_rows={self._proxy.rowCount(proxy_idx)}")
         self._tree.setRootIndex(proxy_idx)
 
     def _on_directory_loaded(self, loaded_path: str) -> None:
+        print(f"[tree] directoryLoaded: {loaded_path!r}  root={self._root_dir!r}")
         self._proxy.invalidateFilter()
-        # Re-apply root index after loading (lazy-loading guard)
-        if os.path.normpath(loaded_path) == self._root_dir:
-            self._apply_root_index()
+        QTimer.singleShot(0, self._apply_root_index)
+        QTimer.singleShot(0, self._do_select)
+
+    def select_file(self, path: str) -> None:
+        """Selects and scrolls to *path* in the tree.
+
+        If the model hasn't loaded the directory yet, the selection is deferred
+        until ``directoryLoaded`` fires or a short timer expires.
+        """
+        self._pending_select = os.path.normpath(path)
+        self._do_select()
+        # Fallback: retry after async model has populated the directory
+        QTimer.singleShot(250, self._do_select)
+
+    def _do_select(self) -> None:
+        """Applies the pending selection if the model index is already valid."""
+        if not self._pending_select:
+            return
+        src_idx = self._fs_model.index(self._pending_select)
+        if not src_idx.isValid():
+            return
+        proxy_idx = self._proxy.mapFromSource(src_idx)
+        if proxy_idx.isValid():
+            self._tree.setCurrentIndex(proxy_idx)
+            self._tree.scrollTo(proxy_idx)
+            self._pending_select = ""
 
     def _choose_root(self) -> None:
         path = QFileDialog.getExistingDirectory(self, tr("Choose Directory"))
