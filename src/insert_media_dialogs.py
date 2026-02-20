@@ -1,4 +1,4 @@
-"""Dialoge zum Einfügen von Links und Bildern."""
+"""Dialogs for inserting links and images."""
 
 from __future__ import annotations
 
@@ -43,10 +43,10 @@ def _preview_group(preview_widget: QPlainTextEdit) -> QGroupBox:
     return grp
 
 
-# ── Link-Dialog ───────────────────────────────────────────────────────────────
+# ── Link dialog ───────────────────────────────────────────────────────────────
 
 class InsertLinkDialog(QDialog):
-    """Dialog zum Einfügen eines Markdown-Links."""
+    """Dialog for inserting a Markdown link."""
 
     def __init__(self, selected_text: str = "", parent=None) -> None:
         super().__init__(parent)
@@ -106,10 +106,10 @@ class InsertLinkDialog(QDialog):
         return f'[{text}]({url} "{title}")' if title else f"[{text}]({url})"
 
 
-# ── Bild-Dialog ───────────────────────────────────────────────────────────────
+# ── Image dialog ──────────────────────────────────────────────────────────────
 
 class InsertImageDialog(QDialog):
-    """Dialog zum Einfügen eines Markdown-Bildes."""
+    """Dialog for inserting a Markdown image."""
 
     _IMG_FILTER = (
         "Bilder (*.png *.jpg *.jpeg *.gif *.svg *.webp *.bmp *.ico)"

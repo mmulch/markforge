@@ -1,4 +1,4 @@
-"""PlantUML-Kodierung und URL-Generierung für den Server-Dienst."""
+"""PlantUML encoding and URL generation for the online rendering service."""
 
 from __future__ import annotations
 
@@ -57,10 +57,10 @@ def encode(text: str) -> str:
 
 
 def svg_url(text: str) -> str:
-    """Gibt die PlantUML-Server-URL für eine SVG-Ausgabe zurück."""
+    """Returns the PlantUML server URL for an SVG rendering."""
     return f"{PLANTUML_SERVER}/svg/{encode(text)}"
 
 
 def png_url(text: str) -> str:
-    """Gibt die PlantUML-Server-URL für eine PNG-Ausgabe zurück."""
+    """Returns the PlantUML server URL for a PNG rendering."""
     return f"{PLANTUML_SERVER}/png/{encode(text)}"

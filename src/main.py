@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Einstiegspunkt für den Markdown-Editor."""
+"""Entry point for the Markdown editor."""
 
 from __future__ import annotations
 

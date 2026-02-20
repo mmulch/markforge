@@ -1,4 +1,4 @@
-"""Dialog zum Erstellen und Einfügen von PlantUML-Diagrammen."""
+"""Dialog for creating and inserting PlantUML diagrams."""
 
 from __future__ import annotations
 
@@ -158,7 +158,7 @@ node "Datenbankserver" {
 
 
 class InsertPlantUMLDialog(QDialog):
-    """Erstellt ein PlantUML-Diagramm und fügt es als Fenced-Code-Block ein."""
+    """Creates a PlantUML diagram and inserts it as a fenced code block."""
 
     def __init__(self, parent=None) -> None:
         super().__init__(parent)
@@ -215,10 +215,10 @@ class InsertPlantUMLDialog(QDialog):
         name = self._type_combo.currentText()
         self._editor.setPlainText(_TEMPLATES.get(name, ""))
 
-    # ── Öffentliche API ───────────────────────────────────────────────────────
+    # ── Public API ────────────────────────────────────────────────────────────
 
     def get_markdown(self) -> str:
-        """Gibt den PlantUML-Code als Markdown-Fenced-Block zurück."""
+        """Returns the PlantUML code as a Markdown fenced block."""
         code = self._editor.toPlainText().strip()
         if not code:
             return ""

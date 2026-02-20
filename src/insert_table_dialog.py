@@ -1,4 +1,4 @@
-"""Dialog zum Konfigurieren und Einfügen einer Markdown-Tabelle."""
+"""Dialog for configuring and inserting a Markdown table."""
 
 from __future__ import annotations
 
@@ -19,7 +19,7 @@ from PyQt6.QtWidgets import (
     QVBoxLayout,
 )
 
-# Ausrichtungs-Optionen und ihre Markdown-Trennzeichen
+# Alignment options and their Markdown separator markers
 _ALIGNMENTS: list[tuple[str, str]] = [
     ("Links",    ":---"),
     ("Zentriert", ":---:"),
@@ -36,7 +36,7 @@ def _make_mono_font(size: int = 10) -> QFont:
 
 
 class InsertTableDialog(QDialog):
-    """Dialog zur Konfiguration einer einzufügenden Markdown-Tabelle."""
+    """Dialog for configuring a Markdown table to be inserted."""
 
     def __init__(self, parent=None) -> None:
         super().__init__(parent)
@@ -46,7 +46,7 @@ class InsertTableDialog(QDialog):
         self._sync_column_table()
         self._refresh_preview()
 
-    # ── UI-Aufbau ─────────────────────────────────────────────────────────────
+    # ── UI setup ──────────────────────────────────────────────────────────────
 
     def _build_ui(self) -> None:
         root = QVBoxLayout(self)
@@ -125,21 +125,21 @@ class InsertTableDialog(QDialog):
 
         return grp
 
-    # ── Logik ─────────────────────────────────────────────────────────────────
+    # ── Logic ─────────────────────────────────────────────────────────────────
 
     def _on_cols_changed(self) -> None:
         self._sync_column_table()
         self._refresh_preview()
 
     def _sync_column_table(self) -> None:
-        """Passt die Anzahl der Zeilen in der Spaltentabelle an."""
+        """Adjusts the number of rows in the column configuration table."""
         n    = self._cols_spin.value()
         prev = self._col_table.rowCount()
 
         self._col_table.blockSignals(True)
         self._col_table.setRowCount(n)
 
-        for i in range(prev, n):          # nur neue Zeilen befüllen
+        for i in range(prev, n):          # only fill newly added rows
             item = QTableWidgetItem(f"Spalte {i + 1}")
             self._col_table.setItem(i, 0, item)
 
@@ -151,7 +151,7 @@ class InsertTableDialog(QDialog):
         self._col_table.blockSignals(False)
 
     def _column_config(self) -> list[tuple[str, str]]:
-        """Gibt eine Liste von (Name, Ausrichtungslabel) zurück."""
+        """Returns a list of (name, alignment label) tuples for each column."""
         result = []
         for i in range(self._col_table.rowCount()):
             item  = self._col_table.item(i, 0)
@@ -166,16 +166,16 @@ class InsertTableDialog(QDialog):
         data_rows  = self._rows_spin.value()
         has_header = self._header_check.isChecked()
 
-        # Kopfzeile
+        # Header row
         if has_header:
             header = "| " + " | ".join(name for name, _ in cols) + " |"
         else:
             header = "| " + " | ".join(" " * max(len(name), 3) for name, _ in cols) + " |"
 
-        # Trennzeile mit Ausrichtungsmarkierungen
+        # Separator row with alignment markers
         sep = "| " + " | ".join(_ALIGN_MARKERS[align] for _, align in cols) + " |"
 
-        # Datenzeilen (leere Zellen, Breite = Spaltenname)
+        # Data rows (empty cells, width = column name length)
         empty_cells = [" " * max(len(name), 3) for name, _ in cols]
         data_row    = "| " + " | ".join(empty_cells) + " |"
 
@@ -185,8 +185,8 @@ class InsertTableDialog(QDialog):
     def _refresh_preview(self) -> None:
         self._preview.setPlainText(self._build_markdown())
 
-    # ── Öffentliche API ───────────────────────────────────────────────────────
+    # ── Public API ────────────────────────────────────────────────────────────
 
     def get_markdown(self) -> str:
-        """Gibt den fertigen Markdown-Tabellentext zurück."""
+        """Returns the finished Markdown table text."""
         return self._build_markdown()

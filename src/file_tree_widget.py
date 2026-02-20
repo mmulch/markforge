@@ -1,4 +1,4 @@
-"""Dateibaum-Panel für Markdown-relevante Dateien."""
+"""File tree panel for Markdown-related files."""
 
 from __future__ import annotations
 
@@ -30,11 +30,11 @@ _OPENABLE_EXTS   = {".md", ".markdown", ".txt"}
 # ── Proxy-Modell ──────────────────────────────────────────────────────────────
 
 class _HideEmptyDirsProxy(QSortFilterProxyModel):
-    """Blendet Verzeichnisse aus, die keine relevanten Dateien enthalten.
+    """Hides directories that contain no relevant files.
 
-    Das Wurzelverzeichnis wird immer akzeptiert, damit ``mapFromSource``
-    auch direkt nach ``setRootPath`` einen gültigen Proxy-Index liefert
-    (QFileSystemModel lädt Unterordner verzögert).
+    The root directory is always accepted so that ``mapFromSource``
+    returns a valid proxy index immediately after ``setRootPath``
+    (QFileSystemModel loads sub-directories lazily).
     """
 
     def __init__(self, parent=None) -> None:
@@ -51,20 +51,20 @@ class _HideEmptyDirsProxy(QSortFilterProxyModel):
         idx   = model.index(source_row, 0, source_parent)
 
         if model.isDir(idx):
-            # Wurzel immer akzeptieren → mapFromSource liefert stets gültigen Index
+            # Always accept root → mapFromSource always returns a valid index
             if os.path.normpath(model.filePath(idx)) == self._root:
                 return True
-            # Alle anderen Verzeichnisse: nur zeigen, wenn ein Nachkomme passt
+            # All other directories: only show if a descendant matches
             return False
 
-        # Dateien: QFileSystemModel hat bereits nach _NAME_FILTERS gefiltert
+        # Files: QFileSystemModel has already filtered by _NAME_FILTERS
         return True
 
 
 # ── Widget ────────────────────────────────────────────────────────────────────
 
 class FileTreeWidget(QWidget):
-    """Zeigt Dateien im Verzeichnis der aktuellen Datei, gefiltert nach Typ."""
+    """Shows files in the directory of the current file, filtered by type."""
 
     file_activated = pyqtSignal(str)
 
@@ -75,7 +75,7 @@ class FileTreeWidget(QWidget):
         self._root_dir = ""
         self._build_ui()
 
-    # ── UI-Aufbau ─────────────────────────────────────────────────────────────
+    # ── UI setup ──────────────────────────────────────────────────────────────
 
     def _build_ui(self) -> None:
         layout = QVBoxLayout(self)
@@ -115,7 +115,7 @@ class FileTreeWidget(QWidget):
         self._proxy = _HideEmptyDirsProxy()
         self._proxy.setSourceModel(self._fs_model)
 
-        # Nach jedem Ladeschritt: Filter neu auswerten + Root-Index sicherstellen
+        # Re-evaluate filter and ensure root index after each load step
         self._fs_model.directoryLoaded.connect(self._on_directory_loaded)
 
         self._tree = QTreeView()
@@ -131,10 +131,10 @@ class FileTreeWidget(QWidget):
 
         return self._tree
 
-    # ── Öffentliche API ───────────────────────────────────────────────────────
+    # ── Public API ────────────────────────────────────────────────────────────
 
     def set_root(self, path: str) -> None:
-        """Setzt das Stammverzeichnis; Elternverzeichnisse werden nie angezeigt."""
+        """Sets the root directory; parent directories are never shown."""
         directory = path if os.path.isdir(path) else os.path.dirname(os.path.abspath(path))
         self._root_dir = os.path.normpath(directory)
 
@@ -146,17 +146,17 @@ class FileTreeWidget(QWidget):
         self._dir_label.setText(label)
         self._dir_label.setToolTip(self._root_dir)
 
-    # ── Intern ────────────────────────────────────────────────────────────────
+    # ── Internal ──────────────────────────────────────────────────────────────
 
     def _apply_root_index(self) -> None:
-        """Setzt den Root-Index des Tree-Views auf den Proxy-Index des Wurzelverzeichnisses."""
+        """Sets the tree view root index to the proxy index of the root directory."""
         src_idx   = self._fs_model.index(self._root_dir)
         proxy_idx = self._proxy.mapFromSource(src_idx)
         self._tree.setRootIndex(proxy_idx)
 
     def _on_directory_loaded(self, loaded_path: str) -> None:
         self._proxy.invalidateFilter()
-        # Root-Index nach dem Laden erneut setzen (lazy-loading-Sicherung)
+        # Re-apply root index after loading (lazy-loading guard)
         if os.path.normpath(loaded_path) == self._root_dir:
             self._apply_root_index()
 

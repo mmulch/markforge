@@ -1,4 +1,4 @@
-"""Editor-Widget mit Zeilennummern und Markdown-Syntaxhervorhebung."""
+"""Editor widget with line numbers and Markdown syntax highlighting."""
 
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ from highlighter import MarkdownHighlighter
 
 
 class _LineNumberArea(QWidget):
-    """Schmaler Bereich links vom Editor für Zeilennummern."""
+    """Narrow gutter widget on the left side of the editor for line numbers."""
 
     def __init__(self, editor: EditorWidget) -> None:
         super().__init__(editor)
@@ -32,7 +32,7 @@ class _LineNumberArea(QWidget):
 
 
 class EditorWidget(QPlainTextEdit):
-    """Klartext-Editor mit Zeilennummern, Zeilenhervorhebung und Markdown-Highlighting."""
+    """Plain-text editor with line numbers, current-line highlight, and Markdown syntax highlighting."""
 
     _BG        = QColor("#1e1e1e")
     _FG        = QColor("#d4d4d4")
@@ -54,7 +54,7 @@ class EditorWidget(QPlainTextEdit):
         self._update_gutter_width(0)
         self._highlight_current_line()
 
-    # ── Erscheinungsbild ──────────────────────────────────────────────────────
+    # ── Appearance ────────────────────────────────────────────────────────────
 
     def _apply_theme(self) -> None:
         font = QFont("Monospace", 12)
@@ -68,13 +68,13 @@ class EditorWidget(QPlainTextEdit):
         pal.setColor(QPalette.ColorRole.Text, self._FG)
         self.setPalette(pal)
 
-    # ── Öffentliche API ───────────────────────────────────────────────────────
+    # ── Public API ────────────────────────────────────────────────────────────
 
     def set_word_wrap(self, enabled: bool) -> None:
         mode = QTextOption.WrapMode.WordWrap if enabled else QTextOption.WrapMode.NoWrap
         self.setWordWrapMode(mode)
 
-    # ── Zeilennummern ─────────────────────────────────────────────────────────
+    # ── Line numbers ──────────────────────────────────────────────────────────
 
     def line_number_area_width(self) -> int:
         digits = max(1, len(str(self.blockCount())))
@@ -127,7 +127,7 @@ class EditorWidget(QPlainTextEdit):
             bot   = top + round(self.blockBoundingRect(block).height())
             num  += 1
 
-    # ── Aktuelle Zeile hervorheben ────────────────────────────────────────────
+    # ── Current line highlight ────────────────────────────────────────────────
 
     def _highlight_current_line(self) -> None:
         if self.isReadOnly():

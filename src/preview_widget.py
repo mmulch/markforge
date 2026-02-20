@@ -1,4 +1,4 @@
-"""HTML-Vorschau für Markdown-Inhalte (GitHub-Dark-Theme)."""
+"""HTML preview for Markdown content (GitHub Dark theme)."""
 
 from __future__ import annotations
 
@@ -124,7 +124,7 @@ li { display: list-item; }
 li + li { margin-top: .25em; }
 li > p  { margin-top: 16px; }
 
-/* ── Aufgabenlisten ── */
+/* ── Task lists ── */
 li.task-item {
     list-style: none !important;
     margin-left: -1.4em;
@@ -153,7 +153,7 @@ li.task-item input[type="checkbox"]:checked {
     border-color: #1f6feb;
 }
 
-/* Häkchen via CSS-Pseudoelement */
+/* Checkmark via CSS pseudo-element */
 li.task-item input[type="checkbox"]:checked::after {
     content: "";
     position: absolute;
@@ -179,7 +179,7 @@ del {
     color: #6e7681;
 }
 
-/* Mathematische Formeln */
+/* Math formulas */
 .math-block {
     overflow-x: auto;
     margin: 20px 0;
@@ -187,7 +187,7 @@ del {
 }
 mjx-container { color: #c9d1d9; }
 
-/* PlantUML-Diagramme */
+/* PlantUML diagrams */
 .plantuml-diagram {
     text-align: center;
     margin: 20px 0;
@@ -216,7 +216,7 @@ except ImportError:
     _HAS_PLANTUML = False
 
 # ── MathJax ───────────────────────────────────────────────────────────────────
-# Wird in den <head> injiziert; MathJax erkennt \(...\) und \[...\]
+# Injected into <head>; MathJax recognises \(...\) and \[...\]
 _MATHJAX_SCRIPT = r"""<script>
 MathJax = {
   tex: {
@@ -230,20 +230,20 @@ MathJax = {
 </script>
 <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>"""
 
-# ── Math-Extraktion ───────────────────────────────────────────────────────────
-# Format 1: einzelnes $ auf eigener Zeile  →  Block-Formel
+# ── Math extraction ───────────────────────────────────────────────────────────
+# Format 1: single $ on its own line  →  display formula
 _MATH_SINGLE_BLOCK = _re.compile(r"^\$[ \t]*\n(.*?)\n\$[ \t]*$",
                                   _re.MULTILINE | _re.DOTALL)
-# Format 2: $$...$$  →  Block-Formel
+# Format 2: $$...$$  →  display formula
 _MATH_DOUBLE_BLOCK = _re.compile(r"\$\$(.*?)\$\$", _re.DOTALL)
-# Format 3: $...$   →  Inline-Formel  (kein $ oder Zeilenumbruch innen)
+# Format 3: $...$   →  inline formula  (no $ or newline inside)
 _MATH_INLINE       = _re.compile(r"(?<!\$)\$([^$\n]+?)\$(?!\$)")
 
-_MATH_PH = "XMTH{}XMTH"   # Platzhalter-Format
+_MATH_PH = "XMTH{}XMTH"   # placeholder format
 
 
 def _extract_math(text: str) -> tuple[str, dict]:
-    """Ersetzt Formeln durch Platzhalter, die Markdown nicht verändert."""
+    """Replaces math formulas with placeholders that Markdown will not modify."""
     store: dict[str, tuple[str, bool]] = {}
 
     def _save(content: str, display: bool) -> str:
@@ -258,7 +258,7 @@ def _extract_math(text: str) -> tuple[str, dict]:
 
 
 def _restore_math(html: str, store: dict) -> str:
-    """Setzt die extrahierten Formeln als MathJax-Delimiters wieder ein."""
+    """Restores the extracted formulas using MathJax delimiters."""
     for key, (content, display) in store.items():
         if display:
             html = html.replace(key,
@@ -268,14 +268,14 @@ def _restore_math(html: str, store: dict) -> str:
     return html
 
 
-# ── Textvorverarbeitung ───────────────────────────────────────────────────────
+# ── Text pre-processing ───────────────────────────────────────────────────────
 
-# Stellt sicher, dass Listen immer von einer Leerzeile eingeleitet werden,
-# damit Python-Markdown sie auch ohne explizite Leerzeile erkennt.
+# Ensures lists are always preceded by a blank line so Python-Markdown
+# recognises them even without an explicit blank line.
 _LIST_START  = _re.compile(r"(\S.*\n)([ \t]*[-*+] )", _re.MULTILINE)
 _OLIST_START = _re.compile(r"(\S.*\n)([ \t]*\d+\. )", _re.MULTILINE)
 
-# ~~text~~ → <del>text</del>  (nicht über Zeilengrenzen hinweg)
+# ~~text~~ → <del>text</del>  (single line only)
 _STRIKETHROUGH = _re.compile(r"~~([^~\n]+?)~~")
 
 
@@ -292,12 +292,12 @@ _HTML_TAG       = _re.compile(r"<[^>]+>")
 _AUTOLINK_URL   = _re.compile(r"https?://[^\s<>()\[\]\"']+")
 _AUTOLINK_EMAIL = _re.compile(r"[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}")
 
-# Zeichen, die am URL-Ende abgeschnitten werden
+# Characters stripped from the end of a matched URL
 _TRAIL_CHARS = ".,;:!?)"
 
 
 def _autolink_text(text: str) -> str:
-    """Verlinkt nackte URLs und E-Mail-Adressen in einem Text-Node."""
+    """Links bare URLs and e-mail addresses within a plain text node."""
     def _url_sub(m: _re.Match) -> str:
         url = m.group().rstrip(_TRAIL_CHARS)
         rest = m.group()[len(url):]
@@ -313,11 +313,11 @@ def _autolink_text(text: str) -> str:
 
 
 def _autolink(html: str) -> str:
-    """Wandelt nackte URLs/E-Mails in HTML-Links um, ohne bestehende Tags anzufassen."""
+    """Converts bare URLs/e-mails to HTML links without touching existing tags."""
     parts  = _HTML_TAG.split(html)
     tags   = _HTML_TAG.findall(html)
     result = []
-    skip   = 0   # Zähler für <a>/<code>/<pre>-Verschachtelungen
+    skip   = 0   # nesting counter for <a>/<code>/<pre>
 
     for i, text in enumerate(parts):
         if skip == 0 and text:
@@ -328,7 +328,7 @@ def _autolink(html: str) -> str:
             tag = tags[i]
             result.append(tag)
             tl  = tag.lower()
-            # Verschachtelungstiefe verwalten
+            # Track nesting depth
             if tl.startswith(("<a ", "<a>", "<code", "<pre")):
                 skip += 1
             elif tl in ("</a>", "</code>", "</pre>"):
@@ -337,7 +337,7 @@ def _autolink(html: str) -> str:
     return "".join(result)
 
 
-# Ersetzt [ ] / [x] in <li>-Elementen durch gestylte Checkboxen
+# Replaces [ ] / [x] in <li> elements with styled checkboxes
 _TASK_OPEN   = _re.compile(r"<li>\[ \]\s*")
 _TASK_CLOSED = _re.compile(r"<li>\[x\]\s*", _re.IGNORECASE)
 
@@ -348,10 +348,10 @@ _SPAN_CLOSE = "</span></li>"
 
 
 def _postprocess(html: str) -> str:
-    """Wandelt Markdown-Aufgabenlisten in gestylte Checkbox-Elemente um."""
+    """Converts Markdown task lists into styled checkbox elements."""
     html = _TASK_OPEN.sub(_CB_OPEN, html)
     html = _TASK_CLOSED.sub(_CB_CLOSED, html)
-    # Schließendes </li> nach Task-Items mit </span> ergänzen
+    # Replace closing </li> in task items with </span></li>
     html = _re.sub(r"(<li class=\"task-item[^\"]*\">.*?)</li>",
                    lambda m: m.group(1) + _SPAN_CLOSE,
                    html, flags=_re.DOTALL)
@@ -360,7 +360,7 @@ def _postprocess(html: str) -> str:
 
 # ── PlantUML-Extraktion ───────────────────────────────────────────────────────
 
-# Erkennt ```plantuml ... ``` Blöcke (Groß-/Kleinschreibung egal)
+# Matches ```plantuml ... ``` blocks (case-insensitive)
 _PLANTUML_FENCE = _re.compile(
     r"^```[ \t]*plantuml[ \t]*\n(.*?)\n```[ \t]*$",
     _re.MULTILINE | _re.DOTALL | _re.IGNORECASE,
@@ -369,7 +369,7 @@ _PUML_PH = "XPUML{}XPUML"   # Platzhalter-Format
 
 
 def _extract_plantuml(text: str) -> tuple[str, dict]:
-    """Ersetzt ```plantuml-Blöcke durch Platzhalter vor der Markdown-Verarbeitung."""
+    """Replaces ```plantuml blocks with placeholders before Markdown processing."""
     store: dict[str, str] = {}
     counter = [0]
 
@@ -384,7 +384,7 @@ def _extract_plantuml(text: str) -> tuple[str, dict]:
 
 
 def _restore_plantuml(html: str, store: dict) -> str:
-    """Ersetzt PlantUML-Platzhalter durch <img>-Tags mit Server-URLs."""
+    """Replaces PlantUML placeholders with <img> tags pointing to the server URL."""
     if not store:
         return html
     for key, uml_text in store.items():
@@ -406,11 +406,11 @@ def _restore_plantuml(html: str, store: dict) -> str:
 
 
 def _render(text: str) -> str:
-    """Wandelt Markdown-Text in ein vollständiges HTML-Dokument um."""
-    # PlantUML-Blöcke VOR allem anderen extrahieren
+    """Converts Markdown text into a complete HTML document."""
+    # Extract PlantUML blocks before everything else
     text, puml_store = _extract_plantuml(text)
-    # Formeln VOR der Markdown-Verarbeitung extrahieren, damit _  ^ etc.
-    # nicht als Kursiv / Hochstellen interpretiert werden.
+    # Extract math formulas before Markdown processing so that _ ^ etc.
+    # are not interpreted as italic / superscript.
     text, math_store = _extract_math(text)
 
     body = markdown.markdown(
@@ -437,9 +437,9 @@ _MARKDOWN_EXTS    = {".md", ".markdown", ".txt"}
 
 
 class _NavigationPage(QWebEnginePage):
-    """Leitet externe Links an den Systembrowser weiter.
+    """Redirects external links to the system browser.
 
-    Lokale Markdown-Dateien werden per Signal an den Editor weitergegeben.
+    Local Markdown files are forwarded to the editor via a signal.
     """
 
     open_file = pyqtSignal(str)
@@ -453,12 +453,12 @@ class _NavigationPage(QWebEnginePage):
         if nav_type == QWebEnginePage.NavigationType.NavigationTypeLinkClicked:
             scheme = url.scheme().lower()
 
-            # Externe URLs → Systembrowser
+            # External URLs → system browser
             if scheme in _EXTERNAL_SCHEMES:
                 QDesktopServices.openUrl(url)
                 return False
 
-            # Lokale Dateien auswerten
+            # Evaluate local files
             if url.isLocalFile():
                 path = url.toLocalFile()
                 ext  = os.path.splitext(path)[1].lower()
@@ -473,9 +473,9 @@ class _NavigationPage(QWebEnginePage):
 
 
 class PreviewWidget(QWidget):
-    """Zeigt gerendertes Markdown als HTML-Seite an."""
+    """Displays rendered Markdown as an HTML page."""
 
-    # Wird ausgelöst, wenn auf einen lokalen Markdown-Link geklickt wird
+    # Emitted when a local Markdown link is clicked
     open_file = pyqtSignal(str)
 
     def __init__(self) -> None:
@@ -489,8 +489,8 @@ class PreviewWidget(QWidget):
             self._page.open_file.connect(self.open_file)
             self._view.setPage(self._page)
             self._page.setBackgroundColor(QColor("#0d1117"))
-            # Erlaubt file://-Seiten das Laden externer https://-Ressourcen
-            # (z. B. PlantUML-Diagramme vom Server, MathJax-CDN)
+            # Allow file:// pages to load external https:// resources
+            # (e.g. PlantUML diagrams from the server, MathJax CDN)
             self._view.settings().setAttribute(
                 QWebEngineSettings.WebAttribute.LocalContentCanAccessRemoteUrls,
                 True,
@@ -505,13 +505,13 @@ class PreviewWidget(QWidget):
 
         layout.addWidget(self._view)
 
-    # ── Öffentliche API ───────────────────────────────────────────────────────
+    # ── Public API ────────────────────────────────────────────────────────────
 
     def set_markdown(self, text: str, base_url: QUrl | None = None) -> None:
-        """Rendert *text* als Markdown und aktualisiert die Vorschau.
+        """Renders *text* as Markdown and updates the preview.
 
-        *base_url* wird als Basis für relative Pfade (z. B. Bilder) verwendet.
-        Fehlt der Parameter, wird das aktuelle Arbeitsverzeichnis genutzt.
+        *base_url* is used as the base for resolving relative paths (e.g. images).
+        If omitted, the current working directory is used.
         """
         html = _render(text)
         if _HAS_WEBENGINE:
@@ -526,7 +526,7 @@ class PreviewWidget(QWidget):
         else:
             self._view.setHtml(html)  # type: ignore[attr-defined]
 
-    # ── Internes (nur WebEngine) ──────────────────────────────────────────────
+    # ── Internal (WebEngine only) ─────────────────────────────────────────────
 
     def _load_html(self, scroll_y: object) -> None:
         self._scroll_y = float(scroll_y) if isinstance(scroll_y, (int, float)) else 0.0

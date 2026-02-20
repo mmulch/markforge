@@ -1,4 +1,4 @@
-"""Hauptfenster des Markdown-Editors."""
+"""Main window of the Markdown editor."""
 
 from __future__ import annotations
 
@@ -44,7 +44,7 @@ class MainWindow(QMainWindow):
         self.resize(1280, 800)
         self._update_title()
 
-    # ── UI-Aufbau ─────────────────────────────────────────────────────────────
+    # ── UI setup ──────────────────────────────────────────────────────────────
 
     def _build_ui(self) -> None:
         # Innerer Splitter: Editor | Vorschau
@@ -55,7 +55,7 @@ class MainWindow(QMainWindow):
         self._splitter.addWidget(self._preview)
         self._splitter.setSizes([640, 640])
 
-        # Äußerer Splitter: Dateibaum | (Editor + Vorschau)
+        # Outer splitter: file tree | (editor + preview)
         self._outer_splitter = QSplitter(Qt.Orientation.Horizontal)
         self._file_tree = FileTreeWidget()
         self._file_tree.set_root(os.getcwd())
@@ -95,7 +95,7 @@ class MainWindow(QMainWindow):
         copy.triggered.connect(self._editor.copy)
         paste.triggered.connect(self._editor.paste)
 
-        # ── Einfügen ───────────────────────────────────────────────────────
+        # ── Insert ─────────────────────────────────────────────────────────
         m = mb.addMenu("&Einfügen")
         self._act_insert_link    = self._mk_action("&Link …",      "Ctrl+K",       m)
         self._act_insert_image   = self._mk_action("&Bild …",      "Ctrl+Shift+K", m)
@@ -139,7 +139,7 @@ class MainWindow(QMainWindow):
         sb.addPermanentWidget(self._lbl_words)
         sb.addPermanentWidget(self._lbl_pos)
 
-    # ── Hilfsmethoden ─────────────────────────────────────────────────────────
+    # ── Helpers ───────────────────────────────────────────────────────────────
 
     def _mk_action(
         self,
@@ -156,7 +156,7 @@ class MainWindow(QMainWindow):
         menu.addAction(act)
         return act
 
-    # ── Signalverbindungen ────────────────────────────────────────────────────
+    # ── Signal connections ────────────────────────────────────────────────────
 
     def _connect_signals(self) -> None:
         self._act_new.triggered.connect(self._new)
@@ -181,7 +181,7 @@ class MainWindow(QMainWindow):
         self._timer.setInterval(300)  # 300 ms Entprellung
         self._timer.timeout.connect(self._refresh_preview)
 
-    # ── Slots ─────────────────────────────────────────────────────────────────
+    # ── Slots / callbacks ─────────────────────────────────────────────────────
 
     def _on_change(self) -> None:
         self._modified = True
@@ -193,7 +193,7 @@ class MainWindow(QMainWindow):
         self._preview.set_markdown(self._editor.toPlainText(), self._doc_base_url())
 
     def _doc_base_url(self) -> QUrl:
-        """Basis-URL für die Vorschau: Verzeichnis der geöffneten Datei."""
+        """Base URL for the preview: directory of the currently open file."""
         if self._file:
             directory = os.path.dirname(os.path.abspath(self._file))
         else:
@@ -216,7 +216,7 @@ class MainWindow(QMainWindow):
         mod  = "*" if self._modified else ""
         self.setWindowTitle(f"{mod}{name} — Markdown-Editor")
 
-    # ── Datei-Operationen ─────────────────────────────────────────────────────
+    # ── File operations ───────────────────────────────────────────────────────
 
     def _new(self) -> None:
         if not self._maybe_save():
@@ -275,7 +275,7 @@ class MainWindow(QMainWindow):
         self.statusBar().showMessage("Gespeichert.", 3000)
 
     def _maybe_save(self) -> bool:
-        """Gibt True zurück, wenn der aktuelle Inhalt verworfen werden darf."""
+        """Returns True if the current content may be discarded."""
         if not self._modified:
             return True
         reply = QMessageBox.question(
@@ -291,7 +291,7 @@ class MainWindow(QMainWindow):
             return True
         return reply == QMessageBox.StandardButton.Discard
 
-    # ── Einstellungen ─────────────────────────────────────────────────────────
+    # ── Settings ──────────────────────────────────────────────────────────────
 
     def _restore_settings(self) -> None:
         if geo := self._settings.value("geometry"):
@@ -310,7 +310,7 @@ class MainWindow(QMainWindow):
         self._settings.setValue("outer_splitter", self._outer_splitter.sizes())
         event.accept()
 
-    # ── Einfügen ──────────────────────────────────────────────────────────────
+    # ── Insert actions ────────────────────────────────────────────────────────
 
     def _insert_link(self) -> None:
         selected = self._editor.textCursor().selectedText()
@@ -354,13 +354,13 @@ class MainWindow(QMainWindow):
         table_md = dlg.get_markdown()
         cursor   = self._editor.textCursor()
 
-        # Tabelle soll immer auf einer eigenen Zeile beginnen und enden
+        # Table should always start and end on its own line
         prefix = "\n" if cursor.columnNumber() > 0 else ""
         cursor.insertText(f"{prefix}{table_md}\n")
         self._editor.setTextCursor(cursor)
         self._editor.setFocus()
 
-    # ── Über ──────────────────────────────────────────────────────────────────
+    # ── About ─────────────────────────────────────────────────────────────────
 
     def _about(self) -> None:
         QMessageBox.about(

@@ -1,4 +1,4 @@
-"""Syntax-Highlighter für Markdown-Text (VS-Code-Dark+-Farbschema)."""
+"""Syntax highlighter for Markdown text (VS Code Dark+ colour scheme)."""
 
 from __future__ import annotations
 
@@ -40,7 +40,7 @@ _C = {
     "block":  _fmt("#9CDCFE", bg="#1a1a2e"),
 }
 
-# Regeln für einzelne Zeilen: (Muster, Format)
+# Single-line rules: (pattern, format)
 _RULES: list[tuple[QRegularExpression, QTextCharFormat]] = [
     (QRegularExpression(r"^# .+$"),                                  _C["h1"]),
     (QRegularExpression(r"^## .+$"),                                 _C["h2"]),
@@ -65,7 +65,7 @@ _STATE_CODE_BLOCK = 1
 
 
 class MarkdownHighlighter(QSyntaxHighlighter):
-    """Einfacher Markdown-Highlighter mit Unterstützung für Code-Blöcke."""
+    """Simple Markdown highlighter with fenced code block support."""
 
     def highlightBlock(self, text: str) -> None:  # type: ignore[override]
         prev = self.previousBlockState()
@@ -87,7 +87,7 @@ class MarkdownHighlighter(QSyntaxHighlighter):
 
         self.setCurrentBlockState(0)
 
-        # ── Inline-Regeln ─────────────────────────────────────────────────────
+        # ── Inline rules ──────────────────────────────────────────────────────
         for pattern, fmt in _RULES:
             it = pattern.globalMatch(text)
             while it.hasNext():
