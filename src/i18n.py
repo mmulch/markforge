@@ -12,6 +12,12 @@ _DE: dict[str, str] = {
     "&Save": "&Speichern",
     "Save &As …": "Speichern &unter …",
     "Export as PDF …": "Als PDF exportieren …",
+    # ── Splash screen ─────────────────────────────────────────────────────────
+    "Loading …": "Laden …",
+    "Initializing interface …": "Oberfläche wird geladen …",
+    "Ready": "Bereit",
+    # ── PDF import ────────────────────────────────────────────────────────────
+    "Importing PDF …": "PDF wird importiert …",
     "&Import PDF …": "&PDF importieren …",
     "Import PDF": "PDF importieren",
     "pymupdf4llm is not installed.\nInstall it with: pip install pymupdf4llm":

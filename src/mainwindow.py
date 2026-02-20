@@ -4,14 +4,16 @@ from __future__ import annotations
 
 import os
 
-from PyQt6.QtCore import QSettings, QTimer, Qt, QUrl
+from PyQt6.QtCore import QEventLoop, QSettings, QThread, QTimer, Qt, QUrl, pyqtSignal
 from PyQt6.QtGui import QAction, QKeySequence
 from PyQt6.QtWidgets import (
+    QApplication,
     QDialog,
     QFileDialog,
     QLabel,
     QMainWindow,
     QMessageBox,
+    QProgressDialog,
     QSplitter,
     QToolBar,
 )
@@ -26,6 +28,26 @@ from markdown_help_dialog import MarkdownHelpDialog
 from plantuml_help_dialog import PlantUMLHelpDialog
 from preview_widget import PreviewWidget
 from settings_dialog import SettingsDialog
+
+
+class _PdfWorker(QThread):
+    """Runs pymupdf4llm.to_markdown() in a background thread."""
+
+    finished = pyqtSignal(str)
+    failed   = pyqtSignal(str, bool)   # message, is_import_error
+
+    def __init__(self, path: str, parent=None) -> None:
+        super().__init__(parent)
+        self._path = path
+
+    def run(self) -> None:
+        try:
+            import pymupdf4llm
+            self.finished.emit(pymupdf4llm.to_markdown(self._path))
+        except ImportError:
+            self.failed.emit("", True)
+        except Exception as exc:
+            self.failed.emit(str(exc), False)
 
 
 class MainWindow(QMainWindow):
@@ -264,22 +286,63 @@ class MainWindow(QMainWindow):
         )
         if not path:
             return
-        try:
-            import pymupdf4llm  # lazy import, kein Pflicht-Abhängigkeitsfehler beim Start
-            md = pymupdf4llm.to_markdown(path)
-        except ImportError:
-            QMessageBox.critical(
-                self, tr("Error"),
-                tr("pymupdf4llm is not installed.\nInstall it with: pip install pymupdf4llm"),
-            )
+
+        # ── Progress dialog (indeterminate / marquee) ──────────────────────
+        progress = QProgressDialog(
+            tr("Importing PDF …"), tr("Cancel"), 0, 0, self
+        )
+        progress.setWindowTitle(tr("Import PDF"))
+        progress.setWindowModality(Qt.WindowModality.ApplicationModal)
+        progress.setMinimumDuration(0)
+        progress.setValue(0)
+
+        # ── Worker thread ──────────────────────────────────────────────────
+        worker = _PdfWorker(path, self)
+        loop   = QEventLoop()
+
+        _result:   list[str | None]         = [None]
+        _error:    list[tuple | None]        = [None]
+        _canceled: list[bool]               = [False]
+
+        def _done(md: str) -> None:
+            _result[0] = md
+            loop.quit()
+
+        def _fail(msg: str, is_import: bool) -> None:
+            _error[0] = (msg, is_import)
+            loop.quit()
+
+        def _cancel() -> None:
+            _canceled[0] = True
+            worker.terminate()
+            worker.wait()
+            loop.quit()
+
+        worker.finished.connect(_done)
+        worker.failed.connect(_fail)
+        progress.canceled.connect(_cancel)
+        worker.start()
+        loop.exec()
+        progress.close()
+
+        if _canceled[0]:
             return
-        except Exception as exc:
-            QMessageBox.critical(
-                self, tr("Error"),
-                tr("Could not import PDF:\n{exc}", exc=exc),
-            )
+
+        if _error[0] is not None:
+            msg, is_import = _error[0]
+            if is_import:
+                QMessageBox.critical(
+                    self, tr("Error"),
+                    tr("pymupdf4llm is not installed.\nInstall it with: pip install pymupdf4llm"),
+                )
+            else:
+                QMessageBox.critical(
+                    self, tr("Error"),
+                    tr("Could not import PDF:\n{exc}", exc=msg),
+                )
             return
-        self._editor.setPlainText(md)
+
+        self._editor.setPlainText(_result[0])
         self._file     = None
         self._modified = True
         self._update_title()
