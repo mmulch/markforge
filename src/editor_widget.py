@@ -15,6 +15,7 @@ from PyQt6.QtGui import (
 from PyQt6.QtWidgets import QPlainTextEdit, QTextEdit, QWidget
 
 from highlighter import MarkdownHighlighter
+from themes import EDITOR_THEMES
 
 
 class _LineNumberArea(QWidget):
@@ -36,7 +37,7 @@ class EditorWidget(QPlainTextEdit):
 
     def __init__(self) -> None:
         super().__init__()
-        self._dark = True
+        self._theme_name = "VS Code Dark"
         self._gutter = _LineNumberArea(self)
         self._highlighter = MarkdownHighlighter(self.document())
 
@@ -58,18 +59,12 @@ class EditorWidget(QPlainTextEdit):
         self.setTabStopDistance(40.0)
         self.setWordWrapMode(QTextOption.WrapMode.WordWrap)
 
-        if self._dark:
-            bg = QColor("#1e1e1e")
-            fg = QColor("#d4d4d4")
-            self._GUTTER_BG = QColor("#252526")
-            self._GUTTER_FG = QColor("#858585")
-            self._LINE_HL   = QColor("#2a2a2a")
-        else:
-            bg = QColor("#ffffff")
-            fg = QColor("#1e1e1e")
-            self._GUTTER_BG = QColor("#f0f0f0")
-            self._GUTTER_FG = QColor("#888888")
-            self._LINE_HL   = QColor("#e8f2ff")
+        theme = EDITOR_THEMES.get(self._theme_name, EDITOR_THEMES["VS Code Dark"])
+        bg = QColor(theme["bg"])
+        fg = QColor(theme["fg"])
+        self._GUTTER_BG = QColor(theme["gutter_bg"])
+        self._GUTTER_FG = QColor(theme["gutter_fg"])
+        self._LINE_HL   = QColor(theme["line_hl"])
 
         pal = self.palette()
         pal.setColor(QPalette.ColorRole.Base, bg)
@@ -82,12 +77,12 @@ class EditorWidget(QPlainTextEdit):
         mode = QTextOption.WrapMode.WordWrap if enabled else QTextOption.WrapMode.NoWrap
         self.setWordWrapMode(mode)
 
-    def set_theme(self, dark: bool) -> None:
-        if self._dark == dark:
+    def set_theme(self, theme_name: str) -> None:
+        if self._theme_name == theme_name:
             return
-        self._dark = dark
+        self._theme_name = theme_name
         self._apply_theme()
-        self._highlighter.set_theme(dark=dark)
+        self._highlighter.set_theme(theme_name)
         self._highlight_current_line()
         self._gutter.update()
 

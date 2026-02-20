@@ -1,9 +1,11 @@
-"""Syntax highlighter for Markdown text (dark and light colour schemes)."""
+"""Syntax highlighter for Markdown text (named colour themes)."""
 
 from __future__ import annotations
 
 from PyQt6.QtCore import QRegularExpression
 from PyQt6.QtGui import QColor, QFont, QSyntaxHighlighter, QTextCharFormat
+
+from themes import EDITOR_THEMES
 
 
 def _fmt(
@@ -24,42 +26,16 @@ def _fmt(
     return f
 
 
-def _make_colors(dark: bool) -> dict[str, QTextCharFormat]:
-    if dark:
-        return {
-            "h1":     _fmt("#569CD6", bold=True),
-            "h2":     _fmt("#4EC9B0", bold=True),
-            "h3":     _fmt("#9CDCFE", bold=True),
-            "bold":   _fmt("#DCDCAA", bold=True),
-            "italic": _fmt("#CE9178", italic=True),
-            "code":   _fmt("#CE9178", bg="#2a2a2a"),
-            "link":   _fmt("#4EC9B0"),
-            "image":  _fmt("#C586C0"),
-            "quote":  _fmt("#6A9955", italic=True),
-            "list":   _fmt("#DCDCAA"),
-            "hr":     _fmt("#555555"),
-            "fence":  _fmt("#555555"),
-            "block":  _fmt("#9CDCFE", bg="#1a1a2e"),
-        }
-    else:
-        return {
-            "h1":     _fmt("#0000CC", bold=True),
-            "h2":     _fmt("#007070", bold=True),
-            "h3":     _fmt("#0070C1", bold=True),
-            "bold":   _fmt("#795E26", bold=True),
-            "italic": _fmt("#A31515", italic=True),
-            "code":   _fmt("#A31515", bg="#f0f0f0"),
-            "link":   _fmt("#0563C1"),
-            "image":  _fmt("#811F3F"),
-            "quote":  _fmt("#008000", italic=True),
-            "list":   _fmt("#795E26"),
-            "hr":     _fmt("#999999"),
-            "fence":  _fmt("#999999"),
-            "block":  _fmt("#0070C1", bg="#f0f0f0"),
-        }
+def _make_colors(theme_name: str) -> dict[str, QTextCharFormat]:
+    theme = EDITOR_THEMES.get(theme_name, EDITOR_THEMES["VS Code Dark"])
+    syntax = theme["syntax"]
+    return {
+        key: _fmt(fg, bold=bold, italic=italic, bg=bg)
+        for key, (fg, bold, italic, bg) in syntax.items()
+    }
 
 
-# Patterns paired with color-map keys (compiled once, reused for both themes)
+# Patterns paired with color-map keys (compiled once, reused for all themes)
 _PATTERNS: list[tuple[QRegularExpression, str]] = [
     (QRegularExpression(r"^# .+$"),                                  "h1"),
     (QRegularExpression(r"^## .+$"),                                 "h2"),
@@ -88,11 +64,11 @@ class MarkdownHighlighter(QSyntaxHighlighter):
 
     def __init__(self, document) -> None:
         super().__init__(document)
-        self._colors = _make_colors(dark=True)
+        self._colors = _make_colors("VS Code Dark")
         self._rules = [(pat, self._colors[key]) for pat, key in _PATTERNS]
 
-    def set_theme(self, dark: bool) -> None:
-        self._colors = _make_colors(dark=dark)
+    def set_theme(self, theme_name: str) -> None:
+        self._colors = _make_colors(theme_name)
         self._rules = [(pat, self._colors[key]) for pat, key in _PATTERNS]
         self.rehighlight()
 

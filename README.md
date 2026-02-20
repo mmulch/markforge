@@ -18,6 +18,7 @@ A modern, feature-rich Markdown editor built with Python and PyQt6. Includes a l
 - **Insert dialogs** — guided dialogs for links, images, tables, and PlantUML diagrams
 - **PlantUML support** — embed diagrams rendered via the PlantUML online service
 - **Math formulas** — LaTeX notation rendered with MathJax
+- **PDF import** — import any PDF and convert it to Markdown automatically (headings, paragraphs, tables preserved)
 - **PDF export** — export the current document as a PDF
 - **Word count & cursor position** — always visible in the status bar
 - **Multilingual** — English and German (Deutsch) UI
@@ -32,6 +33,7 @@ A modern, feature-rich Markdown editor built with Python and PyQt6. Includes a l
 | Save | `Ctrl+S` |
 | Save As | `Ctrl+Shift+S` |
 | Export as PDF | `Ctrl+Shift+E` |
+| Import PDF | `Ctrl+Shift+I` |
 | Toggle file tree | `Ctrl+B` |
 | Toggle preview | `Ctrl+Shift+P` |
 | Insert link | `Ctrl+K` |
@@ -54,6 +56,8 @@ Python dependencies (installed automatically by CMake):
 | PyQt6-WebEngine | ≥ 6.4.0 |
 | markdown | ≥ 3.4.0 |
 | Pygments | ≥ 2.14.0 |
+| PyMuPDF | ≥ 1.23.0 |
+| pymupdf4llm | ≥ 0.3.4 |
 
 ---
 

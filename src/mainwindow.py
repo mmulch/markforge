@@ -71,8 +71,9 @@ class MainWindow(QMainWindow):
 
         # ── File ───────────────────────────────────────────────────────────
         m = mb.addMenu(tr("&File"))
-        self._act_new     = self._mk_action(tr("&New"),        QKeySequence.StandardKey.New,    m)
-        self._act_open    = self._mk_action(tr("&Open …"),     QKeySequence.StandardKey.Open,   m)
+        self._act_new        = self._mk_action(tr("&New"),           QKeySequence.StandardKey.New,    m)
+        self._act_open       = self._mk_action(tr("&Open …"),        QKeySequence.StandardKey.Open,   m)
+        self._act_import_pdf = self._mk_action(tr("&Import PDF …"),  "Ctrl+Shift+I",                  m)
         m.addSeparator()
         self._act_save    = self._mk_action(tr("&Save"),           QKeySequence.StandardKey.Save,   m)
         self._act_save_as = self._mk_action(tr("Save &As …"),      QKeySequence.StandardKey.SaveAs, m)
@@ -116,8 +117,6 @@ class MainWindow(QMainWindow):
         m.addSeparator()
         self._act_wrap = self._mk_action(tr("Word wrap"), None, m, checkable=True)
         self._act_wrap.setChecked(True)
-        self._act_light = self._mk_action(tr("Light preview"), None, m, checkable=True)
-        self._act_light_editor = self._mk_action(tr("Light editor"), None, m, checkable=True)
         m.addSeparator()
         settings_act = self._mk_action(tr("Settings …"), None, m)
         settings_act.triggered.connect(self._open_settings)
@@ -171,6 +170,7 @@ class MainWindow(QMainWindow):
     def _connect_signals(self) -> None:
         self._act_new.triggered.connect(self._new)
         self._act_open.triggered.connect(self._open)
+        self._act_import_pdf.triggered.connect(self._import_pdf)
         self._act_save.triggered.connect(self._save)
         self._act_save_as.triggered.connect(self._save_as)
         self._act_export_pdf.triggered.connect(self._export_pdf)
@@ -182,8 +182,6 @@ class MainWindow(QMainWindow):
         self._act_filetree.toggled.connect(self._file_tree.setVisible)
         self._act_preview.toggled.connect(self._preview.setVisible)
         self._act_wrap.toggled.connect(self._editor.set_word_wrap)
-        self._act_light.toggled.connect(self._set_preview_theme)
-        self._act_light_editor.toggled.connect(self._set_editor_theme)
         self._file_tree.file_activated.connect(self._load)
         self._preview.open_file.connect(self._load)
 
@@ -254,6 +252,38 @@ class MainWindow(QMainWindow):
         )
         if path:
             self._load(path)
+
+    def _import_pdf(self) -> None:
+        if not self._maybe_save():
+            return
+        path, _ = QFileDialog.getOpenFileName(
+            self,
+            tr("Import PDF"),
+            "",
+            tr("PDF files (*.pdf);;All files (*)"),
+        )
+        if not path:
+            return
+        try:
+            import pymupdf4llm  # lazy import, kein Pflicht-Abhängigkeitsfehler beim Start
+            md = pymupdf4llm.to_markdown(path)
+        except ImportError:
+            QMessageBox.critical(
+                self, tr("Error"),
+                tr("pymupdf4llm is not installed.\nInstall it with: pip install pymupdf4llm"),
+            )
+            return
+        except Exception as exc:
+            QMessageBox.critical(
+                self, tr("Error"),
+                tr("Could not import PDF:\n{exc}", exc=exc),
+            )
+            return
+        self._editor.setPlainText(md)
+        self._file     = None
+        self._modified = True
+        self._update_title()
+        self._refresh_preview()
 
     def _load(self, path: str) -> None:
         try:
@@ -349,16 +379,18 @@ class MainWindow(QMainWindow):
             self._splitter.setSizes([int(s) for s in sizes])
         if sizes := self._settings.value("outer_splitter"):
             self._outer_splitter.setSizes([int(s) for s in sizes])
-        light = self._settings.value("light_preview", False, type=bool)
-        self._act_light.setChecked(light)
-        self._preview.set_theme(dark=not light)
-        light_editor = self._settings.value("light_editor", False, type=bool)
-        self._act_light_editor.setChecked(light_editor)
-        self._editor.set_theme(dark=not light_editor)
+        self._apply_themes()
+
+    def _apply_themes(self) -> None:
+        editor_theme  = self._settings.value("editor_theme",  "VS Code Dark")
+        preview_theme = self._settings.value("preview_theme", "GitHub Dark")
+        self._editor.set_theme(editor_theme)
+        self._preview.set_theme(preview_theme)
 
     def _open_settings(self) -> None:
         dlg = SettingsDialog(self)
-        dlg.exec()
+        if dlg.exec() == QDialog.DialogCode.Accepted:
+            self._apply_themes()
 
     def closeEvent(self, event) -> None:  # type: ignore[override]
         if not self._maybe_save():
@@ -367,8 +399,6 @@ class MainWindow(QMainWindow):
         self._settings.setValue("geometry", self.saveGeometry())
         self._settings.setValue("splitter", self._splitter.sizes())
         self._settings.setValue("outer_splitter", self._outer_splitter.sizes())
-        self._settings.setValue("light_preview", self._act_light.isChecked())
-        self._settings.setValue("light_editor", self._act_light_editor.isChecked())
         event.accept()
 
     # ── Insert actions ────────────────────────────────────────────────────────
@@ -421,12 +451,6 @@ class MainWindow(QMainWindow):
         self._editor.setFocus()
 
     # ── Markdown help ─────────────────────────────────────────────────────────
-
-    def _set_preview_theme(self, light: bool) -> None:
-        self._preview.set_theme(dark=not light)
-
-    def _set_editor_theme(self, light: bool) -> None:
-        self._editor.set_theme(dark=not light)
 
     def _show_markdown_help(self) -> None:
         dlg = MarkdownHelpDialog(self)

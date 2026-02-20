@@ -12,6 +12,11 @@ _DE: dict[str, str] = {
     "&Save": "&Speichern",
     "Save &As …": "Speichern &unter …",
     "Export as PDF …": "Als PDF exportieren …",
+    "&Import PDF …": "&PDF importieren …",
+    "Import PDF": "PDF importieren",
+    "pymupdf4llm is not installed.\nInstall it with: pip install pymupdf4llm":
+        "pymupdf4llm ist nicht installiert.\nInstallieren mit: pip install pymupdf4llm",
+    "Could not import PDF:\n{exc}": "PDF konnte nicht importiert werden:\n{exc}",
     "&Quit": "&Beenden",
     "&Edit": "&Bearbeiten",
     "&Undo": "&Rückgängig",
@@ -143,6 +148,10 @@ _DE: dict[str, str] = {
     "Language:": "Sprache:",
     "Restart required to apply language changes.":
         "Neustart erforderlich, um Sprachänderungen anzuwenden.",
+    "Editor theme:": "Editor-Theme:",
+    "Preview theme:": "Vorschau-Theme:",
+    "App theme:": "App-Theme:",
+    "App theme requires restart.": "App-Theme erfordert einen Neustart.",
 }
 
 

@@ -10,6 +10,7 @@ from PyQt6.QtWidgets import QApplication
 
 import i18n
 from mainwindow import MainWindow
+from themes import apply_app_theme
 
 
 def main() -> int:
@@ -21,6 +22,11 @@ def main() -> int:
     app.setOrganizationName("MarkdownEditor")
 
     i18n.setup(QSettings("Markforge", "Markforge").value("language", "en"))
+
+    apply_app_theme(
+        QSettings("MarkdownEditor", "MarkdownEditor").value("app_theme", "System"),
+        app,
+    )
 
     window = MainWindow()
     window.show()
