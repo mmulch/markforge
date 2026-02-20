@@ -204,6 +204,13 @@ _DE: dict[str, str] = {
         "Versuche erneut zu speichern und 'Neuer Branch' zu wählen.",
     "Commit message:": "Commit-Nachricht:",
     "Username:": "Benutzername:",
+    # ── Proxy ─────────────────────────────────────────────────────────────────
+    "HTTP Proxy": "HTTP-Proxy",
+    "Proxy URL:": "Proxy-URL:",
+    "Proxy username:": "Proxy-Benutzername:",
+    "Proxy password:": "Proxy-Passwort:",
+    "Leave empty to use system proxy settings.":
+        "Leer lassen, um die Systemproxy-Einstellungen zu verwenden.",
 }
 
 

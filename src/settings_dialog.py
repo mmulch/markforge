@@ -147,6 +147,33 @@ class SettingsDialog(QDialog):
         self._git_auth_combo.currentIndexChanged.connect(self._on_auth_changed)
         self._on_auth_changed()
 
+        # ── HTTP Proxy ────────────────────────────────────────────────────────
+        proxy_grp = QGroupBox(tr("HTTP Proxy"))
+        proxy_form = QFormLayout(proxy_grp)
+
+        self._proxy_url_edit = QLineEdit()
+        self._proxy_url_edit.setPlaceholderText("http://proxy.company.com:8080")
+        proxy_form.addRow(tr("Proxy URL:"), self._proxy_url_edit)
+
+        self._proxy_user_edit = QLineEdit()
+        self._proxy_user_edit.setPlaceholderText("domain\\username")
+        proxy_form.addRow(tr("Proxy username:"), self._proxy_user_edit)
+
+        self._proxy_pass_edit = QLineEdit()
+        self._proxy_pass_edit.setEchoMode(QLineEdit.EchoMode.Password)
+        proxy_form.addRow(tr("Proxy password:"), self._proxy_pass_edit)
+
+        proxy_hint = QLabel(tr("Leave empty to use system proxy settings."))
+        proxy_hint.setStyleSheet("color: #888; font-size: 12px;")
+        proxy_form.addRow(proxy_hint)
+
+        s2 = QSettings("MarkdownEditor", "MarkdownEditor")
+        self._proxy_url_edit.setText(s2.value("proxy/url",      ""))
+        self._proxy_user_edit.setText(s2.value("proxy/username", ""))
+        self._proxy_pass_edit.setText(s2.value("proxy/password", ""))
+
+        root.addWidget(proxy_grp)
+
         # ── Buttons ───────────────────────────────────────────────────────────
         btns = QDialogButtonBox(
             QDialogButtonBox.StandardButton.Ok
@@ -185,5 +212,10 @@ class SettingsDialog(QDialog):
         theme_settings.setValue("git/https_token",    self._git_token_edit.text())
         theme_settings.setValue("git/ssh_key_path",   self._git_ssh_key_edit.text())
         theme_settings.setValue("git/ssh_passphrase", self._git_passphrase_edit.text())
+
+        # Proxy
+        theme_settings.setValue("proxy/url",      self._proxy_url_edit.text().strip())
+        theme_settings.setValue("proxy/username", self._proxy_user_edit.text().strip())
+        theme_settings.setValue("proxy/password", self._proxy_pass_edit.text())
 
         self.accept()

@@ -204,6 +204,33 @@ def _https_headers(settings, platform: str) -> dict[str, str]:
     return headers
 
 
+def _apply_proxy(settings) -> None:
+    """Install a urllib opener with the configured proxy (if any).
+
+    If a proxy URL is set in settings, that proxy is used for all subsequent
+    urllib.request.urlopen() calls in this process.  If a username is also
+    provided, ProxyBasicAuthHandler supplies the credentials automatically.
+
+    If no proxy URL is configured, the system's default proxy settings are
+    used (Windows registry / environment variables).
+    """
+    proxy_url  = (settings.value("proxy/url",      "") or "").strip()
+    proxy_user = (settings.value("proxy/username", "") or "").strip()
+    proxy_pass = (settings.value("proxy/password", "") or "").strip()
+
+    if not proxy_url:
+        return   # keep default urllib behaviour (reads system/env proxies)
+
+    handlers: list = [urllib.request.ProxyHandler({"http": proxy_url, "https": proxy_url})]
+
+    if proxy_user:
+        pwd_mgr = urllib.request.HTTPPasswordMgrWithDefaultRealm()
+        pwd_mgr.add_password(None, proxy_url, proxy_user, proxy_pass)
+        handlers.append(urllib.request.ProxyBasicAuthHandler(pwd_mgr))
+
+    urllib.request.install_opener(urllib.request.build_opener(*handlers))
+
+
 def _http_get(url: str, headers: dict) -> bytes:
     req = urllib.request.Request(url, headers=headers)
     try:
@@ -523,6 +550,7 @@ def clone_repo(info: GitFileInfo, settings, progress_cb) -> str:
 
 def _clone_via_api(info: GitFileInfo, settings, progress_cb) -> str:
     """Download just the target file via the platform REST API."""
+    _apply_proxy(settings)
     progress_cb(20, "Downloading file …")
     content, sha = _download_file(info, settings)
     info.file_sha = sha
@@ -603,6 +631,7 @@ def commit_and_push(info: GitFileInfo, spec: CommitSpec, settings, progress_cb) 
 
 
 def _push_via_api(info: GitFileInfo, spec: CommitSpec, settings, progress_cb) -> None:
+    _apply_proxy(settings)
     progress_cb(20, "Pushing changes …")
     with open(info.local_file_path, "rb") as f:
         new_content = f.read()
