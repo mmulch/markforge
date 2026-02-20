@@ -1,0 +1,11 @@
+Package: markforge
+Version: @VERSION@
+Section: editors
+Priority: optional
+Architecture: all
+Depends: python3 (>= 3.8), python3-pyqt6 (>= 6.4), python3-pyqt6.qtwebengine, python3-markdown, python3-pygments
+Maintainer: Marcel Mulch <marcel@mulch-online.de>
+Description: Modern Markdown editor with live preview
+ A PyQt6-based Markdown editor with live side-by-side preview,
+ syntax highlighting, PlantUML diagram support, math formulas,
+ and PDF export.
