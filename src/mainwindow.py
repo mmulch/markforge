@@ -22,6 +22,8 @@ from i18n import tr
 from insert_media_dialogs import InsertImageDialog, InsertLinkDialog
 from insert_plantuml_dialog import InsertPlantUMLDialog
 from insert_table_dialog import InsertTableDialog
+from markdown_help_dialog import MarkdownHelpDialog
+from plantuml_help_dialog import PlantUMLHelpDialog
 from preview_widget import PreviewWidget
 from settings_dialog import SettingsDialog
 
@@ -72,8 +74,9 @@ class MainWindow(QMainWindow):
         self._act_new     = self._mk_action(tr("&New"),        QKeySequence.StandardKey.New,    m)
         self._act_open    = self._mk_action(tr("&Open …"),     QKeySequence.StandardKey.Open,   m)
         m.addSeparator()
-        self._act_save    = self._mk_action(tr("&Save"),       QKeySequence.StandardKey.Save,   m)
-        self._act_save_as = self._mk_action(tr("Save &As …"),  QKeySequence.StandardKey.SaveAs, m)
+        self._act_save    = self._mk_action(tr("&Save"),           QKeySequence.StandardKey.Save,   m)
+        self._act_save_as = self._mk_action(tr("Save &As …"),      QKeySequence.StandardKey.SaveAs, m)
+        self._act_export_pdf = self._mk_action(tr("Export as PDF …"), "Ctrl+Shift+E", m)
         m.addSeparator()
         quit_act = self._mk_action(tr("&Quit"), QKeySequence.StandardKey.Quit, m)
         quit_act.triggered.connect(self.close)
@@ -119,6 +122,11 @@ class MainWindow(QMainWindow):
 
         # ── Help ───────────────────────────────────────────────────────────
         m = mb.addMenu(tr("&Help"))
+        markdown_help = self._mk_action(tr("&Markdown …"), None, m)
+        markdown_help.triggered.connect(self._show_markdown_help)
+        plantuml_help = self._mk_action(tr("&PlantUML …"), None, m)
+        plantuml_help.triggered.connect(self._show_plantuml_help)
+        m.addSeparator()
         about = self._mk_action(tr("&About …"), None, m)
         about.triggered.connect(self._about)
 
@@ -163,6 +171,8 @@ class MainWindow(QMainWindow):
         self._act_open.triggered.connect(self._open)
         self._act_save.triggered.connect(self._save)
         self._act_save_as.triggered.connect(self._save_as)
+        self._act_export_pdf.triggered.connect(self._export_pdf)
+        self._preview.pdf_saved.connect(self._on_pdf_saved)
         self._act_insert_link.triggered.connect(self._insert_link)
         self._act_insert_image.triggered.connect(self._insert_image)
         self._act_insert_plantuml.triggered.connect(self._insert_plantuml)
@@ -216,7 +226,7 @@ class MainWindow(QMainWindow):
     def _update_title(self) -> None:
         name = os.path.basename(self._file) if self._file else tr("Untitled")
         mod  = "*" if self._modified else ""
-        self.setWindowTitle(f"{mod}{name} — Markdown Editor")
+        self.setWindowTitle(f"{mod}{name} — MarkForge")
 
     # ── File operations ───────────────────────────────────────────────────────
 
@@ -285,6 +295,29 @@ class MainWindow(QMainWindow):
         self._modified = False
         self._update_title()
         self.statusBar().showMessage(tr("Saved."), 3000)
+
+    def _export_pdf(self) -> None:
+        default = ""
+        if self._file:
+            import os as _os
+            base = _os.path.splitext(self._file)[0]
+            default = base + ".pdf"
+        path, _ = QFileDialog.getSaveFileName(
+            self,
+            tr("Export as PDF"),
+            default,
+            tr("PDF files (*.pdf);;All files (*)"),
+        )
+        if path:
+            self._preview.export_to_pdf(path)
+
+    def _on_pdf_saved(self, path: str, success: bool) -> None:
+        if success:
+            self.statusBar().showMessage(tr("PDF saved: {path}", path=path), 5000)
+        else:
+            QMessageBox.critical(
+                self, tr("Error"), tr("Could not save PDF:\n{path}", path=path)
+            )
 
     def _maybe_save(self) -> bool:
         """Returns True if the current content may be discarded."""
@@ -375,16 +408,29 @@ class MainWindow(QMainWindow):
         self._editor.setTextCursor(cursor)
         self._editor.setFocus()
 
+    # ── Markdown help ─────────────────────────────────────────────────────────
+
+    def _show_markdown_help(self) -> None:
+        dlg = MarkdownHelpDialog(self)
+        dlg.exec()
+
+    def _show_plantuml_help(self) -> None:
+        dlg = PlantUMLHelpDialog(self)
+        dlg.exec()
+
     # ── About ─────────────────────────────────────────────────────────────────
 
     def _about(self) -> None:
         QMessageBox.about(
             self,
-            tr("About Markdown Editor"),
+            tr("About MarkForge"),
             tr(
-                "<h3>Markdown Editor 1.0</h3>"
+                "<h3>MarkForge 1.0</h3>"
                 "<p>Created with <b>Python 3</b> and <b>PyQt6</b>.</p>"
                 "<p>Supported extensions:<br>"
                 "Tables · Fenced Code Blocks · Footnotes · Abbreviations · ToC</p>"
+                "<hr>"
+                "<p>Copyright &copy; Marcel Mulch</p>"
+                "<p>License: GNU General Public License 3.0</p>"
             ),
         )

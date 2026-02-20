@@ -1,5 +1,12 @@
-# CMake Build-Verzeichnis
-build/
+# CMake / PyInstaller Build-Ausgabe
+build/CMakeFiles/
+build/CMakeCache.txt
+build/cmake_install.cmake
+build/Makefile
+build/markdown-editor
+build/venv/
+build/windows/Output/
+build/deb/markforge_*/
 
 # Python Bytecode
 __pycache__/

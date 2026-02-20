@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Markforge
+Comment=Markdown editor with live preview
+Exec=markforge %F
+Icon=markforge
+Terminal=false
+Type=Application
+Categories=Office;TextEditor;
+MimeType=text/markdown;text/x-markdown;
+Keywords=markdown;editor;preview;
+StartupNotify=true

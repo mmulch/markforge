@@ -1,0 +1,8 @@
+markforge (1.0.0) stable; urgency=low
+
+  * Initial release.
+  * PyQt6 Markdown editor with live QtWebEngine preview.
+  * Syntax highlighting via Pygments.
+  * DE/EN language toggle.
+
+ -- Markforge Contributors <markforge@example.com>  Thu, 20 Feb 2025 00:00:00 +0000

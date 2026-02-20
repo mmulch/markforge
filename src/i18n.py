@@ -11,6 +11,7 @@ _DE: dict[str, str] = {
     "&Open …": "&Öffnen …",
     "&Save": "&Speichern",
     "Save &As …": "Speichern &unter …",
+    "Export as PDF …": "Als PDF exportieren …",
     "&Quit": "&Beenden",
     "&Edit": "&Bearbeiten",
     "&Undo": "&Rückgängig",
@@ -29,6 +30,7 @@ _DE: dict[str, str] = {
     "Word wrap": "Zeilenumbruch",
     "Settings …": "Einstellungen …",
     "&Help": "&Hilfe",
+    "&Markdown …": "&Markdown …",
     "&About …": "&Über …",
     # ── Toolbar ───────────────────────────────────────────────────────────────
     "Toolbar": "Werkzeugleiste",
@@ -45,6 +47,10 @@ _DE: dict[str, str] = {
     "Markdown files (*.md);;Text files (*.txt);;All files (*)":
         "Markdown-Dateien (*.md);;Textdateien (*.txt);;Alle Dateien (*)",
     # ── Status / messages ─────────────────────────────────────────────────────
+    "Export as PDF": "Als PDF exportieren",
+    "PDF files (*.pdf);;All files (*)": "PDF-Dateien (*.pdf);;Alle Dateien (*)",
+    "PDF saved: {path}": "PDF gespeichert: {path}",
+    "Could not save PDF:\n{path}": "PDF konnte nicht gespeichert werden:\n{path}",
     "Saved.": "Gespeichert.",
     "Unsaved Changes": "Ungespeicherte Änderungen",
     "Do you want to save the changes?": "Möchten Sie die Änderungen speichern?",
@@ -52,15 +58,21 @@ _DE: dict[str, str] = {
     "Could not open file:\n{exc}": "Datei konnte nicht geöffnet werden:\n{exc}",
     "Could not save file:\n{exc}": "Datei konnte nicht gespeichert werden:\n{exc}",
     # ── About ─────────────────────────────────────────────────────────────────
-    "About Markdown Editor": "Über Markdown-Editor",
-    "<h3>Markdown Editor 1.0</h3>"
+    "About MarkForge": "Über MarkForge",
+    "<h3>MarkForge 1.0</h3>"
     "<p>Created with <b>Python 3</b> and <b>PyQt6</b>.</p>"
     "<p>Supported extensions:<br>"
-    "Tables · Fenced Code Blocks · Footnotes · Abbreviations · ToC</p>":
+    "Tables · Fenced Code Blocks · Footnotes · Abbreviations · ToC</p>"
+    "<hr>"
+    "<p>Copyright &copy; Marcel Mulch</p>"
+    "<p>License: GNU General Public License 3.0</p>":
         "<h3>Markdown-Editor 1.0</h3>"
         "<p>Erstellt mit <b>Python 3</b> und <b>PyQt6</b>.</p>"
         "<p>Unterstützte Erweiterungen:<br>"
-        "Tables · Fenced Code Blocks · Footnotes · Abbreviations · ToC</p>",
+        "Tables · Fenced Code Blocks · Footnotes · Abbreviations · ToC</p>"
+        "<hr>"
+        "<p>Copyright &copy; Marcel Mulch</p>"
+        "<p>Lizenz: GNU General Public License 3.0</p>",
     # ── Table dialog ──────────────────────────────────────────────────────────
     "Insert Table": "Tabelle einfügen",
     "Table Structure": "Tabellenstruktur",

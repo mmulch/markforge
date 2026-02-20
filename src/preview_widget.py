@@ -5,8 +5,8 @@ from __future__ import annotations
 import os
 
 import markdown
-from PyQt6.QtCore import QUrl, pyqtSignal
-from PyQt6.QtGui import QColor, QDesktopServices
+from PyQt6.QtCore import QMarginsF, QUrl, pyqtSignal
+from PyQt6.QtGui import QColor, QDesktopServices, QPageLayout, QPageSize
 from PyQt6.QtWidgets import QVBoxLayout, QWidget
 
 try:
@@ -436,6 +436,35 @@ _BROWSER_EXTS     = {".html", ".htm", ".pdf"}
 _MARKDOWN_EXTS    = {".md", ".markdown", ".txt"}
 
 
+_PDF_CSS_INJECT = """
+(function() {
+    var s = document.createElement('style');
+    s.id = '__pdf_override__';
+    s.textContent =
+        'body{background:#fff!important;color:#1a1a1a!important}' +
+        'h1,h2,h3,h4,h5,h6{color:#1a1a1a!important;border-bottom-color:#ddd!important}' +
+        'code,kbd,samp{background:#f0f0f0!important;color:#1a1a1a!important}' +
+        'pre{background:#f6f8fa!important;border-color:#ddd!important}' +
+        'pre code{color:#1a1a1a!important;background:transparent!important}' +
+        'blockquote{color:#555!important;border-left-color:#ccc!important}' +
+        'a{color:#0366d6!important}' +
+        'th,td{border-color:#ddd!important}' +
+        'thead tr{background:#f6f8fa!important}' +
+        'tbody tr:nth-child(odd){background:#fff!important}' +
+        'tbody tr:nth-child(even){background:#f6f8fa!important}' +
+        'hr{background:#ddd!important}';
+    document.head.appendChild(s);
+})();
+"""
+
+_PDF_CSS_REMOVE = """
+(function() {
+    var s = document.getElementById('__pdf_override__');
+    if (s) s.parentNode.removeChild(s);
+})();
+"""
+
+
 class _NavigationPage(QWebEnginePage):
     """Redirects external links to the system browser.
 
@@ -477,6 +506,8 @@ class PreviewWidget(QWidget):
 
     # Emitted when a local Markdown link is clicked
     open_file = pyqtSignal(str)
+    # Emitted when printToPdf finishes: (file_path, success)
+    pdf_saved = pyqtSignal(str, bool)
 
     def __init__(self) -> None:
         super().__init__()
@@ -487,6 +518,8 @@ class PreviewWidget(QWidget):
             self._view: QWebEngineView = QWebEngineView()
             self._page = _NavigationPage(self._view)
             self._page.open_file.connect(self.open_file)
+            self._page.pdfPrintingFinished.connect(self._on_pdf_printing_finished)
+            self._pdf_export_path = ""
             self._view.setPage(self._page)
             self._page.setBackgroundColor(QColor("#0d1117"))
             # Allow file:// pages to load external https:// resources
@@ -526,7 +559,31 @@ class PreviewWidget(QWidget):
         else:
             self._view.setHtml(html)  # type: ignore[attr-defined]
 
+    def export_to_pdf(self, path: str) -> None:
+        """Renders the current preview page as a PDF file at *path*.
+
+        Temporarily injects a light CSS override so the PDF has a white
+        background instead of the dark editor theme.
+        """
+        if not _HAS_WEBENGINE:
+            return
+        self._pdf_export_path = path
+        self._page.runJavaScript(_PDF_CSS_INJECT, self._after_css_inject)
+
     # ── Internal (WebEngine only) ─────────────────────────────────────────────
+
+    def _after_css_inject(self, _result: object) -> None:
+        layout = QPageLayout(
+            QPageSize(QPageSize.PageSizeId.A4),
+            QPageLayout.Orientation.Portrait,
+            QMarginsF(15, 15, 15, 15),
+            QPageLayout.Unit.Millimeter,
+        )
+        self._page.printToPdf(self._pdf_export_path, layout)
+
+    def _on_pdf_printing_finished(self, path: str, success: bool) -> None:
+        self._page.runJavaScript(_PDF_CSS_REMOVE)
+        self.pdf_saved.emit(path, success)
 
     def _load_html(self, scroll_y: object) -> None:
         self._scroll_y = float(scroll_y) if isinstance(scroll_y, (int, float)) else 0.0
