@@ -1,11 +1,14 @@
-; Inno Setup script for Markforge
+; Inno Setup script for MarkForge
 ; Build from project root: ISCC.exe build\windows\markforge.iss
+; Pass version via: ISCC.exe /DAppVersion=1.3.6 build\windows\markforge.iss
 
-#define AppName    "Markforge"
-#define AppVersion "1.0.0"
-#define AppPublisher "Markforge Contributors"
-#define AppURL     "https://github.com/your-org/markforge"
-#define AppExeName "Markforge.exe"
+#define AppName    "MarkForge"
+#ifndef AppVersion
+  #define AppVersion "1.3.6"
+#endif
+#define AppPublisher "MarkForge Contributors"
+#define AppURL     "https://github.com/mmulch/markforge"
+#define AppExeName "MarkForge.exe"
 
 [Setup]
 AppId={{E4A7C2D1-83F5-4B2A-9C6E-1D0F7A3B8E5C}
@@ -20,7 +23,7 @@ DefaultGroupName={#AppName}
 AllowNoIcons=yes
 LicenseFile=..\..\LICENSE
 OutputDir=Output
-OutputBaseFilename=Markforge-Setup
+OutputBaseFilename=MarkForge-Setup-{#AppVersion}
 SetupIconFile=..\..\assets\markforge.ico
 Compression=lzma2/ultra64
 SolidCompression=yes
@@ -37,7 +40,7 @@ Name: "german";  MessagesFile: "compiler:Languages\German.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "..\..\dist\Markforge\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\..\dist\MarkForge\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
 Name: "{group}\{#AppName}";        Filename: "{app}\{#AppExeName}"; IconFilename: "{app}\{#AppExeName}"
