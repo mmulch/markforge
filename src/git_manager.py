@@ -1,9 +1,11 @@
 """Git integration logic for MarkForge – no Qt imports.
 
-Uses *dulwich* (pure-Python git implementation) so no git executable is
-required on the host system.  HTTPS auth embeds credentials in the URL;
-SSH auth uses paramiko (pure Python) if installed, otherwise falls back
-to the system ssh client.
+HTTPS operations use each platform's REST API directly (GitHub Contents API,
+Bitbucket Cloud src API, Bitbucket Server browse API).  This is more reliable
+than dulwich's HTTP transport, which can fail on Windows due to TLS/proxy
+differences with corporate Bitbucket Server instances.
+
+SSH operations still use dulwich + paramiko (pure Python, no git executable).
 """
 
 from __future__ import annotations
@@ -16,7 +18,7 @@ import shutil
 import tempfile
 import urllib.error
 import urllib.request
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from urllib.parse import urlparse, parse_qs
 
 
@@ -33,6 +35,9 @@ class GitFileInfo:
     base_url:        str   # scheme + host, e.g. "https://bitbucket.mycompany.com"
     local_repo_path: str = ""
     local_file_path: str = ""
+    # Stored during download; required for some platform commit APIs:
+    # GitHub/GHE → blob SHA; Bitbucket Server → latest commit ID
+    file_sha:        str = ""
 
 
 @dataclass
@@ -183,6 +188,208 @@ def _ssh_clone_url(info: GitFileInfo) -> str:
         return f"git@{host}:{info.owner}/{info.repo}.git"
 
 
+# ── HTTPS REST API helpers ─────────────────────────────────────────────────────
+
+def _https_headers(settings, platform: str) -> dict[str, str]:
+    """Return request headers with Authorization for HTTPS REST API calls."""
+    user  = settings.value("git/https_username", "")
+    token = settings.value("git/https_token",    "")
+    headers: dict[str, str] = {"User-Agent": "MarkForge", "Accept": "application/json"}
+    if user and token:
+        if platform in ("github", "github_enterprise"):
+            headers["Authorization"] = f"token {token}"
+        else:
+            creds = base64.b64encode(f"{user}:{token}".encode()).decode()
+            headers["Authorization"] = f"Basic {creds}"
+    return headers
+
+
+def _http_get(url: str, headers: dict) -> bytes:
+    req = urllib.request.Request(url, headers=headers)
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            return resp.read()
+    except urllib.error.HTTPError as exc:
+        body = exc.read().decode("utf-8", errors="replace")
+        if exc.code == 401:
+            raise RuntimeError("Authentication failed (HTTP 401). Check credentials.") from exc
+        raise RuntimeError(f"HTTP {exc.code}: {exc.reason}") from exc
+
+
+def _http_json(url: str, headers: dict, payload: dict, method: str = "POST") -> bytes:
+    data = json.dumps(payload).encode()
+    h = {**headers, "Content-Type": "application/json"}
+    req = urllib.request.Request(url, data=data, headers=h, method=method)
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            return resp.read()
+    except urllib.error.HTTPError as exc:
+        body = exc.read().decode("utf-8", errors="replace")
+        if exc.code == 401:
+            raise RuntimeError("Authentication failed (HTTP 401). Check credentials.") from exc
+        raise RuntimeError(f"HTTP {exc.code}: {exc.reason}\n{body[:300]}") from exc
+
+
+def _http_multipart(url: str, headers: dict,
+                    fields: list[tuple[str, str, bytes]],
+                    method: str = "PUT") -> bytes:
+    """Send a multipart/form-data request.
+
+    *fields* is a list of (name, filename, data) tuples.
+    Leave *filename* empty for plain text fields.
+    """
+    boundary = b"----------MarkForgeBoundary7MA4YWxkTrZu0gW"
+    parts = []
+    for name, filename, data in fields:
+        disp = f'form-data; name="{name}"'
+        if filename:
+            disp += f'; filename="{filename}"'
+        parts.append(
+            b"--" + boundary + b"\r\n"
+            + f"Content-Disposition: {disp}\r\n\r\n".encode()
+            + data + b"\r\n"
+        )
+    parts.append(b"--" + boundary + b"--\r\n")
+    body = b"".join(parts)
+    h = {**headers, "Content-Type": f"multipart/form-data; boundary={boundary.decode()}"}
+    req = urllib.request.Request(url, data=body, headers=h, method=method)
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            return resp.read()
+    except urllib.error.HTTPError as exc:
+        body_text = exc.read().decode("utf-8", errors="replace")
+        if exc.code == 401:
+            raise RuntimeError("Authentication failed (HTTP 401). Check credentials.") from exc
+        raise RuntimeError(f"HTTP {exc.code}: {exc.reason}\n{body_text[:300]}") from exc
+
+
+# ── HTTPS: download / upload file ─────────────────────────────────────────────
+
+def _download_file(info: GitFileInfo, settings) -> tuple[bytes, str]:
+    """Fetch the file via the platform REST API.
+
+    Returns *(content_bytes, sha_or_commit_id)*.
+    The second element is stored in info.file_sha and passed back to
+    _upload_file when committing (GitHub needs the blob SHA; Bitbucket Server
+    accepts an optional sourceCommitId).
+    """
+    h = _https_headers(settings, info.platform)
+
+    if info.platform == "github":
+        url = (f"https://api.github.com/repos/{info.owner}/{info.repo}"
+               f"/contents/{info.file_path}?ref={info.branch}")
+        raw = json.loads(_http_get(url, h))
+        return base64.b64decode(raw["content"].replace("\n", "")), raw["sha"]
+
+    if info.platform == "github_enterprise":
+        url = (f"{info.base_url}/api/v3/repos/{info.owner}/{info.repo}"
+               f"/contents/{info.file_path}?ref={info.branch}")
+        raw = json.loads(_http_get(url, h))
+        return base64.b64decode(raw["content"].replace("\n", "")), raw["sha"]
+
+    if info.platform == "bitbucket":
+        url = (f"https://api.bitbucket.org/2.0/repositories/{info.owner}/{info.repo}"
+               f"/src/{info.branch}/{info.file_path}")
+        return _http_get(url, h), ""
+
+    if info.platform == "bitbucket_server":
+        raw_url = (f"{info.base_url}/rest/api/1.0/projects/{info.owner}"
+                   f"/repos/{info.repo}/raw/{info.file_path}?at={info.branch}")
+        content = _http_get(raw_url, h)
+        # Fetch the latest commit ID (used as sourceCommitId to avoid conflicts)
+        commit_url = (f"{info.base_url}/rest/api/1.0/projects/{info.owner}"
+                      f"/repos/{info.repo}/commits?until={info.branch}&limit=1")
+        try:
+            commit_data = json.loads(_http_get(commit_url, h))
+            commit_id = commit_data["values"][0]["id"]
+        except Exception:
+            commit_id = ""
+        return content, commit_id
+
+    raise ValueError(f"Unknown platform: {info.platform!r}")
+
+
+def _upload_file(info: GitFileInfo, spec: CommitSpec,
+                 settings, new_content: bytes) -> None:
+    """Commit the file (and optionally a new branch) via the platform REST API."""
+    h = _https_headers(settings, info.platform)
+    push_branch = (spec.new_branch
+                   if spec.push_mode == "new_branch" and spec.new_branch
+                   else info.branch)
+
+    # ── GitHub / GitHub Enterprise ────────────────────────────────────────────
+    if info.platform in ("github", "github_enterprise"):
+        base = ("https://api.github.com" if info.platform == "github"
+                else f"{info.base_url}/api/v3")
+
+        if spec.push_mode == "new_branch" and spec.new_branch:
+            # Resolve current branch tip SHA, then create the new branch
+            ref_url  = f"{base}/repos/{info.owner}/{info.repo}/git/refs/heads/{info.branch}"
+            ref_data = json.loads(_http_get(ref_url, h))
+            tip_sha  = ref_data["object"]["sha"]
+            _http_json(f"{base}/repos/{info.owner}/{info.repo}/git/refs", h, {
+                "ref": f"refs/heads/{spec.new_branch}",
+                "sha": tip_sha,
+            })
+
+        payload: dict = {
+            "message": spec.message,
+            "content": base64.b64encode(new_content).decode(),
+            "branch":  push_branch,
+        }
+        if info.file_sha:
+            payload["sha"] = info.file_sha   # required when updating an existing file
+
+        url = f"{base}/repos/{info.owner}/{info.repo}/contents/{info.file_path}"
+        _http_json(url, h, payload, method="PUT")
+
+    # ── Bitbucket Cloud ───────────────────────────────────────────────────────
+    elif info.platform == "bitbucket":
+        if spec.push_mode == "new_branch" and spec.new_branch:
+            tip_url  = (f"https://api.bitbucket.org/2.0/repositories/{info.owner}/{info.repo}"
+                        f"/refs/branches/{info.branch}")
+            tip_data = json.loads(_http_get(tip_url, h))
+            tip_hash = tip_data["target"]["hash"]
+            _http_json(
+                f"https://api.bitbucket.org/2.0/repositories/{info.owner}/{info.repo}/refs/branches",
+                h,
+                {"name": spec.new_branch, "target": {"hash": tip_hash}},
+            )
+
+        # POST to /src/; the file field name IS the file path
+        fields = [
+            ("message",        "",                              spec.message.encode()),
+            ("branch",         "",                              push_branch.encode()),
+            (info.file_path,   os.path.basename(info.file_path), new_content),
+        ]
+        url = f"https://api.bitbucket.org/2.0/repositories/{info.owner}/{info.repo}/src"
+        _http_multipart(url, h, fields, method="POST")
+
+    # ── Bitbucket Server / Data Center ────────────────────────────────────────
+    elif info.platform == "bitbucket_server":
+        if spec.push_mode == "new_branch" and spec.new_branch:
+            branch_url = (f"{info.base_url}/rest/api/1.0/projects/{info.owner}"
+                          f"/repos/{info.repo}/branches")
+            _http_json(branch_url, h, {
+                "name":       spec.new_branch,
+                "startPoint": f"refs/heads/{info.branch}",
+            })
+
+        url = (f"{info.base_url}/rest/api/1.0/projects/{info.owner}"
+               f"/repos/{info.repo}/browse/{info.file_path}")
+        fields = [
+            ("content",  "file",  new_content),
+            ("message",  "",      spec.message.encode()),
+            ("branch",   "",      push_branch.encode()),
+        ]
+        if info.file_sha:
+            fields.append(("sourceCommitId", "", info.file_sha.encode()))
+        _http_multipart(url, h, fields, method="PUT")
+
+    else:
+        raise ValueError(f"Unknown platform: {info.platform!r}")
+
+
 # ── Progress stream ───────────────────────────────────────────────────────────
 
 class _ProgressStream(io.RawIOBase):
@@ -241,58 +448,46 @@ def _make_paramiko_vendor(key_path: str, passphrase: str):
 # ── Clone ─────────────────────────────────────────────────────────────────────
 
 def clone_repo(info: GitFileInfo, settings, progress_cb) -> str:
-    """Clone the repository into a fresh temp directory using dulwich.
+    """Fetch the repository file into a fresh temp directory.
 
-    dulwich is a pure-Python git implementation — no git executable needed.
+    HTTPS: downloads just the target file via the platform REST API —
+    no dulwich HTTP transport involved, so Windows TLS/proxy issues are avoided.
+
+    SSH: full clone via dulwich + optional paramiko (no git executable needed).
+
     Returns the temp directory path on success; cleans up and re-raises on error.
     """
+    auth_method = settings.value("git/auth_method", "https")
+
+    if auth_method != "ssh":
+        return _clone_via_api(info, settings, progress_cb)
+
+    # ── SSH path (dulwich) ────────────────────────────────────────────────────
     from dulwich import porcelain
 
-    tmpdir = tempfile.mkdtemp(prefix="markforge_git_")
+    tmpdir    = tempfile.mkdtemp(prefix="markforge_git_")
     errstream = _ProgressStream(progress_cb)
 
     try:
-        auth_method = settings.value("git/auth_method", "https")
+        key_path   = settings.value("git/ssh_key_path",   "")
+        passphrase = settings.value("git/ssh_passphrase", "")
+        clone_url  = _ssh_clone_url(info)
 
-        if auth_method == "ssh":
-            key_path   = settings.value("git/ssh_key_path",   "")
-            passphrase = settings.value("git/ssh_passphrase", "")
-            clone_url  = _ssh_clone_url(info)
-
-            vendor = _make_paramiko_vendor(key_path, passphrase)
-            if vendor is not None:
-                # Pure-Python SSH via paramiko
-                import dulwich.client as _dc
-                _orig = _dc.get_ssh_vendor
-                _dc.get_ssh_vendor = lambda: vendor
-                try:
-                    porcelain.clone(
-                        clone_url, tmpdir,
-                        branch=info.branch.encode(),
-                        errstream=errstream,
-                    )
-                finally:
-                    _dc.get_ssh_vendor = _orig
-            else:
-                # Fall back to system ssh client
-                porcelain.clone(
-                    clone_url, tmpdir,
-                    branch=info.branch.encode(),
-                    errstream=errstream,
-                )
+        vendor = _make_paramiko_vendor(key_path, passphrase)
+        if vendor is not None:
+            import dulwich.client as _dc
+            _orig = _dc.get_ssh_vendor
+            _dc.get_ssh_vendor = lambda: vendor
+            try:
+                porcelain.clone(clone_url, tmpdir,
+                                branch=info.branch.encode(),
+                                errstream=errstream)
+            finally:
+                _dc.get_ssh_vendor = _orig
         else:
-            user  = settings.value("git/https_username", "")
-            token = settings.value("git/https_token",    "")
-            clone_url = (
-                _build_https_clone_url(info.clone_url, user, token)
-                if user and token
-                else info.clone_url
-            )
-            porcelain.clone(
-                clone_url, tmpdir,
-                branch=info.branch.encode(),
-                errstream=errstream,
-            )
+            porcelain.clone(clone_url, tmpdir,
+                            branch=info.branch.encode(),
+                            errstream=errstream)
 
         return tmpdir
 
@@ -301,68 +496,80 @@ def clone_repo(info: GitFileInfo, settings, progress_cb) -> str:
         raise
 
 
+def _clone_via_api(info: GitFileInfo, settings, progress_cb) -> str:
+    """Download just the target file via the platform REST API."""
+    progress_cb(20, "Downloading file …")
+    content, sha = _download_file(info, settings)
+    info.file_sha = sha
+
+    tmpdir = tempfile.mkdtemp(prefix="markforge_git_")
+    try:
+        local_path = os.path.join(tmpdir, *info.file_path.split("/"))
+        os.makedirs(os.path.dirname(local_path), exist_ok=True)
+        with open(local_path, "wb") as f:
+            f.write(content)
+        progress_cb(100, "File downloaded.")
+        return tmpdir
+    except Exception:
+        shutil.rmtree(tmpdir, ignore_errors=True)
+        raise
+
+
 # ── Commit & push ─────────────────────────────────────────────────────────────
 
 def commit_and_push(info: GitFileInfo, spec: CommitSpec, settings, progress_cb) -> None:
-    """Stage info.file_path, commit, optionally switch branch, and push."""
+    """Stage info.file_path, commit, optionally switch branch, and push.
+
+    HTTPS: uses the platform REST API — no dulwich HTTP transport.
+    SSH:   uses dulwich + optional paramiko.
+    """
+    auth_method = settings.value("git/auth_method", "https")
+
+    if auth_method != "ssh":
+        _push_via_api(info, spec, settings, progress_cb)
+        if spec.create_pr:
+            _create_pull_request(info, spec, settings)
+        return
+
+    # ── SSH path (dulwich) ────────────────────────────────────────────────────
     from dulwich import porcelain
     from dulwich.repo import Repo
 
     repo_path = info.local_repo_path
     errstream = _ProgressStream(progress_cb)
 
-    # Stage the modified file (path is relative to repo root, forward slashes)
     porcelain.add(repo_path, paths=[info.file_path])
-
-    # Build a commit author string; reuse whatever is in the repo's git config,
-    # falling back to a neutral default so the commit always succeeds.
     author = _git_author(repo_path)
-    porcelain.commit(
-        repo_path,
-        message=spec.message.encode("utf-8"),
-        author=author,
-        committer=author,
-    )
+    porcelain.commit(repo_path,
+                     message=spec.message.encode("utf-8"),
+                     author=author,
+                     committer=author)
 
-    # Optionally create and switch to a new local branch
     push_branch = info.branch
     if spec.push_mode == "new_branch" and spec.new_branch:
         with Repo(repo_path) as repo:
-            head_sha  = repo.head()
-            new_ref   = b"refs/heads/" + spec.new_branch.encode()
+            head_sha = repo.head()
+            new_ref  = b"refs/heads/" + spec.new_branch.encode()
             repo.refs[new_ref] = head_sha
             repo.refs.set_symbolic_ref(b"HEAD", new_ref)
         push_branch = spec.new_branch
 
-    refspec   = f"refs/heads/{push_branch}:refs/heads/{push_branch}".encode()
-    auth_method = settings.value("git/auth_method", "https")
+    refspec    = f"refs/heads/{push_branch}:refs/heads/{push_branch}".encode()
+    key_path   = settings.value("git/ssh_key_path",   "")
+    passphrase = settings.value("git/ssh_passphrase", "")
+    push_url   = _ssh_clone_url(info)
 
-    if auth_method == "ssh":
-        key_path   = settings.value("git/ssh_key_path",   "")
-        passphrase = settings.value("git/ssh_passphrase", "")
-        push_url   = _ssh_clone_url(info)
-
-        vendor = _make_paramiko_vendor(key_path, passphrase)
-        if vendor is not None:
-            import dulwich.client as _dc
-            _orig = _dc.get_ssh_vendor
-            _dc.get_ssh_vendor = lambda: vendor
-            try:
-                porcelain.push(repo_path, remote_location=push_url,
-                               refspecs=[refspec], errstream=errstream)
-            finally:
-                _dc.get_ssh_vendor = _orig
-        else:
+    vendor = _make_paramiko_vendor(key_path, passphrase)
+    if vendor is not None:
+        import dulwich.client as _dc
+        _orig = _dc.get_ssh_vendor
+        _dc.get_ssh_vendor = lambda: vendor
+        try:
             porcelain.push(repo_path, remote_location=push_url,
                            refspecs=[refspec], errstream=errstream)
+        finally:
+            _dc.get_ssh_vendor = _orig
     else:
-        user  = settings.value("git/https_username", "")
-        token = settings.value("git/https_token",    "")
-        push_url = (
-            _build_https_clone_url(info.clone_url, user, token)
-            if user and token
-            else info.clone_url
-        )
         porcelain.push(repo_path, remote_location=push_url,
                        refspecs=[refspec], errstream=errstream)
 
@@ -370,12 +577,19 @@ def commit_and_push(info: GitFileInfo, spec: CommitSpec, settings, progress_cb) 
         _create_pull_request(info, spec, settings)
 
 
+def _push_via_api(info: GitFileInfo, spec: CommitSpec, settings, progress_cb) -> None:
+    progress_cb(20, "Pushing changes …")
+    with open(info.local_file_path, "rb") as f:
+        new_content = f.read()
+    _upload_file(info, spec, settings, new_content)
+    progress_cb(100, "Done.")
+
+
 def _git_author(repo_path: str) -> bytes:
     """Read name/email from the repo's git config; fall back to a safe default."""
     try:
-        from dulwich.repo import Repo
         from dulwich.config import StackedConfig
-        cfg = StackedConfig.default()
+        cfg   = StackedConfig.default()
         name  = cfg.get(b"user", b"name")
         email = cfg.get(b"user", b"email")
         return f"{name.decode()} <{email.decode()}>".encode()
