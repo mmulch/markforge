@@ -10,6 +10,7 @@ from PyQt6.QtWidgets import (
     QApplication,
     QDialog,
     QFileDialog,
+    QInputDialog,
     QLabel,
     QMainWindow,
     QMessageBox,
@@ -53,7 +54,8 @@ class _PdfWorker(QThread):
 class MainWindow(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
-        self._file: str | None = None
+        self._file:       str | None = None
+        self._draft_name: str | None = None
         self._modified = False
         self._settings = QSettings("MarkdownEditor", "MarkdownEditor")
 
@@ -66,6 +68,7 @@ class MainWindow(QMainWindow):
 
         self.resize(1280, 800)
         self._update_title()
+        self._set_editor_active(False)
 
     # ── UI setup ──────────────────────────────────────────────────────────────
 
@@ -247,8 +250,21 @@ class MainWindow(QMainWindow):
         n   = len(txt.split()) if txt else 0
         self._lbl_words.setText(tr("{n} words", n=n))
 
+    def _set_editor_active(self, active: bool) -> None:
+        """Enable/disable the editor and all actions that require an open document."""
+        self._editor.setEnabled(active)
+        for act in (
+            self._act_save, self._act_save_as, self._act_export_pdf,
+            self._act_insert_link, self._act_insert_image,
+            self._act_insert_plantuml, self._act_insert_table,
+        ):
+            act.setEnabled(active)
+
     def _update_title(self) -> None:
-        name = os.path.basename(self._file) if self._file else tr("Untitled")
+        name = (
+            os.path.basename(self._file) if self._file
+            else (self._draft_name or tr("Untitled"))
+        )
         mod  = "*" if self._modified else ""
         self.setWindowTitle(f"{mod}{name} — MarkForge")
 
@@ -257,9 +273,19 @@ class MainWindow(QMainWindow):
     def _new(self) -> None:
         if not self._maybe_save():
             return
+        name, ok = QInputDialog.getText(
+            self, tr("New File"), tr("File name:"), text="Untitled.md"
+        )
+        if not ok or not name.strip():
+            return
+        name = name.strip()
+        if "." not in name:
+            name += ".md"
         self._editor.clear()
-        self._file     = None
-        self._modified = False
+        self._file       = None
+        self._draft_name = name
+        self._modified   = False
+        self._set_editor_active(True)
         self._update_title()
         self._refresh_preview()
 
@@ -342,9 +368,12 @@ class MainWindow(QMainWindow):
                 )
             return
 
+        draft_name = os.path.splitext(os.path.basename(path))[0] + ".md"
         self._editor.setPlainText(_result[0])
-        self._file     = None
-        self._modified = True
+        self._file       = None
+        self._draft_name = draft_name
+        self._modified   = True
+        self._set_editor_active(True)
         self._update_title()
         self._refresh_preview()
 
@@ -357,8 +386,10 @@ class MainWindow(QMainWindow):
                 self, tr("Error"), tr("Could not open file:\n{exc}", exc=exc)
             )
             return
-        self._file     = path
-        self._modified = False
+        self._file       = path
+        self._draft_name = None
+        self._modified   = False
+        self._set_editor_active(True)
         self._update_title()
         self._file_tree.set_root(os.path.dirname(os.path.abspath(path)))
         self._refresh_preview()
@@ -373,7 +404,7 @@ class MainWindow(QMainWindow):
         path, _ = QFileDialog.getSaveFileName(
             self,
             tr("Save As"),
-            "",
+            self._draft_name or "",
             tr("Markdown files (*.md);;Text files (*.txt);;All files (*)"),
         )
         if path:
@@ -388,8 +419,9 @@ class MainWindow(QMainWindow):
                 self, tr("Error"), tr("Could not save file:\n{exc}", exc=exc)
             )
             return
-        self._file     = path
-        self._modified = False
+        self._file       = path
+        self._draft_name = None
+        self._modified   = False
         self._update_title()
         self.statusBar().showMessage(tr("Saved."), 3000)
 

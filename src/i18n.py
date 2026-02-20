@@ -20,6 +20,8 @@ _DE: dict[str, str] = {
     "Importing PDF …": "PDF wird importiert …",
     "&Import PDF …": "&PDF importieren …",
     "Import PDF": "PDF importieren",
+    "New File": "Neue Datei",
+    "File name:": "Dateiname:",
     "pymupdf4llm is not installed.\nInstall it with: pip install pymupdf4llm":
         "pymupdf4llm ist nicht installiert.\nInstallieren mit: pip install pymupdf4llm",
     "Could not import PDF:\n{exc}": "PDF konnte nicht importiert werden:\n{exc}",
