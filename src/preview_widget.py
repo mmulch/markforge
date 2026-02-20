@@ -33,7 +33,7 @@ _MD_EXT_CONFIG = {
 import re as _re
 
 try:
-    from plantuml_utils import svg_data_uri as _plantuml_data_uri
+    from plantuml_utils import svg_inline as _plantuml_inline
     _HAS_PLANTUML = True
 except ImportError:
     _HAS_PLANTUML = False
@@ -204,12 +204,12 @@ def _restore_plantuml(html: str, store: dict) -> str:
         return html
     for key, uml_text in store.items():
         if _HAS_PLANTUML:
-            data_uri = _plantuml_data_uri(uml_text)
-            if data_uri:
-                img = f'<img src="{data_uri}" alt="PlantUML diagram">'
+            svg = _plantuml_inline(uml_text)
+            if svg:
+                inner = svg
             else:
-                img = '<em style="color:#e57373">PlantUML: could not reach server</em>'
-            replacement = f'<div class="plantuml-diagram">{img}</div>'
+                inner = '<em style="color:#e57373">PlantUML: could not reach server</em>'
+            replacement = f'<div class="plantuml-diagram">{inner}</div>'
         else:
             replacement = (
                 '<div class="plantuml-diagram">'

@@ -69,24 +69,38 @@ def png_url(text: str) -> str:
     return f"{PLANTUML_SERVER}/png/{encode(text)}"
 
 
-@lru_cache(maxsize=64)
-def svg_data_uri(text: str) -> str:
-    """Fetch the SVG for *text* from the PlantUML server and return it as a data URI.
+_svg_cache: dict[str, str] = {}
 
-    The result is cached per session so each unique diagram is only fetched once.
-    Embedding the SVG as a data URI avoids Qt WebEngine's remote-URL restrictions
-    that can block <img> tags pointing at external HTTPS servers when the page is
-    loaded via setHtml() (which creates an opaque/null security origin in modern
-    Chromium-based engines).
+def svg_inline(text: str) -> str:
+    """Fetch the SVG for *text* from the PlantUML server and return it as an
+    inline SVG string ready to embed directly in HTML.
+
+    Only successful fetches are cached — failures are retried on the next render.
+
+    Why inline SVG instead of a data URI or remote <img> tag:
+    - Qt WebEngine blocks remote HTTPS <img> in pages loaded via setHtml()
+      (opaque security origin in modern Chromium).
+    - The PlantUML server prefixes its SVG with a non-standard processing
+      instruction (<?plantuml ...?>) which causes Chromium to abort parsing
+      when the content is delivered as a data:image/svg+xml URI.
+    - Embedding the SVG directly in the HTML lets the HTML parser handle it;
+      unknown processing instructions are silently ignored.
 
     Returns an empty string if the server cannot be reached.
     """
+    if text in _svg_cache:
+        return _svg_cache[text]
+
     url = svg_url(text)
     try:
         req = urllib.request.Request(url, headers={"User-Agent": "MarkForge"})
         with urllib.request.urlopen(req, timeout=5) as resp:
-            data = resp.read()
-        b64 = base64.b64encode(data).decode("ascii")
-        return f"data:image/svg+xml;base64,{b64}"
+            raw = resp.read().decode("utf-8", errors="replace")
+        # Strip any leading processing instructions (<?plantuml …?>, <?xml …?>)
+        # so the inline SVG starts cleanly with <svg …>.
+        import re as _re
+        raw = _re.sub(r"<\?[^>]*\?>", "", raw).strip()
+        _svg_cache[text] = raw
+        return raw
     except Exception:
         return ""
