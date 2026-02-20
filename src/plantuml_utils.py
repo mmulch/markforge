@@ -1,8 +1,11 @@
-"""PlantUML encoding and URL generation for the online rendering service."""
+"""PlantUML encoding, URL generation, and SVG fetching for the online rendering service."""
 
 from __future__ import annotations
 
+import base64
+import urllib.request
 import zlib
+from functools import lru_cache
 
 PLANTUML_SERVER = "https://www.plantuml.com/plantuml"
 
@@ -64,3 +67,26 @@ def svg_url(text: str) -> str:
 def png_url(text: str) -> str:
     """Returns the PlantUML server URL for a PNG rendering."""
     return f"{PLANTUML_SERVER}/png/{encode(text)}"
+
+
+@lru_cache(maxsize=64)
+def svg_data_uri(text: str) -> str:
+    """Fetch the SVG for *text* from the PlantUML server and return it as a data URI.
+
+    The result is cached per session so each unique diagram is only fetched once.
+    Embedding the SVG as a data URI avoids Qt WebEngine's remote-URL restrictions
+    that can block <img> tags pointing at external HTTPS servers when the page is
+    loaded via setHtml() (which creates an opaque/null security origin in modern
+    Chromium-based engines).
+
+    Returns an empty string if the server cannot be reached.
+    """
+    url = svg_url(text)
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": "MarkForge"})
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            data = resp.read()
+        b64 = base64.b64encode(data).decode("ascii")
+        return f"data:image/svg+xml;base64,{b64}"
+    except Exception:
+        return ""

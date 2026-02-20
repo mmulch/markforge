@@ -33,7 +33,7 @@ _MD_EXT_CONFIG = {
 import re as _re
 
 try:
-    from plantuml_utils import svg_url as _plantuml_svg_url
+    from plantuml_utils import svg_data_uri as _plantuml_data_uri
     _HAS_PLANTUML = True
 except ImportError:
     _HAS_PLANTUML = False
@@ -194,17 +194,22 @@ def _extract_plantuml(text: str) -> tuple[str, dict]:
 
 
 def _restore_plantuml(html: str, store: dict) -> str:
-    """Replaces PlantUML placeholders with <img> tags pointing to the server URL."""
+    """Replaces PlantUML placeholders with embedded SVG data URIs.
+
+    The SVG is fetched from the PlantUML server in Python and embedded as a
+    data URI so Qt WebEngine's remote-URL restrictions (which can block external
+    HTTPS images in pages loaded via setHtml) are bypassed entirely.
+    """
     if not store:
         return html
     for key, uml_text in store.items():
         if _HAS_PLANTUML:
-            url = _plantuml_svg_url(uml_text)
-            replacement = (
-                f'<div class="plantuml-diagram">'
-                f'<img src="{url}" alt="PlantUML-Diagramm">'
-                f'</div>'
-            )
+            data_uri = _plantuml_data_uri(uml_text)
+            if data_uri:
+                img = f'<img src="{data_uri}" alt="PlantUML diagram">'
+            else:
+                img = '<em style="color:#e57373">PlantUML: could not reach server</em>'
+            replacement = f'<div class="plantuml-diagram">{img}</div>'
         else:
             replacement = (
                 '<div class="plantuml-diagram">'
