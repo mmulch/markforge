@@ -2,41 +2,39 @@
 from PyInstaller.utils.hooks import collect_all
 
 # ── Qt DLL stems NOT used by MarkForge ────────────────────────────────────────
-# Removing these saves 60-100 MB from the final package.
+# Filtered AFTER Analysis so PyInstaller's DLL-dependency tracker can't re-add
+# them via indirect dependencies.
 _UNUSED_QT = {
-    'Qt63DAnimation', 'Qt63DCore', 'Qt63DExtras', 'Qt63DInput',
-    'Qt63DLogic', 'Qt63DRender', 'Qt63DQuick', 'Qt63DQuickScene2D',
-    'Qt6Bluetooth',
-    'Qt6Charts',
-    'Qt6DataVisualization',
-    'Qt6Location',
-    'Qt6Multimedia', 'Qt6MultimediaQuick', 'Qt6MultimediaWidgets',
-    'Qt6Nfc',
-    'Qt6Positioning', 'Qt6PositioningQuick',
-    'Qt6Quick', 'Qt6QuickControls2', 'Qt6QuickDialogs2',
-    'Qt6QuickLayouts', 'Qt6QuickParticles', 'Qt6QuickShapes',
-    'Qt6QuickTemplates2', 'Qt6QuickTimeline', 'Qt6QuickWidgets',
-    'Qt6RemoteObjects',
-    'Qt6Sensors',
-    'Qt6SerialPort',
-    'Qt6Sql',
-    'Qt6Test',
-    'Qt6TextToSpeech',
-    'Qt6VirtualKeyboard',
-    'Qt6WebView',
+    'qt63danimation', 'qt63dcore', 'qt63dextras', 'qt63dinput',
+    'qt63dlogic', 'qt63drender', 'qt63dquick', 'qt63dquickscene2d',
+    'qt6bluetooth',
+    'qt6charts',
+    'qt6datavisualization',
+    'qt6location',
+    'qt6multimedia', 'qt6multimediaquick', 'qt6multimediawidgets',
+    'qt6nfc',
+    'qt6positioning', 'qt6positioningquick',
+    'qt6quick', 'qt6quickcontrols2', 'qt6quickdialogs2',
+    'qt6quicklayouts', 'qt6quickparticles', 'qt6quickshapes',
+    'qt6quicktemplates2', 'qt6quicktimeline', 'qt6quickwidgets',
+    'qt6remoteobjects',
+    'qt6sensors',
+    'qt6serialport',
+    'qt6sql',
+    'qt6test',
+    'qt6texttospeech',
+    'qt6virtualkeyboard',
+    'qt6webview',
 }
 
-datas, binaries, hiddenimports = collect_all('PyQt6')
+def _needed(name):
+    """Return False for Qt DLLs / .pyd files we don't need."""
+    # name is the dest path, e.g. 'PyQt6/Qt6/bin/Qt63DCore.dll'
+    stem = name.rsplit('/', 1)[-1].rsplit('\\', 1)[-1]  # basename
+    stem = stem.rsplit('.', 1)[0].lower()               # strip extension
+    return stem not in _UNUSED_QT
 
-# Drop unused Qt DLLs and their associated data files
-binaries = [
-    (src, dst) for src, dst in binaries
-    if not any(name in src for name in _UNUSED_QT)
-]
-datas = [
-    (src, dst) for src, dst in datas
-    if not any(name in src for name in _UNUSED_QT)
-]
+datas, binaries, hiddenimports = collect_all('PyQt6')
 
 hiddenimports += [
     'markdown',
@@ -53,7 +51,7 @@ hiddenimports += [
     'PyQt6.QtWebEngineCore',
     'PyQt6.QtWebChannel',
     'PyQt6.QtPrintSupport',
-    # PDF import (lazy imports — PyInstaller can't detect these automatically)
+    # PDF import — lazy imports not visible to PyInstaller's static analysis
     'fitz',
     'pymupdf',
     'pymupdf4llm',
@@ -75,7 +73,7 @@ a = Analysis(
         'difflib', 'turtle', 'curses',
         'multiprocessing', 'concurrent',
         'xmlrpc', 'ftplib', 'smtplib', 'telnetlib',
-        # Unused PyQt6 Python bindings
+        # Unused PyQt6 Python bindings (prevents .pyd files being loaded)
         'PyQt6.Qt3DAnimation', 'PyQt6.Qt3DCore', 'PyQt6.Qt3DExtras',
         'PyQt6.Qt3DInput', 'PyQt6.Qt3DLogic', 'PyQt6.Qt3DRender',
         'PyQt6.QtBluetooth', 'PyQt6.QtCharts',
@@ -88,6 +86,15 @@ a = Analysis(
     ],
     noarchive=False,
 )
+
+# ── Post-analysis DLL filter ───────────────────────────────────────────────────
+# PyInstaller's dependency tracker re-adds Qt DLLs via DLL-import analysis.
+# Filter a.binaries HERE (after Analysis) to actually remove them.
+a.binaries = TOC([
+    (name, src, typ)
+    for name, src, typ in a.binaries
+    if _needed(name)
+])
 
 pyz = PYZ(a.pure)
 
