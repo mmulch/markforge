@@ -33,7 +33,7 @@ _MD_EXT_CONFIG = {
 import re as _re
 
 try:
-    from plantuml_utils import svg_inline as _plantuml_inline
+    from plantuml_utils import png_data_uri as _plantuml_img
     _HAS_PLANTUML = True
 except ImportError:
     _HAS_PLANTUML = False
@@ -194,22 +194,33 @@ def _extract_plantuml(text: str) -> tuple[str, dict]:
 
 
 def _restore_plantuml(html: str, store: dict) -> str:
-    """Replaces PlantUML placeholders with embedded SVG data URIs.
+    """Replaces PlantUML placeholders with PNG images embedded as data URIs.
 
-    The SVG is fetched from the PlantUML server in Python and embedded as a
-    data URI so Qt WebEngine's remote-URL restrictions (which can block external
-    HTTPS images in pages loaded via setHtml) are bypassed entirely.
+    The PNG is fetched from the PlantUML server in Python and embedded as a
+    data:image/png;base64 URI.  This bypasses Qt WebEngine's remote-URL
+    restrictions (opaque security origin for setHtml pages) without relying
+    on inline SVG, which is unreliable here because the PlantUML server
+    embeds non-standard processing instructions inside its SVG output that
+    confuse Qt WebEngine's HTML parser.
     """
     if not store:
         return html
     for key, uml_text in store.items():
         if _HAS_PLANTUML:
-            svg = _plantuml_inline(uml_text)
-            if svg:
-                inner = svg
+            uri = _plantuml_img(uml_text)
+            if uri:
+                replacement = (
+                    '<div class="plantuml-diagram">'
+                    f'<img src="{uri}" alt="PlantUML diagram"'
+                    ' style="max-width:100%;height:auto;"/>'
+                    '</div>'
+                )
             else:
-                inner = '<em style="color:#e57373">PlantUML: could not reach server</em>'
-            replacement = f'<div class="plantuml-diagram">{inner}</div>'
+                replacement = (
+                    '<div class="plantuml-diagram">'
+                    '<em style="color:#e57373">PlantUML: could not reach server</em>'
+                    '</div>'
+                )
         else:
             replacement = (
                 '<div class="plantuml-diagram">'

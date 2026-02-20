@@ -69,38 +69,37 @@ def png_url(text: str) -> str:
     return f"{PLANTUML_SERVER}/png/{encode(text)}"
 
 
-_svg_cache: dict[str, str] = {}
+_png_cache: dict[str, str] = {}
 
-def svg_inline(text: str) -> str:
-    """Fetch the SVG for *text* from the PlantUML server and return it as an
-    inline SVG string ready to embed directly in HTML.
 
-    Only successful fetches are cached — failures are retried on the next render.
+def png_data_uri(text: str) -> str:
+    """Fetch the PNG for *text* from the PlantUML server and return it as a
+    data URI suitable for use in an HTML <img> tag.
 
-    Why inline SVG instead of a data URI or remote <img> tag:
+    Why PNG data URI instead of inline SVG or a remote <img> tag:
     - Qt WebEngine blocks remote HTTPS <img> in pages loaded via setHtml()
       (opaque security origin in modern Chromium).
-    - The PlantUML server prefixes its SVG with a non-standard processing
-      instruction (<?plantuml ...?>) which causes Chromium to abort parsing
-      when the content is delivered as a data:image/svg+xml URI.
-    - Embedding the SVG directly in the HTML lets the HTML parser handle it;
-      unknown processing instructions are silently ignored.
+    - Inline SVG is unreliable in this context: the PlantUML server embeds
+      non-standard processing instructions (<?plantuml-src …?>) inside the
+      SVG element itself, which interfere with Qt WebEngine's HTML parser and
+      cause the SVG text nodes to appear as plain text instead of graphics.
+    - PNG is binary — no XML/PI parsing involved.  A data:image/png;base64
+      URI is resolved locally by the browser and never hits the network, so
+      it is not subject to the opaque-origin remote-resource restriction.
 
+    Only successful fetches are cached; failures are retried on the next render.
     Returns an empty string if the server cannot be reached.
     """
-    if text in _svg_cache:
-        return _svg_cache[text]
+    if text in _png_cache:
+        return _png_cache[text]
 
-    url = svg_url(text)
+    url = png_url(text)
     try:
         req = urllib.request.Request(url, headers={"User-Agent": "MarkForge"})
         with urllib.request.urlopen(req, timeout=5) as resp:
-            raw = resp.read().decode("utf-8", errors="replace")
-        # Strip any leading processing instructions (<?plantuml …?>, <?xml …?>)
-        # so the inline SVG starts cleanly with <svg …>.
-        import re as _re
-        raw = _re.sub(r"<\?[^>]*\?>", "", raw).strip()
-        _svg_cache[text] = raw
-        return raw
+            data = resp.read()
+        uri = "data:image/png;base64," + base64.b64encode(data).decode("ascii")
+        _png_cache[text] = uri
+        return uri
     except Exception:
         return ""
