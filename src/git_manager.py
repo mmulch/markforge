@@ -1,73 +1,23 @@
-"""Git integration logic for MarkForge – no Qt imports."""
+"""Git integration logic for MarkForge – no Qt imports.
+
+Uses *dulwich* (pure-Python git implementation) so no git executable is
+required on the host system.  HTTPS auth embeds credentials in the URL;
+SSH auth uses paramiko (pure Python) if installed, otherwise falls back
+to the system ssh client.
+"""
 
 from __future__ import annotations
 
 import base64
+import io
+import json
 import os
 import shutil
-import sys
 import tempfile
-import urllib.request
 import urllib.error
-import json
+import urllib.request
 from dataclasses import dataclass
 from urllib.parse import urlparse, parse_qs
-
-
-# ── Git executable discovery ───────────────────────────────────────────────────
-
-# Candidate paths searched on Windows when git is not in PATH
-_WINDOWS_GIT_CANDIDATES = [
-    r"C:\Program Files\Git\cmd\git.exe",
-    r"C:\Program Files\Git\bin\git.exe",
-    r"C:\Program Files (x86)\Git\cmd\git.exe",
-    r"C:\Program Files (x86)\Git\bin\git.exe",
-]
-
-def _ensure_git() -> None:
-    """Make sure GitPython can find the git executable.
-
-    On Windows git.exe is often only on the Git-internal PATH and not visible
-    to processes launched from a GUI.  We probe well-known install locations
-    as a fallback and call git.refresh() so all subsequent calls succeed.
-    """
-    import git as gitpython
-
-    try:
-        gitpython.refresh()
-        return  # already works
-    except gitpython.exc.InvalidGitRepositoryError:
-        return  # refresh() raised for a different reason; git itself is fine
-    except Exception:
-        pass  # git not found in PATH – fall through to manual search
-
-    if sys.platform != "win32":
-        raise RuntimeError(
-            "git executable not found. Make sure git is installed and in your PATH."
-        )
-
-    # Search common Windows installation directories
-    for candidate in _WINDOWS_GIT_CANDIDATES:
-        if os.path.isfile(candidate):
-            gitpython.refresh(candidate)
-            return
-
-    # Also check the user's local AppData (GitHub Desktop, scoop, etc.)
-    local_app = os.environ.get("LOCALAPPDATA", "")
-    extra = [
-        os.path.join(local_app, "Programs", "Git", "cmd", "git.exe"),
-        os.path.join(local_app, "Programs", "Git", "bin", "git.exe"),
-    ]
-    for candidate in extra:
-        if os.path.isfile(candidate):
-            gitpython.refresh(candidate)
-            return
-
-    raise RuntimeError(
-        "git executable not found on this system.\n"
-        "Please install Git for Windows (https://git-scm.com/) "
-        "and make sure git.exe is in your PATH."
-    )
 
 
 # ── Dataclasses ───────────────────────────────────────────────────────────────
@@ -78,7 +28,7 @@ class GitFileInfo:
     owner:           str   # GitHub: owner login; Bitbucket Server: project key
     repo:            str
     branch:          str
-    file_path:       str   # relative path inside repo
+    file_path:       str   # relative path inside repo (forward slashes)
     clone_url:       str   # https clone URL (no credentials)
     base_url:        str   # scheme + host, e.g. "https://bitbucket.mycompany.com"
     local_repo_path: str = ""
@@ -87,8 +37,8 @@ class GitFileInfo:
 
 @dataclass
 class CommitSpec:
-    message:   str
-    push_mode: str        # "current_branch" | "new_branch"
+    message:    str
+    push_mode:  str        # "current_branch" | "new_branch"
     new_branch: str  = ""
     create_pr:  bool = False
     pr_title:   str  = ""
@@ -117,9 +67,9 @@ def parse_git_url(url: str) -> GitFileInfo:
 
     Raises ValueError with a human-readable message on any problem.
     """
-    parsed = urlparse(url.strip())
-    host   = parsed.hostname or ""
-    scheme = parsed.scheme or "https"
+    parsed   = urlparse(url.strip())
+    host     = parsed.hostname or ""
+    scheme   = parsed.scheme or "https"
     base_url = f"{scheme}://{host}"
 
     parts = [p for p in parsed.path.split("/") if p]
@@ -139,7 +89,7 @@ def parse_git_url(url: str) -> GitFileInfo:
         if not file_path:
             raise ValueError("The URL does not point to a file (file path is empty).")
 
-        # Branch from ?at= query param; strip refs/heads/ prefix if present
+        # Branch from ?at= query param; strip refs/heads/ / refs/tags/ prefix
         qs = parse_qs(parsed.query)
         at = qs.get("at", ["main"])[0]
         branch = at
@@ -228,100 +178,120 @@ def _ssh_clone_url(info: GitFileInfo) -> str:
     """Return the SSH clone URL for *info*."""
     host = urlparse(info.base_url).hostname or ""
     if info.platform == "bitbucket_server":
-        # Bitbucket Server SSH: ssh://git@host/scm/project/repo.git
         return f"ssh://git@{host}/scm/{info.owner.lower()}/{info.repo}.git"
     else:
-        # GitHub / GHE / Bitbucket Cloud: git@host:owner/repo.git
         return f"git@{host}:{info.owner}/{info.repo}.git"
 
 
-def build_auth_env(settings) -> dict:
-    """Build the environment dict for git operations (SSH only; HTTPS uses URL auth)."""
-    auth_method = settings.value("git/auth_method", "https")
-    if auth_method != "ssh":
-        return {}
+# ── Progress stream ───────────────────────────────────────────────────────────
 
-    key_path   = settings.value("git/ssh_key_path",   "")
-    passphrase = settings.value("git/ssh_passphrase", "")
+class _ProgressStream(io.RawIOBase):
+    """File-like object that forwards dulwich progress lines to a callback."""
 
-    ssh_cmd = f'ssh -i "{key_path}" -o StrictHostKeyChecking=no'
-    env = dict(os.environ)
-    env["GIT_SSH_COMMAND"] = ssh_cmd
+    def __init__(self, callback) -> None:
+        self._cb  = callback
+        self._buf = b""
 
-    if passphrase:
-        # Write a tiny askpass script so git can supply the passphrase
-        askpass = tempfile.NamedTemporaryFile(
-            mode="w", suffix=".sh", delete=False, prefix="markforge_askpass_"
-        )
-        askpass.write(f'#!/bin/sh\necho "{passphrase}"\n')
-        askpass.flush()
-        os.chmod(askpass.name, 0o700)
-        env["SSH_ASKPASS"]         = askpass.name
-        env["SSH_ASKPASS_REQUIRE"] = "force"
+    def write(self, data) -> int:  # type: ignore[override]
+        if isinstance(data, str):
+            data = data.encode("utf-8", errors="replace")
+        self._buf += data
+        while b"\n" in self._buf:
+            line, self._buf = self._buf.split(b"\n", 1)
+            text = line.decode("utf-8", errors="replace").strip()
+            if text and self._cb:
+                self._cb(0, text)
+        return len(data)
 
-    return env
+    def flush(self) -> None:
+        if self._buf.strip() and self._cb:
+            self._cb(0, self._buf.decode("utf-8", errors="replace").strip())
+        self._buf = b""
 
 
-# ── Progress helper ───────────────────────────────────────────────────────────
+# ── SSH vendor (paramiko) ─────────────────────────────────────────────────────
 
-class _GitProgress:
-    """Adapter from GitPython's RemoteProgress to a simple callback."""
+def _make_paramiko_vendor(key_path: str, passphrase: str):
+    """Return a dulwich ParamikoSSHVendor configured with *key_path*.
 
-    def __init__(self, callback):
-        self._cb = callback
+    Returns None if paramiko is not installed (dulwich falls back to
+    the system ssh client in that case).
+    """
+    try:
+        import paramiko  # noqa: F401
+        from dulwich.contrib.paramiko_vendor import ParamikoSSHVendor
 
-    def __call__(self, op_code, cur_count, max_count=None, message=""):
-        if self._cb is None:
-            return
-        pct = int(cur_count / max_count * 100) if max_count else 0
-        self._cb(pct, message or "")
+        class _KeyedVendor(ParamikoSSHVendor):
+            def run_command(self, host, command, username=None, port=None,
+                            password=None, key_filename=None, **kwargs):
+                return super().run_command(
+                    host, command,
+                    username=username,
+                    port=port,
+                    password=passphrase or None,
+                    key_filename=key_path or None,
+                    **kwargs,
+                )
 
-    def update(self, op_code, cur_count, max_count=None, message=""):
-        self.__call__(op_code, cur_count, max_count, message)
+        return _KeyedVendor()
+    except ImportError:
+        return None
 
 
 # ── Clone ─────────────────────────────────────────────────────────────────────
 
 def clone_repo(info: GitFileInfo, settings, progress_cb) -> str:
-    """Clone *info.clone_url* into a temporary directory.
+    """Clone the repository into a fresh temp directory using dulwich.
 
-    Returns the path to the temp directory on success.
-    Raises on any error (and cleans up the temp dir).
+    dulwich is a pure-Python git implementation — no git executable needed.
+    Returns the temp directory path on success; cleans up and re-raises on error.
     """
-    _ensure_git()
-    import git as gitpython
+    from dulwich import porcelain
 
     tmpdir = tempfile.mkdtemp(prefix="markforge_git_")
+    errstream = _ProgressStream(progress_cb)
+
     try:
         auth_method = settings.value("git/auth_method", "https")
 
         if auth_method == "ssh":
-            clone_url = _ssh_clone_url(info)
-            env       = build_auth_env(settings)
-            gitpython.Repo.clone_from(
-                clone_url,
-                tmpdir,
-                branch=info.branch,
-                single_branch=True,
-                depth=1,
-                env=env,
-                progress=_GitProgress(progress_cb),
-            )
+            key_path   = settings.value("git/ssh_key_path",   "")
+            passphrase = settings.value("git/ssh_passphrase", "")
+            clone_url  = _ssh_clone_url(info)
+
+            vendor = _make_paramiko_vendor(key_path, passphrase)
+            if vendor is not None:
+                # Pure-Python SSH via paramiko
+                import dulwich.client as _dc
+                _orig = _dc.get_ssh_vendor
+                _dc.get_ssh_vendor = lambda: vendor
+                try:
+                    porcelain.clone(
+                        clone_url, tmpdir,
+                        branch=info.branch.encode(),
+                        errstream=errstream,
+                    )
+                finally:
+                    _dc.get_ssh_vendor = _orig
+            else:
+                # Fall back to system ssh client
+                porcelain.clone(
+                    clone_url, tmpdir,
+                    branch=info.branch.encode(),
+                    errstream=errstream,
+                )
         else:
             user  = settings.value("git/https_username", "")
             token = settings.value("git/https_token",    "")
             clone_url = (
                 _build_https_clone_url(info.clone_url, user, token)
                 if user and token
-                else info.clone_url   # public repo – no credentials
+                else info.clone_url
             )
-            gitpython.Repo.clone_from(
-                clone_url,
-                tmpdir,
-                branch=info.branch,
-                single_branch=True,
-                depth=1,
-                progress=_GitProgress(progress_cb),
+            porcelain.clone(
+                clone_url, tmpdir,
+                branch=info.branch.encode(),
+                errstream=errstream,
             )
 
         return tmpdir
@@ -335,51 +305,82 @@ def clone_repo(info: GitFileInfo, settings, progress_cb) -> str:
 
 def commit_and_push(info: GitFileInfo, spec: CommitSpec, settings, progress_cb) -> None:
     """Stage info.file_path, commit, optionally switch branch, and push."""
-    _ensure_git()
-    import git as gitpython
+    from dulwich import porcelain
+    from dulwich.repo import Repo
 
-    repo   = gitpython.Repo(info.local_repo_path)
-    origin = repo.remotes.origin
+    repo_path = info.local_repo_path
+    errstream = _ProgressStream(progress_cb)
 
-    repo.index.add([info.file_path])
-    repo.index.commit(spec.message)
+    # Stage the modified file (path is relative to repo root, forward slashes)
+    porcelain.add(repo_path, paths=[info.file_path])
 
+    # Build a commit author string; reuse whatever is in the repo's git config,
+    # falling back to a neutral default so the commit always succeeds.
+    author = _git_author(repo_path)
+    porcelain.commit(
+        repo_path,
+        message=spec.message.encode("utf-8"),
+        author=author,
+        committer=author,
+    )
+
+    # Optionally create and switch to a new local branch
     push_branch = info.branch
     if spec.push_mode == "new_branch" and spec.new_branch:
-        repo.create_head(spec.new_branch).checkout()
+        with Repo(repo_path) as repo:
+            head_sha  = repo.head()
+            new_ref   = b"refs/heads/" + spec.new_branch.encode()
+            repo.refs[new_ref] = head_sha
+            repo.refs.set_symbolic_ref(b"HEAD", new_ref)
         push_branch = spec.new_branch
 
+    refspec   = f"refs/heads/{push_branch}:refs/heads/{push_branch}".encode()
     auth_method = settings.value("git/auth_method", "https")
-    env = {}
+
     if auth_method == "ssh":
-        env = build_auth_env(settings)
+        key_path   = settings.value("git/ssh_key_path",   "")
+        passphrase = settings.value("git/ssh_passphrase", "")
+        push_url   = _ssh_clone_url(info)
+
+        vendor = _make_paramiko_vendor(key_path, passphrase)
+        if vendor is not None:
+            import dulwich.client as _dc
+            _orig = _dc.get_ssh_vendor
+            _dc.get_ssh_vendor = lambda: vendor
+            try:
+                porcelain.push(repo_path, remote_location=push_url,
+                               refspecs=[refspec], errstream=errstream)
+            finally:
+                _dc.get_ssh_vendor = _orig
+        else:
+            porcelain.push(repo_path, remote_location=push_url,
+                           refspecs=[refspec], errstream=errstream)
     else:
         user  = settings.value("git/https_username", "")
         token = settings.value("git/https_token",    "")
-        if user and token:
-            with origin.config_writer as cw:
-                cw.set("url", _build_https_clone_url(info.clone_url, user, token))
-
-    class _PushProgress:
-        def __call__(self, op_code, cur_count, max_count=None, message=""):
-            if progress_cb and max_count and max_count > 0:
-                progress_cb(int(cur_count / max_count * 100), message or "")
-        def update(self, op_code, cur_count, max_count=None, message=""):
-            self.__call__(op_code, cur_count, max_count, message)
-
-    push_info = origin.push(
-        refspec=f"{push_branch}:{push_branch}",
-        progress=_PushProgress(),
-        **( {"env": env} if env else {} ),
-    )
-
-    for pi in push_info:
-        import git as _g
-        if pi.flags & _g.PushInfo.ERROR:
-            raise RuntimeError(f"Push rejected: {pi.summary.strip()}")
+        push_url = (
+            _build_https_clone_url(info.clone_url, user, token)
+            if user and token
+            else info.clone_url
+        )
+        porcelain.push(repo_path, remote_location=push_url,
+                       refspecs=[refspec], errstream=errstream)
 
     if spec.create_pr:
         _create_pull_request(info, spec, settings)
+
+
+def _git_author(repo_path: str) -> bytes:
+    """Read name/email from the repo's git config; fall back to a safe default."""
+    try:
+        from dulwich.repo import Repo
+        from dulwich.config import StackedConfig
+        cfg = StackedConfig.default()
+        name  = cfg.get(b"user", b"name")
+        email = cfg.get(b"user", b"email")
+        return f"{name.decode()} <{email.decode()}>".encode()
+    except Exception:
+        return b"MarkForge <markforge@local>"
 
 
 # ── Pull request creation ─────────────────────────────────────────────────────
@@ -412,7 +413,6 @@ def _create_pull_request(info: GitFileInfo, spec: CommitSpec, settings) -> None:
         )
 
     elif info.platform == "github_enterprise":
-        # GitHub Enterprise Server REST API lives at /api/v3/
         api_url = f"{info.base_url}/api/v3/repos/{info.owner}/{info.repo}/pulls"
         payload = json.dumps({
             "title": spec.pr_title,
@@ -453,13 +453,12 @@ def _create_pull_request(info: GitFileInfo, spec: CommitSpec, settings) -> None:
         )
 
     elif info.platform == "bitbucket_server":
-        # Bitbucket Server / Data Center REST API 1.0
         api_url = (
             f"{info.base_url}/rest/api/1.0"
             f"/projects/{info.owner}/repos/{info.repo}/pull-requests"
         )
         payload = json.dumps({
-            "title": spec.pr_title,
+            "title":   spec.pr_title,
             "fromRef": {"id": f"refs/heads/{head_branch}"},
             "toRef":   {"id": f"refs/heads/{target_branch}"},
         }).encode()

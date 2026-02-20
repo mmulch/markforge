@@ -4,4 +4,4 @@ markdown>=3.4.0
 Pygments>=2.14.0
 PyMuPDF>=1.23.0
 pymupdf4llm>=0.3.4
-gitpython>=3.1.40
+dulwich>=0.20.50
