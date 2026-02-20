@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import fnmatch
 import os
 
 from PyQt6.QtCore import Qt, QSortFilterProxyModel, QTimer, pyqtSignal
@@ -20,13 +19,12 @@ from PyQt6.QtWidgets import (
 
 from i18n import tr
 
-_NAME_FILTERS    = [
+_NAME_FILTERS  = [
     "*.md", "*.markdown",
     "*.txt",
     "*.png", "*.jpg", "*.jpeg", "*.gif", "*.svg", "*.webp", "*.bmp",
 ]
-_FILTER_PATTERNS = [p.lower() for p in _NAME_FILTERS]
-_OPENABLE_EXTS   = {".md", ".markdown", ".txt"}
+_OPENABLE_EXTS = {".md", ".markdown", ".txt"}
 
 
 # ── Proxy-Modell ──────────────────────────────────────────────────────────────
@@ -46,7 +44,7 @@ class _HideEmptyDirsProxy(QSortFilterProxyModel):
 
     def set_root(self, path: str) -> None:
         self._root = os.path.normpath(path)
-        self.invalidateFilter()
+        self.invalidateRowsFilter()
 
     def filterAcceptsRow(self, source_row: int, source_parent) -> bool:
         model = self.sourceModel()
@@ -165,16 +163,19 @@ class FileTreeWidget(QWidget):
         """Sets the tree view root index to the proxy index of the root directory."""
         src_idx   = self._fs_model.index(self._root_dir)
         proxy_idx = self._proxy.mapFromSource(src_idx)
-        print(f"[tree] _apply_root_index root={self._root_dir!r} "
-              f"src_valid={src_idx.isValid()} proxy_valid={proxy_idx.isValid()} "
-              f"src_rows={self._fs_model.rowCount(src_idx)} "
-              f"proxy_rows={self._proxy.rowCount(proxy_idx)}")
-        self._tree.setRootIndex(proxy_idx)
+        if proxy_idx.isValid():
+            self._tree.setRootIndex(proxy_idx)
 
-    def _on_directory_loaded(self, loaded_path: str) -> None:
-        print(f"[tree] directoryLoaded: {loaded_path!r}  root={self._root_dir!r}")
-        self._proxy.invalidateFilter()
-        QTimer.singleShot(0, self._apply_root_index)
+    def _on_directory_loaded(self, _: str) -> None:
+        # Use invalidateRowsFilter() instead of invalidateFilter() so that the
+        # proxy re-evaluates filterAcceptsRow for every row WITHOUT triggering a
+        # full model reset (beginResetModel/endResetModel).  A full reset clears
+        # the tree view's root index and rebuilds the proxy mapping from scratch;
+        # on the first directory load the subsequent mapFromSource() call could
+        # return an invalid index because the mapping hadn't been rebuilt yet.
+        # invalidateRowsFilter() preserves the existing mapping and root index.
+        self._proxy.invalidateRowsFilter()
+        self._apply_root_index()
         QTimer.singleShot(0, self._do_select)
 
     def select_file(self, path: str) -> None:
