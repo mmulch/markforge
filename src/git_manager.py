@@ -5,12 +5,69 @@ from __future__ import annotations
 import base64
 import os
 import shutil
+import sys
 import tempfile
 import urllib.request
 import urllib.error
 import json
 from dataclasses import dataclass
 from urllib.parse import urlparse, parse_qs
+
+
+# ── Git executable discovery ───────────────────────────────────────────────────
+
+# Candidate paths searched on Windows when git is not in PATH
+_WINDOWS_GIT_CANDIDATES = [
+    r"C:\Program Files\Git\cmd\git.exe",
+    r"C:\Program Files\Git\bin\git.exe",
+    r"C:\Program Files (x86)\Git\cmd\git.exe",
+    r"C:\Program Files (x86)\Git\bin\git.exe",
+]
+
+def _ensure_git() -> None:
+    """Make sure GitPython can find the git executable.
+
+    On Windows git.exe is often only on the Git-internal PATH and not visible
+    to processes launched from a GUI.  We probe well-known install locations
+    as a fallback and call git.refresh() so all subsequent calls succeed.
+    """
+    import git as gitpython
+
+    try:
+        gitpython.refresh()
+        return  # already works
+    except gitpython.exc.InvalidGitRepositoryError:
+        return  # refresh() raised for a different reason; git itself is fine
+    except Exception:
+        pass  # git not found in PATH – fall through to manual search
+
+    if sys.platform != "win32":
+        raise RuntimeError(
+            "git executable not found. Make sure git is installed and in your PATH."
+        )
+
+    # Search common Windows installation directories
+    for candidate in _WINDOWS_GIT_CANDIDATES:
+        if os.path.isfile(candidate):
+            gitpython.refresh(candidate)
+            return
+
+    # Also check the user's local AppData (GitHub Desktop, scoop, etc.)
+    local_app = os.environ.get("LOCALAPPDATA", "")
+    extra = [
+        os.path.join(local_app, "Programs", "Git", "cmd", "git.exe"),
+        os.path.join(local_app, "Programs", "Git", "bin", "git.exe"),
+    ]
+    for candidate in extra:
+        if os.path.isfile(candidate):
+            gitpython.refresh(candidate)
+            return
+
+    raise RuntimeError(
+        "git executable not found on this system.\n"
+        "Please install Git for Windows (https://git-scm.com/) "
+        "and make sure git.exe is in your PATH."
+    )
 
 
 # ── Dataclasses ───────────────────────────────────────────────────────────────
@@ -231,6 +288,7 @@ def clone_repo(info: GitFileInfo, settings, progress_cb) -> str:
     Returns the path to the temp directory on success.
     Raises on any error (and cleans up the temp dir).
     """
+    _ensure_git()
     import git as gitpython
 
     tmpdir = tempfile.mkdtemp(prefix="markforge_git_")
@@ -277,6 +335,7 @@ def clone_repo(info: GitFileInfo, settings, progress_cb) -> str:
 
 def commit_and_push(info: GitFileInfo, spec: CommitSpec, settings, progress_cb) -> None:
     """Stage info.file_path, commit, optionally switch branch, and push."""
+    _ensure_git()
     import git as gitpython
 
     repo   = gitpython.Repo(info.local_repo_path)
