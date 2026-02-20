@@ -214,6 +214,27 @@ def _http_get(url: str, headers: dict) -> bytes:
         if exc.code == 401:
             raise RuntimeError("Authentication failed (HTTP 401). Check credentials.") from exc
         raise RuntimeError(f"HTTP {exc.code}: {exc.reason}") from exc
+    except urllib.error.URLError as exc:
+        _raise_network_error(url, exc)
+
+
+def _raise_network_error(url: str, exc: urllib.error.URLError) -> None:
+    """Convert urllib network errors into human-readable messages."""
+    import socket
+    from urllib.parse import urlparse
+    host = urlparse(url).hostname or url
+    reason = exc.reason
+    if isinstance(reason, socket.gaierror):
+        raise RuntimeError(
+            f"Could not resolve host '{host}'.\n"
+            "Check that you are connected to the correct network or VPN."
+        )
+    if isinstance(reason, TimeoutError) or "timed out" in str(reason).lower():
+        raise RuntimeError(
+            f"Connection to '{host}' timed out.\n"
+            "Check your network connection and that the server is reachable."
+        )
+    raise RuntimeError(f"Network error: {reason}")
 
 
 def _http_json(url: str, headers: dict, payload: dict, method: str = "POST") -> bytes:
@@ -228,6 +249,8 @@ def _http_json(url: str, headers: dict, payload: dict, method: str = "POST") -> 
         if exc.code == 401:
             raise RuntimeError("Authentication failed (HTTP 401). Check credentials.") from exc
         raise RuntimeError(f"HTTP {exc.code}: {exc.reason}\n{body[:300]}") from exc
+    except urllib.error.URLError as exc:
+        _raise_network_error(url, exc)
 
 
 def _http_multipart(url: str, headers: dict,
@@ -261,6 +284,8 @@ def _http_multipart(url: str, headers: dict,
         if exc.code == 401:
             raise RuntimeError("Authentication failed (HTTP 401). Check credentials.") from exc
         raise RuntimeError(f"HTTP {exc.code}: {exc.reason}\n{body_text[:300]}") from exc
+    except urllib.error.URLError as exc:
+        _raise_network_error(url, exc)
 
 
 # ── HTTPS: download / upload file ─────────────────────────────────────────────
