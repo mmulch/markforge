@@ -37,20 +37,22 @@ jobs:
         run: choco install innosetup -y
 
       - name: Build installer with Inno Setup
-        run: >
-          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
-          build\windows\markforge.iss
+        run: |
+          $version = "${{ github.ref_name }}" -replace '^v', ''
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" `
+            /DAppVersion=$version `
+            build\windows\markforge.iss
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Markforge-Setup
-          path: build/windows/Output/Markforge-Setup.exe
+          name: MarkForge-Setup
+          path: build/windows/Output/MarkForge-Setup-*.exe
           if-no-files-found: error
 
       - name: Upload release asset
         uses: softprops/action-gh-release@v2
         with:
-          files: build/windows/Output/Markforge-Setup.exe
+          files: build/windows/Output/MarkForge-Setup-*.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
