@@ -34,14 +34,9 @@ class _LineNumberArea(QWidget):
 class EditorWidget(QPlainTextEdit):
     """Plain-text editor with line numbers, current-line highlight, and Markdown syntax highlighting."""
 
-    _BG        = QColor("#1e1e1e")
-    _FG        = QColor("#d4d4d4")
-    _GUTTER_BG = QColor("#252526")
-    _GUTTER_FG = QColor("#858585")
-    _LINE_HL   = QColor("#2a2a2a")
-
     def __init__(self) -> None:
         super().__init__()
+        self._dark = True
         self._gutter = _LineNumberArea(self)
         self._highlighter = MarkdownHighlighter(self.document())
 
@@ -63,9 +58,22 @@ class EditorWidget(QPlainTextEdit):
         self.setTabStopDistance(40.0)
         self.setWordWrapMode(QTextOption.WrapMode.WordWrap)
 
+        if self._dark:
+            bg = QColor("#1e1e1e")
+            fg = QColor("#d4d4d4")
+            self._GUTTER_BG = QColor("#252526")
+            self._GUTTER_FG = QColor("#858585")
+            self._LINE_HL   = QColor("#2a2a2a")
+        else:
+            bg = QColor("#ffffff")
+            fg = QColor("#1e1e1e")
+            self._GUTTER_BG = QColor("#f0f0f0")
+            self._GUTTER_FG = QColor("#888888")
+            self._LINE_HL   = QColor("#e8f2ff")
+
         pal = self.palette()
-        pal.setColor(QPalette.ColorRole.Base, self._BG)
-        pal.setColor(QPalette.ColorRole.Text, self._FG)
+        pal.setColor(QPalette.ColorRole.Base, bg)
+        pal.setColor(QPalette.ColorRole.Text, fg)
         self.setPalette(pal)
 
     # ── Public API ────────────────────────────────────────────────────────────
@@ -73,6 +81,15 @@ class EditorWidget(QPlainTextEdit):
     def set_word_wrap(self, enabled: bool) -> None:
         mode = QTextOption.WrapMode.WordWrap if enabled else QTextOption.WrapMode.NoWrap
         self.setWordWrapMode(mode)
+
+    def set_theme(self, dark: bool) -> None:
+        if self._dark == dark:
+            return
+        self._dark = dark
+        self._apply_theme()
+        self._highlighter.set_theme(dark=dark)
+        self._highlight_current_line()
+        self._gutter.update()
 
     # ── Line numbers ──────────────────────────────────────────────────────────
 

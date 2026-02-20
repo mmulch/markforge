@@ -1,0 +1,89 @@
+name: Build Debian Package
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-deb:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Extract version from tag
+        id: version
+        run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Assemble package tree
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          PKG="markforge_${VERSION}_all"
+
+          install -d "${PKG}/DEBIAN"
+          install -d "${PKG}/usr/bin"
+          install -d "${PKG}/usr/lib/markforge"
+          install -d "${PKG}/usr/share/applications"
+          install -d "${PKG}/usr/share/pixmaps"
+
+          # Python sources
+          install -m 644 src/*.py "${PKG}/usr/lib/markforge/"
+
+          # Launcher script
+          printf '#!/bin/sh\nexec python3 /usr/lib/markforge/main.py "$@"\n' \
+            > "${PKG}/usr/bin/markforge"
+          chmod 755 "${PKG}/usr/bin/markforge"
+
+          # Desktop entry
+          cat > "${PKG}/usr/share/applications/markforge.desktop" << 'DESKTOP'
+[Desktop Entry]
+Name=MarkForge
+Comment=Markdown editor with live preview
+Exec=markforge %F
+Icon=markforge
+Terminal=false
+Type=Application
+Categories=Office;TextEditor;
+MimeType=text/markdown;text/x-markdown;
+DESKTOP
+
+          # Application icon
+          install -m 644 assets/markforge.svg \
+            "${PKG}/usr/share/pixmaps/markforge.svg"
+
+          # DEBIAN/control
+          cat > "${PKG}/DEBIAN/control" << CONTROL
+Package: markforge
+Version: ${VERSION}
+Section: editors
+Priority: optional
+Architecture: all
+Depends: python3 (>= 3.8), python3-pyqt6 (>= 6.4), python3-pyqt6.qtwebengine, python3-markdown, python3-pygments
+Maintainer: Marcel Mulch <marcel@mulch-online.de>
+Description: Modern Markdown editor with live preview
+ A PyQt6-based Markdown editor with live side-by-side preview,
+ syntax highlighting, PlantUML diagram support, math formulas,
+ and PDF export.
+CONTROL
+
+          dpkg-deb --build --root-owner-group "${PKG}"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: markforge-deb
+          path: markforge_*.deb
+          if-no-files-found: error
+
+      - name: Upload release asset
+        uses: softprops/action-gh-release@v2
+        with:
+          files: markforge_*.deb
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

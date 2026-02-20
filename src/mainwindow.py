@@ -117,6 +117,7 @@ class MainWindow(QMainWindow):
         self._act_wrap = self._mk_action(tr("Word wrap"), None, m, checkable=True)
         self._act_wrap.setChecked(True)
         self._act_light = self._mk_action(tr("Light preview"), None, m, checkable=True)
+        self._act_light_editor = self._mk_action(tr("Light editor"), None, m, checkable=True)
         m.addSeparator()
         settings_act = self._mk_action(tr("Settings …"), None, m)
         settings_act.triggered.connect(self._open_settings)
@@ -182,6 +183,7 @@ class MainWindow(QMainWindow):
         self._act_preview.toggled.connect(self._preview.setVisible)
         self._act_wrap.toggled.connect(self._editor.set_word_wrap)
         self._act_light.toggled.connect(self._set_preview_theme)
+        self._act_light_editor.toggled.connect(self._set_editor_theme)
         self._file_tree.file_activated.connect(self._load)
         self._preview.open_file.connect(self._load)
 
@@ -350,6 +352,9 @@ class MainWindow(QMainWindow):
         light = self._settings.value("light_preview", False, type=bool)
         self._act_light.setChecked(light)
         self._preview.set_theme(dark=not light)
+        light_editor = self._settings.value("light_editor", False, type=bool)
+        self._act_light_editor.setChecked(light_editor)
+        self._editor.set_theme(dark=not light_editor)
 
     def _open_settings(self) -> None:
         dlg = SettingsDialog(self)
@@ -363,6 +368,7 @@ class MainWindow(QMainWindow):
         self._settings.setValue("splitter", self._splitter.sizes())
         self._settings.setValue("outer_splitter", self._outer_splitter.sizes())
         self._settings.setValue("light_preview", self._act_light.isChecked())
+        self._settings.setValue("light_editor", self._act_light_editor.isChecked())
         event.accept()
 
     # ── Insert actions ────────────────────────────────────────────────────────
@@ -418,6 +424,9 @@ class MainWindow(QMainWindow):
 
     def _set_preview_theme(self, light: bool) -> None:
         self._preview.set_theme(dark=not light)
+
+    def _set_editor_theme(self, light: bool) -> None:
+        self._editor.set_theme(dark=not light)
 
     def _show_markdown_help(self) -> None:
         dlg = MarkdownHelpDialog(self)

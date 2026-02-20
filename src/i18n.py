@@ -29,6 +29,7 @@ _DE: dict[str, str] = {
     "Show preview": "Vorschau anzeigen",
     "Word wrap": "Zeilenumbruch",
     "Light preview": "Helle Vorschau",
+    "Light editor": "Heller Editor",
     "Settings …": "Einstellungen …",
     "&Help": "&Hilfe",
     "&Markdown …": "&Markdown …",
