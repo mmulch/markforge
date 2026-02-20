@@ -71,24 +71,7 @@ a = Analysis(
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
-    excludes=[
-        # Unused Python stdlib
-        'tkinter', '_tkinter',
-        'unittest', 'doctest', 'pdb', 'pydoc',
-        'turtle', 'curses',
-        'multiprocessing', 'concurrent',
-        'xmlrpc', 'ftplib', 'smtplib', 'telnetlib',
-        # Unused PyQt6 Python bindings (prevents .pyd files being loaded)
-        'PyQt6.Qt3DAnimation', 'PyQt6.Qt3DCore', 'PyQt6.Qt3DExtras',
-        'PyQt6.Qt3DInput', 'PyQt6.Qt3DLogic', 'PyQt6.Qt3DRender',
-        'PyQt6.QtBluetooth', 'PyQt6.QtCharts',
-        'PyQt6.QtDataVisualization', 'PyQt6.QtLocation',
-        'PyQt6.QtMultimedia', 'PyQt6.QtMultimediaWidgets',
-        'PyQt6.QtNfc', 'PyQt6.QtPositioning',
-        'PyQt6.QtQuick', 'PyQt6.QtQuickControls2', 'PyQt6.QtQuickWidgets',
-        'PyQt6.QtRemoteObjects', 'PyQt6.QtSensors', 'PyQt6.QtSerialPort',
-        'PyQt6.QtSql', 'PyQt6.QtTest', 'PyQt6.QtTextToSpeech',
-    ],
+    excludes=[],
     noarchive=False,
 )
 
