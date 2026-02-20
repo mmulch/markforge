@@ -36,6 +36,11 @@ def _needed(name):
 
 datas, binaries, hiddenimports = collect_all('PyQt6')
 
+_dulwich_datas, _dulwich_binaries, _dulwich_hidden = collect_all('dulwich')
+datas     += _dulwich_datas
+binaries  += _dulwich_binaries
+hiddenimports += _dulwich_hidden
+
 hiddenimports += [
     'markdown',
     'markdown.extensions',
@@ -70,7 +75,7 @@ a = Analysis(
         # Unused Python stdlib
         'tkinter', '_tkinter',
         'unittest', 'doctest', 'pdb', 'pydoc',
-        'difflib', 'turtle', 'curses',
+        'turtle', 'curses',
         'multiprocessing', 'concurrent',
         'xmlrpc', 'ftplib', 'smtplib', 'telnetlib',
         # Unused PyQt6 Python bindings (prevents .pyd files being loaded)
