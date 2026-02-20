@@ -9,20 +9,21 @@ import tempfile
 import urllib.request
 import urllib.error
 import json
-from dataclasses import dataclass, field
-from urllib.parse import urlparse
+from dataclasses import dataclass
+from urllib.parse import urlparse, parse_qs
 
 
 # ── Dataclasses ───────────────────────────────────────────────────────────────
 
 @dataclass
 class GitFileInfo:
-    platform:        str   # "github" | "bitbucket"
-    owner:           str
+    platform:        str   # "github" | "github_enterprise" | "bitbucket" | "bitbucket_server"
+    owner:           str   # GitHub: owner login; Bitbucket Server: project key
     repo:            str
     branch:          str
     file_path:       str   # relative path inside repo
     clone_url:       str   # https clone URL (no credentials)
+    base_url:        str   # scheme + host, e.g. "https://bitbucket.mycompany.com"
     local_repo_path: str = ""
     local_file_path: str = ""
 
@@ -40,52 +41,121 @@ class CommitSpec:
 # ── URL parsing ───────────────────────────────────────────────────────────────
 
 def parse_git_url(url: str) -> GitFileInfo:
-    """Parse a GitHub or Bitbucket file URL into a GitFileInfo.
+    """Parse a file URL from any GitHub/Bitbucket host into a GitFileInfo.
+
+    Platform is detected from the URL *path structure*, not the hostname,
+    so self-hosted GitHub Enterprise and Bitbucket Server instances work too.
+
+    Supported path patterns
+    -----------------------
+    GitHub / GitHub Enterprise:
+        /owner/repo/blob/branch/path/to/file.md
+
+    Bitbucket Cloud:
+        /owner/repo/src/branch/path/to/file.md
+
+    Bitbucket Server / Data Center:
+        /projects/PROJECT/repos/repo/browse/path/to/file.md?at=branch
+        (the ?at= parameter may be omitted; defaults to "main")
 
     Raises ValueError with a human-readable message on any problem.
     """
     parsed = urlparse(url.strip())
     host   = parsed.hostname or ""
-
-    if "github.com" in host:
-        platform  = "github"
-        clone_fmt = "https://github.com/{owner}/{repo}.git"
-    elif "bitbucket.org" in host:
-        platform  = "bitbucket"
-        clone_fmt = "https://bitbucket.org/{owner}/{repo}.git"
-    else:
-        raise ValueError(
-            f"Unsupported host '{host}'. Only github.com and bitbucket.org are supported."
-        )
+    scheme = parsed.scheme or "https"
+    base_url = f"{scheme}://{host}"
 
     parts = [p for p in parsed.path.split("/") if p]
-    # Expected path structures:
-    #   GitHub:     /owner/repo/blob/branch/path/to/file.md
-    #   Bitbucket:  /owner/repo/src/branch/path/to/file.md
-    if len(parts) < 5:
-        raise ValueError(
-            "URL must point to a specific file, e.g. "
-            "https://github.com/owner/repo/blob/main/README.md"
+
+    # ── Bitbucket Server / Data Center ────────────────────────────────────────
+    # Path: /projects/PROJECT/repos/REPO/browse/path/to/file[?at=branch]
+    if (
+        len(parts) >= 5
+        and parts[0].lower() == "projects"
+        and parts[2].lower() == "repos"
+        and parts[4].lower() == "browse"
+    ):
+        project_key = parts[1]
+        repo        = parts[3]
+        file_path   = "/".join(parts[5:])
+
+        if not file_path:
+            raise ValueError("The URL does not point to a file (file path is empty).")
+
+        # Branch from ?at= query param; strip refs/heads/ prefix if present
+        qs = parse_qs(parsed.query)
+        at = qs.get("at", ["main"])[0]
+        branch = at
+        for prefix in ("refs/heads/", "refs/tags/"):
+            if branch.startswith(prefix):
+                branch = branch[len(prefix):]
+                break
+
+        # Bitbucket Server clone URL uses /scm/project/repo.git
+        clone_url = f"{base_url}/scm/{project_key.lower()}/{repo}.git"
+
+        return GitFileInfo(
+            platform="bitbucket_server",
+            owner=project_key,
+            repo=repo,
+            branch=branch,
+            file_path=file_path,
+            clone_url=clone_url,
+            base_url=base_url,
         )
 
-    owner     = parts[0]
-    repo      = parts[1]
-    # parts[2] is "blob" (GitHub) or "src" (Bitbucket) — skip it
-    branch    = parts[3]
-    file_path = "/".join(parts[4:])
+    # ── GitHub / GitHub Enterprise ────────────────────────────────────────────
+    # Path: /owner/repo/blob/branch/path/to/file.md
+    if len(parts) >= 5 and parts[2].lower() == "blob":
+        owner     = parts[0]
+        repo      = parts[1]
+        branch    = parts[3]
+        file_path = "/".join(parts[4:])
 
-    if not file_path:
-        raise ValueError("The URL does not point to a file (file path is empty).")
+        if not file_path:
+            raise ValueError("The URL does not point to a file (file path is empty).")
 
-    clone_url = clone_fmt.format(owner=owner, repo=repo)
+        clone_url = f"{base_url}/{owner}/{repo}.git"
+        platform  = "github" if host == "github.com" else "github_enterprise"
 
-    return GitFileInfo(
-        platform=platform,
-        owner=owner,
-        repo=repo,
-        branch=branch,
-        file_path=file_path,
-        clone_url=clone_url,
+        return GitFileInfo(
+            platform=platform,
+            owner=owner,
+            repo=repo,
+            branch=branch,
+            file_path=file_path,
+            clone_url=clone_url,
+            base_url=base_url,
+        )
+
+    # ── Bitbucket Cloud ───────────────────────────────────────────────────────
+    # Path: /owner/repo/src/branch/path/to/file.md
+    if len(parts) >= 5 and parts[2].lower() == "src":
+        owner     = parts[0]
+        repo      = parts[1]
+        branch    = parts[3]
+        file_path = "/".join(parts[4:])
+
+        if not file_path:
+            raise ValueError("The URL does not point to a file (file path is empty).")
+
+        clone_url = f"https://bitbucket.org/{owner}/{repo}.git"
+
+        return GitFileInfo(
+            platform="bitbucket",
+            owner=owner,
+            repo=repo,
+            branch=branch,
+            file_path=file_path,
+            clone_url=clone_url,
+            base_url=base_url,
+        )
+
+    raise ValueError(
+        "Could not recognise URL format. Supported patterns:\n"
+        "  GitHub / GHE:          …/owner/repo/blob/branch/file.md\n"
+        "  Bitbucket Cloud:       …/owner/repo/src/branch/file.md\n"
+        "  Bitbucket Server/DC:   …/projects/PROJ/repos/repo/browse/file.md?at=branch"
     )
 
 
@@ -93,7 +163,19 @@ def parse_git_url(url: str) -> GitFileInfo:
 
 def _build_https_clone_url(base: str, user: str, token: str) -> str:
     """Embed credentials into an HTTPS clone URL."""
-    return base.replace("https://", f"https://{user}:{token}@", 1)
+    scheme = base.split("://")[0]
+    return base.replace(f"{scheme}://", f"{scheme}://{user}:{token}@", 1)
+
+
+def _ssh_clone_url(info: GitFileInfo) -> str:
+    """Return the SSH clone URL for *info*."""
+    host = urlparse(info.base_url).hostname or ""
+    if info.platform == "bitbucket_server":
+        # Bitbucket Server SSH: ssh://git@host/scm/project/repo.git
+        return f"ssh://git@{host}/scm/{info.owner.lower()}/{info.repo}.git"
+    else:
+        # GitHub / GHE / Bitbucket Cloud: git@host:owner/repo.git
+        return f"git@{host}:{info.owner}/{info.repo}.git"
 
 
 def build_auth_env(settings) -> dict:
@@ -117,7 +199,7 @@ def build_auth_env(settings) -> dict:
         askpass.write(f'#!/bin/sh\necho "{passphrase}"\n')
         askpass.flush()
         os.chmod(askpass.name, 0o700)
-        env["SSH_ASKPASS"]       = askpass.name
+        env["SSH_ASKPASS"]         = askpass.name
         env["SSH_ASKPASS_REQUIRE"] = "force"
 
     return env
@@ -134,13 +216,9 @@ class _GitProgress:
     def __call__(self, op_code, cur_count, max_count=None, message=""):
         if self._cb is None:
             return
-        if max_count and max_count > 0:
-            pct = int(cur_count / max_count * 100)
-        else:
-            pct = 0
+        pct = int(cur_count / max_count * 100) if max_count else 0
         self._cb(pct, message or "")
 
-    # GitPython calls update() on progress objects
     def update(self, op_code, cur_count, max_count=None, message=""):
         self.__call__(op_code, cur_count, max_count, message)
 
@@ -160,9 +238,8 @@ def clone_repo(info: GitFileInfo, settings, progress_cb) -> str:
         auth_method = settings.value("git/auth_method", "https")
 
         if auth_method == "ssh":
-            clone_url = info.clone_url.replace("https://github.com/", "git@github.com:", 1)
-            clone_url = clone_url.replace("https://bitbucket.org/", "git@bitbucket.org:", 1)
-            env = build_auth_env(settings)
+            clone_url = _ssh_clone_url(info)
+            env       = build_auth_env(settings)
             gitpython.Repo.clone_from(
                 clone_url,
                 tmpdir,
@@ -175,10 +252,11 @@ def clone_repo(info: GitFileInfo, settings, progress_cb) -> str:
         else:
             user  = settings.value("git/https_username", "")
             token = settings.value("git/https_token",    "")
-            if user and token:
-                clone_url = _build_https_clone_url(info.clone_url, user, token)
-            else:
-                clone_url = info.clone_url  # public repo – no credentials
+            clone_url = (
+                _build_https_clone_url(info.clone_url, user, token)
+                if user and token
+                else info.clone_url   # public repo – no credentials
+            )
             gitpython.Repo.clone_from(
                 clone_url,
                 tmpdir,
@@ -204,17 +282,14 @@ def commit_and_push(info: GitFileInfo, spec: CommitSpec, settings, progress_cb) 
     repo   = gitpython.Repo(info.local_repo_path)
     origin = repo.remotes.origin
 
-    # Stage the file
     repo.index.add([info.file_path])
     repo.index.commit(spec.message)
 
-    # Optionally create and switch to a new branch
     push_branch = info.branch
     if spec.push_mode == "new_branch" and spec.new_branch:
         repo.create_head(spec.new_branch).checkout()
         push_branch = spec.new_branch
 
-    # Fix remote URL for HTTPS auth
     auth_method = settings.value("git/auth_method", "https")
     env = {}
     if auth_method == "ssh":
@@ -239,13 +314,10 @@ def commit_and_push(info: GitFileInfo, spec: CommitSpec, settings, progress_cb) 
         **( {"env": env} if env else {} ),
     )
 
-    # Check for push rejection
     for pi in push_info:
         import git as _g
         if pi.flags & _g.PushInfo.ERROR:
-            raise RuntimeError(
-                f"Push rejected: {pi.summary.strip()}"
-            )
+            raise RuntimeError(f"Push rejected: {pi.summary.strip()}")
 
     if spec.create_pr:
         _create_pull_request(info, spec, settings)
@@ -254,7 +326,7 @@ def commit_and_push(info: GitFileInfo, spec: CommitSpec, settings, progress_cb) 
 # ── Pull request creation ─────────────────────────────────────────────────────
 
 def _create_pull_request(info: GitFileInfo, spec: CommitSpec, settings) -> None:
-    """Create a PR on GitHub or Bitbucket using only urllib."""
+    """Create a PR on GitHub, GitHub Enterprise, Bitbucket Cloud, or Bitbucket Server."""
     user  = settings.value("git/https_username", "")
     token = settings.value("git/https_token",    "")
 
@@ -262,9 +334,7 @@ def _create_pull_request(info: GitFileInfo, spec: CommitSpec, settings) -> None:
     target_branch = spec.pr_target  or info.branch
 
     if info.platform == "github":
-        api_url = (
-            f"https://api.github.com/repos/{info.owner}/{info.repo}/pulls"
-        )
+        api_url = f"https://api.github.com/repos/{info.owner}/{info.repo}/pulls"
         payload = json.dumps({
             "title": spec.pr_title,
             "head":  head_branch,
@@ -272,8 +342,27 @@ def _create_pull_request(info: GitFileInfo, spec: CommitSpec, settings) -> None:
             "body":  "",
         }).encode()
         req = urllib.request.Request(
-            api_url,
-            data=payload,
+            api_url, data=payload,
+            headers={
+                "Authorization": f"token {token}",
+                "Accept":        "application/vnd.github+json",
+                "Content-Type":  "application/json",
+                "User-Agent":    "MarkForge",
+            },
+            method="POST",
+        )
+
+    elif info.platform == "github_enterprise":
+        # GitHub Enterprise Server REST API lives at /api/v3/
+        api_url = f"{info.base_url}/api/v3/repos/{info.owner}/{info.repo}/pulls"
+        payload = json.dumps({
+            "title": spec.pr_title,
+            "head":  head_branch,
+            "base":  target_branch,
+            "body":  "",
+        }).encode()
+        req = urllib.request.Request(
+            api_url, data=payload,
             headers={
                 "Authorization": f"token {token}",
                 "Accept":        "application/vnd.github+json",
@@ -290,13 +379,12 @@ def _create_pull_request(info: GitFileInfo, spec: CommitSpec, settings) -> None:
         )
         payload = json.dumps({
             "title": spec.pr_title,
-            "source": {"branch": {"name": head_branch}},
+            "source":      {"branch": {"name": head_branch}},
             "destination": {"branch": {"name": target_branch}},
         }).encode()
         credentials = base64.b64encode(f"{user}:{token}".encode()).decode()
         req = urllib.request.Request(
-            api_url,
-            data=payload,
+            api_url, data=payload,
             headers={
                 "Authorization": f"Basic {credentials}",
                 "Content-Type":  "application/json",
@@ -304,6 +392,29 @@ def _create_pull_request(info: GitFileInfo, spec: CommitSpec, settings) -> None:
             },
             method="POST",
         )
+
+    elif info.platform == "bitbucket_server":
+        # Bitbucket Server / Data Center REST API 1.0
+        api_url = (
+            f"{info.base_url}/rest/api/1.0"
+            f"/projects/{info.owner}/repos/{info.repo}/pull-requests"
+        )
+        payload = json.dumps({
+            "title": spec.pr_title,
+            "fromRef": {"id": f"refs/heads/{head_branch}"},
+            "toRef":   {"id": f"refs/heads/{target_branch}"},
+        }).encode()
+        credentials = base64.b64encode(f"{user}:{token}".encode()).decode()
+        req = urllib.request.Request(
+            api_url, data=payload,
+            headers={
+                "Authorization": f"Basic {credentials}",
+                "Content-Type":  "application/json",
+                "User-Agent":    "MarkForge",
+            },
+            method="POST",
+        )
+
     else:
         raise ValueError(f"Unknown platform: {info.platform!r}")
 

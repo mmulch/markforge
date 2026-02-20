@@ -76,8 +76,13 @@ class GitOpenDialog(QDialog):
             info = parse_git_url(text)
             self._info = info
             self._status_label.setStyleSheet("color: #4caf50; font-size: 12px;")
+            host_hint = (
+                f" ({info.base_url})"
+                if info.platform in ("github_enterprise", "bitbucket_server")
+                else ""
+            )
             self._status_label.setText(
-                f"{info.platform} · {info.owner}/{info.repo} · {info.file_path}"
+                f"{info.platform}{host_hint} · {info.owner}/{info.repo} · {info.file_path}"
             )
             # Pre-fill ref field with auto-detected branch if user hasn't typed
             if not self._ref_edit.text():
