@@ -19,14 +19,7 @@ from PyQt6.QtWidgets import (
     QVBoxLayout,
 )
 
-# Alignment options and their Markdown separator markers
-_ALIGNMENTS: list[tuple[str, str]] = [
-    ("Links",    ":---"),
-    ("Zentriert", ":---:"),
-    ("Rechts",   "---:"),
-]
-_ALIGN_LABELS  = [label for label, _ in _ALIGNMENTS]
-_ALIGN_MARKERS = {label: marker for label, marker in _ALIGNMENTS}
+from i18n import tr
 
 
 def _make_mono_font(size: int = 10) -> QFont:
@@ -40,7 +33,7 @@ class InsertTableDialog(QDialog):
 
     def __init__(self, parent=None) -> None:
         super().__init__(parent)
-        self.setWindowTitle("Tabelle einfügen")
+        self.setWindowTitle(tr("Insert Table"))
         self.setMinimumWidth(520)
         self._build_ui()
         self._sync_column_table()
@@ -60,30 +53,30 @@ class InsertTableDialog(QDialog):
             QDialogButtonBox.StandardButton.Ok
             | QDialogButtonBox.StandardButton.Cancel
         )
-        btns.button(QDialogButtonBox.StandardButton.Ok).setText("Einfügen")
-        btns.button(QDialogButtonBox.StandardButton.Cancel).setText("Abbrechen")
+        btns.button(QDialogButtonBox.StandardButton.Ok).setText(tr("Insert"))
+        btns.button(QDialogButtonBox.StandardButton.Cancel).setText(tr("Cancel"))
         btns.accepted.connect(self.accept)
         btns.rejected.connect(self.reject)
         root.addWidget(btns)
 
     def _build_structure_group(self) -> QGroupBox:
-        grp  = QGroupBox("Tabellenstruktur")
+        grp  = QGroupBox(tr("Table Structure"))
         form = QFormLayout(grp)
         form.setRowWrapPolicy(QFormLayout.RowWrapPolicy.DontWrapRows)
 
         self._rows_spin = QSpinBox()
         self._rows_spin.setRange(1, 100)
         self._rows_spin.setValue(3)
-        self._rows_spin.setToolTip("Anzahl der Datenzeilen (ohne Kopfzeile)")
-        form.addRow("Datenzeilen:", self._rows_spin)
+        self._rows_spin.setToolTip(tr("Number of data rows (excluding header)"))
+        form.addRow(tr("Data rows:"), self._rows_spin)
 
         self._cols_spin = QSpinBox()
         self._cols_spin.setRange(1, 15)
         self._cols_spin.setValue(3)
-        self._cols_spin.setToolTip("Anzahl der Spalten")
-        form.addRow("Spalten:", self._cols_spin)
+        self._cols_spin.setToolTip(tr("Number of columns"))
+        form.addRow(tr("Columns:"), self._cols_spin)
 
-        self._header_check = QCheckBox("Kopfzeile mit Spaltentiteln")
+        self._header_check = QCheckBox(tr("Header row with column titles"))
         self._header_check.setChecked(True)
         form.addRow("", self._header_check)
 
@@ -94,12 +87,12 @@ class InsertTableDialog(QDialog):
         return grp
 
     def _build_columns_group(self) -> QGroupBox:
-        grp    = QGroupBox("Spaltenkonfiguration")
+        grp    = QGroupBox(tr("Column Configuration"))
         layout = QVBoxLayout(grp)
 
         self._col_table = QTableWidget()
         self._col_table.setColumnCount(2)
-        self._col_table.setHorizontalHeaderLabels(["Spaltenname", "Ausrichtung"])
+        self._col_table.setHorizontalHeaderLabels([tr("Column Name"), tr("Alignment")])
         hh = self._col_table.horizontalHeader()
         hh.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
         hh.setSectionResizeMode(1, QHeaderView.ResizeMode.ResizeToContents)
@@ -114,7 +107,7 @@ class InsertTableDialog(QDialog):
         return grp
 
     def _build_preview_group(self) -> QGroupBox:
-        grp    = QGroupBox("Vorschau (Markdown)")
+        grp    = QGroupBox(tr("Preview (Markdown)"))
         layout = QVBoxLayout(grp)
 
         self._preview = QPlainTextEdit()
@@ -140,25 +133,27 @@ class InsertTableDialog(QDialog):
         self._col_table.setRowCount(n)
 
         for i in range(prev, n):          # only fill newly added rows
-            item = QTableWidgetItem(f"Spalte {i + 1}")
+            item = QTableWidgetItem(tr("Column {n}", n=i + 1))
             self._col_table.setItem(i, 0, item)
 
             combo = QComboBox()
-            combo.addItems(_ALIGN_LABELS)
+            combo.addItem(tr("Left"),   ":---")
+            combo.addItem(tr("Center"), ":---:")
+            combo.addItem(tr("Right"),  "---:")
             combo.currentIndexChanged.connect(self._refresh_preview)
             self._col_table.setCellWidget(i, 1, combo)
 
         self._col_table.blockSignals(False)
 
     def _column_config(self) -> list[tuple[str, str]]:
-        """Returns a list of (name, alignment label) tuples for each column."""
+        """Returns a list of (name, alignment_marker) tuples for each column."""
         result = []
         for i in range(self._col_table.rowCount()):
-            item  = self._col_table.item(i, 0)
-            name  = item.text().strip() if item and item.text().strip() else f"Spalte {i + 1}"
-            combo = self._col_table.cellWidget(i, 1)
-            align = combo.currentText() if combo else "Links"
-            result.append((name, align))
+            item   = self._col_table.item(i, 0)
+            name   = item.text().strip() if item and item.text().strip() else tr("Column {n}", n=i + 1)
+            combo  = self._col_table.cellWidget(i, 1)
+            marker = combo.currentData() if combo else ":---"
+            result.append((name, marker))
         return result
 
     def _build_markdown(self) -> str:
@@ -173,7 +168,7 @@ class InsertTableDialog(QDialog):
             header = "| " + " | ".join(" " * max(len(name), 3) for name, _ in cols) + " |"
 
         # Separator row with alignment markers
-        sep = "| " + " | ".join(_ALIGN_MARKERS[align] for _, align in cols) + " |"
+        sep = "| " + " | ".join(marker for _, marker in cols) + " |"
 
         # Data rows (empty cells, width = column name length)
         empty_cells = [" " * max(len(name), 3) for name, _ in cols]

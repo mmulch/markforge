@@ -13,17 +13,19 @@ from PyQt6.QtWidgets import (
     QVBoxLayout,
 )
 
-# ── Diagramm-Vorlagen ─────────────────────────────────────────────────────────
+from i18n import tr
+
+# ── Diagram templates (keys are English; tr() is used for display) ────────────
 
 _TEMPLATES: dict[str, str] = {
-    "Sequenzdiagramm": """\
+    "Sequence diagram": """\
 @startuml
 Alice -> Bob: Anfrage
 Bob --> Alice: Antwort
 note right of Bob: Verarbeitung
 @enduml""",
 
-    "Klassendiagramm": """\
+    "Class diagram": """\
 @startuml
 class Fahrzeug {
   - marke: String
@@ -37,7 +39,7 @@ class Auto {
 Fahrzeug <|-- Auto
 @enduml""",
 
-    "Aktivitätsdiagramm": """\
+    "Activity diagram": """\
 @startuml
 start
 :Schritt 1;
@@ -50,7 +52,7 @@ endif
 stop
 @enduml""",
 
-    "Zustandsdiagramm": """\
+    "State diagram": """\
 @startuml
 [*] --> Leerlauf
 Leerlauf --> Aktiv : start
@@ -59,7 +61,7 @@ Aktiv --> Fehler : error
 Fehler --> [*]
 @enduml""",
 
-    "Komponentendiagramm": """\
+    "Component diagram": """\
 @startuml
 package "Frontend" {
   component Browser
@@ -72,7 +74,7 @@ Browser --> Server : HTTP
 Server --> Datenbank : SQL
 @enduml""",
 
-    "Anwendungsfalldiagramm": """\
+    "Use case diagram": """\
 @startuml
 left to right direction
 actor Benutzer
@@ -87,7 +89,7 @@ Benutzer --> UC2
 Admin --> UC3
 @enduml""",
 
-    "Gantt-Diagramm": """\
+    "Gantt diagram": """\
 @startgantt
 [Aufgabe 1] lasts 5 days
 [Aufgabe 2] lasts 3 days
@@ -96,7 +98,7 @@ Admin --> UC3
 [Aufgabe 3] starts at [Aufgabe 2]'s end
 @endgantt""",
 
-    "MindMap": """\
+    "Mind map": """\
 @startmindmap
 * Hauptthema
 ** Thema 1
@@ -106,7 +108,7 @@ Admin --> UC3
 *** Detail 2.1
 @endmindmap""",
 
-    "WBS (Arbeitsstruktur)": """\
+    "WBS (Work breakdown)": """\
 @startwbs
 * Projekt
 ** Phase 1
@@ -116,7 +118,7 @@ Admin --> UC3
 *** Aufgabe 2.1
 @endwbs""",
 
-    "Timing-Diagramm": """\
+    "Timing diagram": """\
 @startuml
 concise "Signal A" as A
 concise "Signal B" as B
@@ -132,7 +134,7 @@ A is inaktiv
 B is inaktiv
 @enduml""",
 
-    "Deployment-Diagramm": """\
+    "Deployment diagram": """\
 @startuml
 node "Webserver" {
   artifact "app.war"
@@ -162,28 +164,27 @@ class InsertPlantUMLDialog(QDialog):
 
     def __init__(self, parent=None) -> None:
         super().__init__(parent)
-        self.setWindowTitle("PlantUML-Diagramm einfügen")
+        self.setWindowTitle(tr("Insert PlantUML Diagram"))
         self.setMinimumSize(620, 480)
         self._build_ui()
         self._type_combo.currentIndexChanged.connect(self._on_type_changed)
         self._on_type_changed(0)
 
-    # ── UI-Aufbau ─────────────────────────────────────────────────────────────
+    # ── UI ────────────────────────────────────────────────────────────────────
 
     def _build_ui(self) -> None:
         root = QVBoxLayout(self)
         root.setSpacing(8)
 
-        # Diagrammtyp-Zeile
         type_row = QHBoxLayout()
-        type_row.addWidget(QLabel("Diagrammtyp:"))
+        type_row.addWidget(QLabel(tr("Diagram type:")))
         self._type_combo = QComboBox()
-        self._type_combo.addItems(list(_TEMPLATES.keys()))
+        for key in _TEMPLATES:
+            self._type_combo.addItem(tr(key), key)
         type_row.addWidget(self._type_combo, 1)
         root.addLayout(type_row)
 
-        # Code-Editor
-        root.addWidget(QLabel("PlantUML-Code:"))
+        root.addWidget(QLabel(tr("PlantUML code:")))
         self._editor = QPlainTextEdit()
         font = QFont("Consolas", 11)
         font.setStyleHint(QFont.StyleHint.Monospace)
@@ -191,16 +192,16 @@ class InsertPlantUMLDialog(QDialog):
         self._editor.setTabStopDistance(28.0)
         root.addWidget(self._editor, 1)
 
-        # Hinweis
         hint = QLabel(
-            "Tipp: Die Vorschau des Diagramms erscheint nach dem Einfügen"
-            " automatisch im Hauptfenster (Internetverbindung erforderlich)."
+            tr(
+                "Tip: The diagram preview appears automatically in the main window after inserting"
+                " (internet connection required)."
+            )
         )
         hint.setWordWrap(True)
         hint.setStyleSheet("color: #6e7681; font-size: 12px;")
         root.addWidget(hint)
 
-        # Buttons
         buttons = QDialogButtonBox(
             QDialogButtonBox.StandardButton.Ok
             | QDialogButtonBox.StandardButton.Cancel
@@ -212,8 +213,8 @@ class InsertPlantUMLDialog(QDialog):
     # ── Slots ─────────────────────────────────────────────────────────────────
 
     def _on_type_changed(self, index: int) -> None:
-        name = self._type_combo.currentText()
-        self._editor.setPlainText(_TEMPLATES.get(name, ""))
+        key = self._type_combo.currentData()
+        self._editor.setPlainText(_TEMPLATES.get(key, ""))
 
     # ── Public API ────────────────────────────────────────────────────────────
 

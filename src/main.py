@@ -5,9 +5,10 @@ from __future__ import annotations
 
 import sys
 
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QSettings
 from PyQt6.QtWidgets import QApplication
 
+import i18n
 from mainwindow import MainWindow
 
 
@@ -16,8 +17,10 @@ def main() -> int:
         Qt.HighDpiScaleFactorRoundingPolicy.PassThrough
     )
     app = QApplication(sys.argv)
-    app.setApplicationName("Markdown-Editor")
+    app.setApplicationName("Markdown Editor")
     app.setOrganizationName("MarkdownEditor")
+
+    i18n.setup(QSettings("Markforge", "Markforge").value("language", "en"))
 
     window = MainWindow()
     window.show()

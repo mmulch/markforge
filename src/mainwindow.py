@@ -18,13 +18,12 @@ from PyQt6.QtWidgets import (
 
 from editor_widget import EditorWidget
 from file_tree_widget import FileTreeWidget
+from i18n import tr
 from insert_media_dialogs import InsertImageDialog, InsertLinkDialog
 from insert_plantuml_dialog import InsertPlantUMLDialog
 from insert_table_dialog import InsertTableDialog
 from preview_widget import PreviewWidget
-
-_FILTER_OPEN = "Markdown-Dateien (*.md *.markdown);;Textdateien (*.txt);;Alle Dateien (*)"
-_FILTER_SAVE = "Markdown-Dateien (*.md);;Textdateien (*.txt);;Alle Dateien (*)"
+from settings_dialog import SettingsDialog
 
 
 class MainWindow(QMainWindow):
@@ -47,7 +46,6 @@ class MainWindow(QMainWindow):
     # ── UI setup ──────────────────────────────────────────────────────────────
 
     def _build_ui(self) -> None:
-        # Innerer Splitter: Editor | Vorschau
         self._splitter = QSplitter(Qt.Orientation.Horizontal)
         self._editor   = EditorWidget()
         self._preview  = PreviewWidget()
@@ -55,7 +53,6 @@ class MainWindow(QMainWindow):
         self._splitter.addWidget(self._preview)
         self._splitter.setSizes([640, 640])
 
-        # Outer splitter: file tree | (editor + preview)
         self._outer_splitter = QSplitter(Qt.Orientation.Horizontal)
         self._file_tree = FileTreeWidget()
         self._file_tree.set_root(os.getcwd())
@@ -70,25 +67,25 @@ class MainWindow(QMainWindow):
     def _build_menu(self) -> None:
         mb = self.menuBar()
 
-        # ── Datei ──────────────────────────────────────────────────────────
-        m = mb.addMenu("&Datei")
-        self._act_new     = self._mk_action("&Neu",              QKeySequence.StandardKey.New,    m)
-        self._act_open    = self._mk_action("&Öffnen …",         QKeySequence.StandardKey.Open,   m)
+        # ── File ───────────────────────────────────────────────────────────
+        m = mb.addMenu(tr("&File"))
+        self._act_new     = self._mk_action(tr("&New"),        QKeySequence.StandardKey.New,    m)
+        self._act_open    = self._mk_action(tr("&Open …"),     QKeySequence.StandardKey.Open,   m)
         m.addSeparator()
-        self._act_save    = self._mk_action("&Speichern",         QKeySequence.StandardKey.Save,   m)
-        self._act_save_as = self._mk_action("Speichern &unter …", QKeySequence.StandardKey.SaveAs, m)
+        self._act_save    = self._mk_action(tr("&Save"),       QKeySequence.StandardKey.Save,   m)
+        self._act_save_as = self._mk_action(tr("Save &As …"),  QKeySequence.StandardKey.SaveAs, m)
         m.addSeparator()
-        quit_act = self._mk_action("&Beenden", QKeySequence.StandardKey.Quit, m)
+        quit_act = self._mk_action(tr("&Quit"), QKeySequence.StandardKey.Quit, m)
         quit_act.triggered.connect(self.close)
 
-        # ── Bearbeiten ─────────────────────────────────────────────────────
-        m = mb.addMenu("&Bearbeiten")
-        undo  = self._mk_action("&Rückgängig",    QKeySequence.StandardKey.Undo,  m)
-        redo  = self._mk_action("&Wiederholen",   QKeySequence.StandardKey.Redo,  m)
+        # ── Edit ───────────────────────────────────────────────────────────
+        m = mb.addMenu(tr("&Edit"))
+        undo  = self._mk_action(tr("&Undo"),  QKeySequence.StandardKey.Undo,  m)
+        redo  = self._mk_action(tr("&Redo"),  QKeySequence.StandardKey.Redo,  m)
         m.addSeparator()
-        cut   = self._mk_action("&Ausschneiden",  QKeySequence.StandardKey.Cut,   m)
-        copy  = self._mk_action("&Kopieren",      QKeySequence.StandardKey.Copy,  m)
-        paste = self._mk_action("&Einfügen",      QKeySequence.StandardKey.Paste, m)
+        cut   = self._mk_action(tr("Cu&t"),   QKeySequence.StandardKey.Cut,   m)
+        copy  = self._mk_action(tr("&Copy"),  QKeySequence.StandardKey.Copy,  m)
+        paste = self._mk_action(tr("&Paste"), QKeySequence.StandardKey.Paste, m)
         undo.triggered.connect(self._editor.undo)
         redo.triggered.connect(self._editor.redo)
         cut.triggered.connect(self._editor.cut)
@@ -96,34 +93,37 @@ class MainWindow(QMainWindow):
         paste.triggered.connect(self._editor.paste)
 
         # ── Insert ─────────────────────────────────────────────────────────
-        m = mb.addMenu("&Einfügen")
-        self._act_insert_link    = self._mk_action("&Link …",      "Ctrl+K",       m)
-        self._act_insert_image   = self._mk_action("&Bild …",      "Ctrl+Shift+K", m)
-        self._act_insert_plantuml = self._mk_action("&PlantUML …", "Ctrl+Shift+U", m)
+        m = mb.addMenu(tr("&Insert"))
+        self._act_insert_link     = self._mk_action(tr("&Link …"),      "Ctrl+K",       m)
+        self._act_insert_image    = self._mk_action(tr("&Image …"),     "Ctrl+Shift+K", m)
+        self._act_insert_plantuml = self._mk_action(tr("&PlantUML …"),  "Ctrl+Shift+U", m)
         m.addSeparator()
-        self._act_insert_table   = self._mk_action("&Tabelle …",   "Ctrl+Shift+T", m)
+        self._act_insert_table    = self._mk_action(tr("&Table …"),     "Ctrl+Shift+T", m)
 
-        # ── Ansicht ────────────────────────────────────────────────────────
-        m = mb.addMenu("&Ansicht")
+        # ── View ───────────────────────────────────────────────────────────
+        m = mb.addMenu(tr("&View"))
         self._act_filetree = self._mk_action(
-            "Dateibaum anzeigen", "Ctrl+B", m, checkable=True
+            tr("Show file tree"), "Ctrl+B", m, checkable=True
         )
         self._act_filetree.setChecked(True)
         self._act_preview = self._mk_action(
-            "Vorschau anzeigen", "Ctrl+Shift+P", m, checkable=True
+            tr("Show preview"), "Ctrl+Shift+P", m, checkable=True
         )
         self._act_preview.setChecked(True)
         m.addSeparator()
-        self._act_wrap = self._mk_action("Zeilenumbruch", None, m, checkable=True)
+        self._act_wrap = self._mk_action(tr("Word wrap"), None, m, checkable=True)
         self._act_wrap.setChecked(True)
+        m.addSeparator()
+        settings_act = self._mk_action(tr("Settings …"), None, m)
+        settings_act.triggered.connect(self._open_settings)
 
-        # ── Hilfe ──────────────────────────────────────────────────────────
-        m = mb.addMenu("&Hilfe")
-        about = self._mk_action("&Über …", None, m)
+        # ── Help ───────────────────────────────────────────────────────────
+        m = mb.addMenu(tr("&Help"))
+        about = self._mk_action(tr("&About …"), None, m)
         about.triggered.connect(self._about)
 
     def _build_toolbar(self) -> None:
-        tb = QToolBar("Werkzeugleiste")
+        tb = QToolBar(tr("Toolbar"))
         tb.setMovable(False)
         self.addToolBar(tb)
         tb.addAction(self._act_new)
@@ -133,8 +133,8 @@ class MainWindow(QMainWindow):
         tb.addAction(self._act_preview)
 
     def _build_statusbar(self) -> None:
-        self._lbl_words = QLabel("0 Wörter")
-        self._lbl_pos   = QLabel("Zeile 1, Spalte 1")
+        self._lbl_words = QLabel(tr("{n} words", n=0))
+        self._lbl_pos   = QLabel(tr("Line {line}, Col {col}", line=1, col=1))
         sb = self.statusBar()
         sb.addPermanentWidget(self._lbl_words)
         sb.addPermanentWidget(self._lbl_pos)
@@ -178,7 +178,7 @@ class MainWindow(QMainWindow):
 
         self._timer = QTimer(self)
         self._timer.setSingleShot(True)
-        self._timer.setInterval(300)  # 300 ms Entprellung
+        self._timer.setInterval(300)
         self._timer.timeout.connect(self._refresh_preview)
 
     # ── Slots / callbacks ─────────────────────────────────────────────────────
@@ -203,18 +203,20 @@ class MainWindow(QMainWindow):
     def _update_pos(self) -> None:
         cur = self._editor.textCursor()
         self._lbl_pos.setText(
-            f"Zeile {cur.blockNumber() + 1}, Spalte {cur.columnNumber() + 1}"
+            tr("Line {line}, Col {col}",
+               line=cur.blockNumber() + 1,
+               col=cur.columnNumber() + 1)
         )
 
     def _update_words(self) -> None:
         txt = self._editor.toPlainText().strip()
         n   = len(txt.split()) if txt else 0
-        self._lbl_words.setText(f"{n} Wörter")
+        self._lbl_words.setText(tr("{n} words", n=n))
 
     def _update_title(self) -> None:
-        name = os.path.basename(self._file) if self._file else "Unbenannt"
+        name = os.path.basename(self._file) if self._file else tr("Untitled")
         mod  = "*" if self._modified else ""
-        self.setWindowTitle(f"{mod}{name} — Markdown-Editor")
+        self.setWindowTitle(f"{mod}{name} — Markdown Editor")
 
     # ── File operations ───────────────────────────────────────────────────────
 
@@ -231,7 +233,10 @@ class MainWindow(QMainWindow):
         if not self._maybe_save():
             return
         path, _ = QFileDialog.getOpenFileName(
-            self, "Datei öffnen", "", _FILTER_OPEN
+            self,
+            tr("Open File"),
+            "",
+            tr("Markdown files (*.md *.markdown);;Text files (*.txt);;All files (*)"),
         )
         if path:
             self._load(path)
@@ -241,7 +246,9 @@ class MainWindow(QMainWindow):
             with open(path, encoding="utf-8") as fh:
                 self._editor.setPlainText(fh.read())
         except OSError as exc:
-            QMessageBox.critical(self, "Fehler", f"Datei konnte nicht geöffnet werden:\n{exc}")
+            QMessageBox.critical(
+                self, tr("Error"), tr("Could not open file:\n{exc}", exc=exc)
+            )
             return
         self._file     = path
         self._modified = False
@@ -257,7 +264,10 @@ class MainWindow(QMainWindow):
 
     def _save_as(self) -> None:
         path, _ = QFileDialog.getSaveFileName(
-            self, "Speichern unter", "", _FILTER_SAVE
+            self,
+            tr("Save As"),
+            "",
+            tr("Markdown files (*.md);;Text files (*.txt);;All files (*)"),
         )
         if path:
             self._write(path)
@@ -267,12 +277,14 @@ class MainWindow(QMainWindow):
             with open(path, "w", encoding="utf-8") as fh:
                 fh.write(self._editor.toPlainText())
         except OSError as exc:
-            QMessageBox.critical(self, "Fehler", f"Datei konnte nicht gespeichert werden:\n{exc}")
+            QMessageBox.critical(
+                self, tr("Error"), tr("Could not save file:\n{exc}", exc=exc)
+            )
             return
         self._file     = path
         self._modified = False
         self._update_title()
-        self.statusBar().showMessage("Gespeichert.", 3000)
+        self.statusBar().showMessage(tr("Saved."), 3000)
 
     def _maybe_save(self) -> bool:
         """Returns True if the current content may be discarded."""
@@ -280,8 +292,8 @@ class MainWindow(QMainWindow):
             return True
         reply = QMessageBox.question(
             self,
-            "Ungespeicherte Änderungen",
-            "Möchten Sie die Änderungen speichern?",
+            tr("Unsaved Changes"),
+            tr("Do you want to save the changes?"),
             QMessageBox.StandardButton.Save
             | QMessageBox.StandardButton.Discard
             | QMessageBox.StandardButton.Cancel,
@@ -300,6 +312,10 @@ class MainWindow(QMainWindow):
             self._splitter.setSizes([int(s) for s in sizes])
         if sizes := self._settings.value("outer_splitter"):
             self._outer_splitter.setSizes([int(s) for s in sizes])
+
+    def _open_settings(self) -> None:
+        dlg = SettingsDialog(self)
+        dlg.exec()
 
     def closeEvent(self, event) -> None:  # type: ignore[override]
         if not self._maybe_save():
@@ -354,7 +370,6 @@ class MainWindow(QMainWindow):
         table_md = dlg.get_markdown()
         cursor   = self._editor.textCursor()
 
-        # Table should always start and end on its own line
         prefix = "\n" if cursor.columnNumber() > 0 else ""
         cursor.insertText(f"{prefix}{table_md}\n")
         self._editor.setTextCursor(cursor)
@@ -365,9 +380,11 @@ class MainWindow(QMainWindow):
     def _about(self) -> None:
         QMessageBox.about(
             self,
-            "Über Markdown-Editor",
-            "<h3>Markdown-Editor 1.0</h3>"
-            "<p>Erstellt mit <b>Python 3</b> und <b>PyQt6</b>.</p>"
-            "<p>Unterstützte Erweiterungen:<br>"
-            "Tables · Fenced Code Blocks · Footnotes · Abbreviations · ToC</p>",
+            tr("About Markdown Editor"),
+            tr(
+                "<h3>Markdown Editor 1.0</h3>"
+                "<p>Created with <b>Python 3</b> and <b>PyQt6</b>.</p>"
+                "<p>Supported extensions:<br>"
+                "Tables · Fenced Code Blocks · Footnotes · Abbreviations · ToC</p>"
+            ),
         )

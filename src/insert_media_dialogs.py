@@ -16,6 +16,8 @@ from PyQt6.QtWidgets import (
     QVBoxLayout,
 )
 
+from i18n import tr
+
 
 def _mono_font(size: int = 10) -> QFont:
     f = QFont("Monospace", size)
@@ -29,15 +31,15 @@ def _make_buttons(dialog: QDialog) -> tuple[QDialogButtonBox, QPushButton]:
         | QDialogButtonBox.StandardButton.Cancel
     )
     ok = btns.button(QDialogButtonBox.StandardButton.Ok)
-    ok.setText("Einfügen")
-    btns.button(QDialogButtonBox.StandardButton.Cancel).setText("Abbrechen")
+    ok.setText(tr("Insert"))
+    btns.button(QDialogButtonBox.StandardButton.Cancel).setText(tr("Cancel"))
     btns.accepted.connect(dialog.accept)
     btns.rejected.connect(dialog.reject)
     return btns, ok
 
 
 def _preview_group(preview_widget: QPlainTextEdit) -> QGroupBox:
-    grp    = QGroupBox("Vorschau (Markdown)")
+    grp    = QGroupBox(tr("Preview (Markdown)"))
     layout = QVBoxLayout(grp)
     layout.addWidget(preview_widget)
     return grp
@@ -50,7 +52,7 @@ class InsertLinkDialog(QDialog):
 
     def __init__(self, selected_text: str = "", parent=None) -> None:
         super().__init__(parent)
-        self.setWindowTitle("Link einfügen")
+        self.setWindowTitle(tr("Insert Link"))
         self.setMinimumWidth(480)
         self._build_ui(selected_text)
         self._refresh()
@@ -59,32 +61,29 @@ class InsertLinkDialog(QDialog):
         root = QVBoxLayout(self)
         root.setSpacing(10)
 
-        # ── Felder ────────────────────────────────────────────────────────
-        grp  = QGroupBox("Link-Eigenschaften")
+        grp  = QGroupBox(tr("Link Properties"))
         form = QFormLayout(grp)
 
         self._text_edit = QLineEdit(selected_text)
-        self._text_edit.setPlaceholderText("z. B.  Hier klicken")
-        form.addRow("Anzeigetext:", self._text_edit)
+        self._text_edit.setPlaceholderText(tr("e.g.  Click here"))
+        form.addRow(tr("Display text:"), self._text_edit)
 
         self._url_edit = QLineEdit()
-        self._url_edit.setPlaceholderText("https://beispiel.de")
-        form.addRow("URL:", self._url_edit)
+        self._url_edit.setPlaceholderText(tr("https://example.com"))
+        form.addRow(tr("URL:"), self._url_edit)
 
         self._title_edit = QLineEdit()
-        self._title_edit.setPlaceholderText("Optionaler Tooltip (erscheint beim Hover)")
-        form.addRow("Titel (optional):", self._title_edit)
+        self._title_edit.setPlaceholderText(tr("Optional tooltip (shown on hover)"))
+        form.addRow(tr("Title (optional):"), self._title_edit)
 
         root.addWidget(grp)
 
-        # ── Vorschau ──────────────────────────────────────────────────────
         self._preview = QPlainTextEdit()
         self._preview.setReadOnly(True)
         self._preview.setFont(_mono_font())
         self._preview.setMaximumHeight(56)
         root.addWidget(_preview_group(self._preview))
 
-        # ── Buttons ───────────────────────────────────────────────────────
         btns, self._ok_btn = _make_buttons(self)
         root.addWidget(btns)
 
@@ -111,14 +110,9 @@ class InsertLinkDialog(QDialog):
 class InsertImageDialog(QDialog):
     """Dialog for inserting a Markdown image."""
 
-    _IMG_FILTER = (
-        "Bilder (*.png *.jpg *.jpeg *.gif *.svg *.webp *.bmp *.ico)"
-        ";;Alle Dateien (*)"
-    )
-
     def __init__(self, selected_text: str = "", parent=None) -> None:
         super().__init__(parent)
-        self.setWindowTitle("Bild einfügen")
+        self.setWindowTitle(tr("Insert Image"))
         self.setMinimumWidth(520)
         self._build_ui(selected_text)
         self._refresh()
@@ -127,42 +121,38 @@ class InsertImageDialog(QDialog):
         root = QVBoxLayout(self)
         root.setSpacing(10)
 
-        # ── Felder ────────────────────────────────────────────────────────
-        grp  = QGroupBox("Bild-Eigenschaften")
+        grp  = QGroupBox(tr("Image Properties"))
         form = QFormLayout(grp)
 
         self._alt_edit = QLineEdit(selected_text)
-        self._alt_edit.setPlaceholderText("Kurze Bildbeschreibung (für Screenreader)")
-        form.addRow("Alt-Text:", self._alt_edit)
+        self._alt_edit.setPlaceholderText(tr("Short image description (for screen readers)"))
+        form.addRow(tr("Alt Text:"), self._alt_edit)
 
-        # URL-Zeile mit Datei-Browser-Button
         url_row = QHBoxLayout()
         self._url_edit = QLineEdit()
         self._url_edit.setPlaceholderText(
-            "https://beispiel.de/bild.png  oder  lokaler Pfad"
+            tr("https://example.com/image.png  or  local path")
         )
         url_row.addWidget(self._url_edit)
         browse_btn = QPushButton("…")
         browse_btn.setFixedWidth(32)
-        browse_btn.setToolTip("Lokale Bilddatei auswählen")
+        browse_btn.setToolTip(tr("Select local image file"))
         browse_btn.clicked.connect(self._browse)
         url_row.addWidget(browse_btn)
-        form.addRow("URL / Pfad:", url_row)
+        form.addRow(tr("URL / Path:"), url_row)
 
         self._title_edit = QLineEdit()
-        self._title_edit.setPlaceholderText("Optionaler Tooltip (erscheint beim Hover)")
-        form.addRow("Titel (optional):", self._title_edit)
+        self._title_edit.setPlaceholderText(tr("Optional tooltip (shown on hover)"))
+        form.addRow(tr("Title (optional):"), self._title_edit)
 
         root.addWidget(grp)
 
-        # ── Vorschau ──────────────────────────────────────────────────────
         self._preview = QPlainTextEdit()
         self._preview.setReadOnly(True)
         self._preview.setFont(_mono_font())
         self._preview.setMaximumHeight(56)
         root.addWidget(_preview_group(self._preview))
 
-        # ── Buttons ───────────────────────────────────────────────────────
         btns, self._ok_btn = _make_buttons(self)
         root.addWidget(btns)
 
@@ -172,7 +162,10 @@ class InsertImageDialog(QDialog):
 
     def _browse(self) -> None:
         path, _ = QFileDialog.getOpenFileName(
-            self, "Bilddatei auswählen", "", self._IMG_FILTER
+            self,
+            tr("Select Image File"),
+            "",
+            tr("Images (*.png *.jpg *.jpeg *.gif *.svg *.webp *.bmp *.ico);;All files (*)"),
         )
         if path:
             self._url_edit.setText(path)

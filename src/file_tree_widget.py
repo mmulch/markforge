@@ -18,6 +18,8 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
+from i18n import tr
+
 _NAME_FILTERS    = [
     "*.md", "*.markdown",
     "*.txt",
@@ -90,7 +92,7 @@ class FileTreeWidget(QWidget):
         hlay.setContentsMargins(8, 4, 4, 4)
 
         self._dir_label = QLabel("–")
-        self._dir_label.setToolTip("Aktuelles Stammverzeichnis")
+        self._dir_label.setToolTip(tr("Current root directory"))
         self._dir_label.setAlignment(
             Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter
         )
@@ -101,7 +103,7 @@ class FileTreeWidget(QWidget):
 
         btn = QToolButton()
         btn.setText("…")
-        btn.setToolTip("Verzeichnis wählen")
+        btn.setToolTip(tr("Choose Directory"))
         btn.clicked.connect(self._choose_root)
         hlay.addWidget(btn)
 
@@ -161,7 +163,7 @@ class FileTreeWidget(QWidget):
             self._apply_root_index()
 
     def _choose_root(self) -> None:
-        path = QFileDialog.getExistingDirectory(self, "Verzeichnis wählen")
+        path = QFileDialog.getExistingDirectory(self, tr("Choose Directory"))
         if path:
             self.set_root(path)
 
