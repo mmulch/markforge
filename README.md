@@ -1,6 +1,6 @@
 # MarkForge
 
-A modern, feature-rich Markdown editor built with Python and PyQt6. Includes a live side-by-side preview, syntax highlighting, PlantUML diagram support, math formulas, and PDF export — in a clean, dual-pane interface.
+A modern, feature-rich Markdown editor built with Python and PyQt6. Includes a live side-by-side preview, syntax highlighting, PlantUML diagram support, math formulas, PDF export, and full Git integration — in a clean, dual-pane interface.
 
 ![License](https://img.shields.io/badge/license-GPL--3.0-blue)
 ![Python](https://img.shields.io/badge/python-3.8%2B-blue)
@@ -20,6 +20,7 @@ A modern, feature-rich Markdown editor built with Python and PyQt6. Includes a l
 - **Math formulas** — LaTeX notation rendered with MathJax
 - **PDF import** — import any PDF and convert it to Markdown automatically (headings, paragraphs, tables preserved)
 - **PDF export** — export the current document as a PDF
+- **Git integration** — open Markdown files directly from GitHub, GitHub Enterprise, Bitbucket Cloud, or Bitbucket Server; edit and push back without leaving the editor (see [Git Integration](#git-integration))
 - **Word count & cursor position** — always visible in the status bar
 - **Multilingual** — English and German (Deutsch) UI
 - **Persistent settings** — window geometry, splitter positions, and theme preferences are saved across sessions
@@ -30,6 +31,7 @@ A modern, feature-rich Markdown editor built with Python and PyQt6. Includes a l
 |---|---|
 | New | `Ctrl+N` |
 | Open | `Ctrl+O` |
+| Open from Git | `Ctrl+Shift+G` |
 | Save | `Ctrl+S` |
 | Save As | `Ctrl+Shift+S` |
 | Export as PDF | `Ctrl+Shift+E` |
@@ -47,17 +49,19 @@ A modern, feature-rich Markdown editor built with Python and PyQt6. Includes a l
 
 - Python 3.8+
 - CMake 3.16+
+- **No git installation required** — git operations use [dulwich](https://www.dulwich.io/), a pure-Python git implementation
 
 Python dependencies (installed automatically by CMake):
 
-| Package | Version |
-|---|---|
-| PyQt6 | ≥ 6.4.0 |
-| PyQt6-WebEngine | ≥ 6.4.0 |
-| markdown | ≥ 3.4.0 |
-| Pygments | ≥ 2.14.0 |
-| PyMuPDF | ≥ 1.23.0 |
-| pymupdf4llm | ≥ 0.3.4 |
+| Package | Version | Purpose |
+|---|---|---|
+| PyQt6 | ≥ 6.4.0 | UI framework |
+| PyQt6-WebEngine | ≥ 6.4.0 | Live preview |
+| markdown | ≥ 3.4.0 | Markdown rendering |
+| Pygments | ≥ 2.14.0 | Code syntax highlighting |
+| PyMuPDF | ≥ 1.23.0 | PDF import |
+| pymupdf4llm | ≥ 0.3.4 | PDF-to-Markdown conversion |
+| dulwich | ≥ 0.20.50 | Pure-Python git client |
 
 ---
 
@@ -84,6 +88,76 @@ Or run directly without CMake:
 pip install -r requirements.txt
 python src/main.py
 ```
+
+---
+
+## Git Integration
+
+MarkForge can open Markdown files directly from any hosted git platform, let you edit them, and push changes back — without leaving the editor and without needing git installed on your system.
+
+### Supported platforms
+
+| Platform | Example URL pattern |
+|---|---|
+| GitHub | `https://github.com/owner/repo/blob/main/README.md` |
+| GitHub Enterprise | `https://github.mycompany.com/owner/repo/blob/main/docs/guide.md` |
+| Bitbucket Cloud | `https://bitbucket.org/owner/repo/src/main/README.md` |
+| Bitbucket Server / Data Center | `https://bitbucket.mycompany.com/projects/PROJ/repos/myrepo/browse/README.md?at=main` |
+
+The platform is auto-detected from the URL structure, not the hostname — so any self-hosted instance works out of the box.
+
+### Opening a file
+
+1. **File → Open from Git…** (`Ctrl+Shift+G`)
+2. Paste the URL of any file from one of the supported platforms
+3. MarkForge validates the URL and shows a preview (`platform · owner/repo · path/to/file.md`)
+4. Optionally override the branch in the **Ref** field
+5. Click **OK** — the repository is cloned in the background and the file opens in the editor
+
+The file tree header shows `[GIT] reponame` (in green) while a git-managed file is open.
+
+### Saving (commit & push)
+
+Press `Ctrl+S` while a git-managed file is open. A dialog appears with:
+
+- **Commit message** — required
+- **Push to:**
+  - *Current branch* — pushes directly to the branch you cloned from
+  - *New branch* — creates a new branch; optionally tick **Create Pull Request** to open a PR automatically
+- **PR title / target branch** — shown when "Create Pull Request" is ticked
+
+### Closing
+
+When you close the application while a git-managed file is open, MarkForge asks whether to delete the temporary clone directory.
+
+### Authentication
+
+Configure credentials in **View → Settings → Git Authentication**.
+
+#### HTTPS (username + token)
+
+Works on all platforms without any additional software.
+
+| Platform | Token type |
+|---|---|
+| GitHub | Personal access token (`ghp_…`) — needs `repo` scope |
+| GitHub Enterprise | Personal access token — same as GitHub |
+| Bitbucket Cloud | App password (Account → App passwords) |
+| Bitbucket Server | Personal access token or HTTP access token |
+
+> **Public repositories** work without any credentials configured.
+
+#### SSH (key file)
+
+Select **SSH (key file)** in settings and provide the path to your private key and an optional passphrase.
+
+SSH uses [paramiko](https://www.paramiko.org/) for a fully pure-Python connection (no system ssh required):
+
+```bash
+pip install paramiko
+```
+
+Without paramiko, MarkForge falls back to the system `ssh` client if one is available.
 
 ---
 
@@ -133,6 +207,8 @@ markforge/
 │   ├── preview_widget.py   # Live HTML preview (WebEngine)
 │   ├── highlighter.py      # Markdown syntax highlighter
 │   ├── file_tree_widget.py # Project file browser
+│   ├── git_manager.py      # Pure-Python git logic (dulwich)
+│   ├── git_dialogs.py      # Git open / commit & push dialogs
 │   ├── i18n.py             # Translations (EN/DE)
 │   └── ...                 # Insert dialogs, settings, help dialogs
 ├── assets/
