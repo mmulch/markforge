@@ -96,9 +96,10 @@ class MainWindow(QMainWindow):
 
         # ── File ───────────────────────────────────────────────────────────
         m = mb.addMenu(tr("&File"))
-        self._act_new        = self._mk_action(tr("&New"),           QKeySequence.StandardKey.New,    m)
-        self._act_open       = self._mk_action(tr("&Open …"),        QKeySequence.StandardKey.Open,   m)
-        self._act_import_pdf = self._mk_action(tr("&Import PDF …"),  "Ctrl+Shift+I",                  m)
+        self._act_new         = self._mk_action(tr("&New"),            QKeySequence.StandardKey.New,  m)
+        self._act_open        = self._mk_action(tr("&Open …"),        QKeySequence.StandardKey.Open, m)
+        self._act_open_folder = self._mk_action(tr("Open &Folder …"), "Ctrl+Shift+O",                m)
+        self._act_import_pdf  = self._mk_action(tr("&Import PDF …"),  "Ctrl+Shift+I",                m)
         m.addSeparator()
         self._act_save    = self._mk_action(tr("&Save"),           QKeySequence.StandardKey.Save,   m)
         self._act_save_as = self._mk_action(tr("Save &As …"),      QKeySequence.StandardKey.SaveAs, m)
@@ -195,6 +196,7 @@ class MainWindow(QMainWindow):
     def _connect_signals(self) -> None:
         self._act_new.triggered.connect(self._new)
         self._act_open.triggered.connect(self._open)
+        self._act_open_folder.triggered.connect(self._open_folder)
         self._act_import_pdf.triggered.connect(self._import_pdf)
         self._act_save.triggered.connect(self._save)
         self._act_save_as.triggered.connect(self._save_as)
@@ -253,6 +255,10 @@ class MainWindow(QMainWindow):
     def _set_editor_active(self, active: bool) -> None:
         """Enable/disable the editor and all actions that require an open document."""
         self._editor.setEnabled(active)
+        self._editor.setPlaceholderText(
+            "" if active
+            else tr("Open or create a Markdown file to start editing.")
+        )
         for act in (
             self._act_save, self._act_save_as, self._act_export_pdf,
             self._act_insert_link, self._act_insert_image,
@@ -273,8 +279,11 @@ class MainWindow(QMainWindow):
     def _new(self) -> None:
         if not self._maybe_save():
             return
+        save_dir = self._file_tree._root_dir or os.getcwd()
         name, ok = QInputDialog.getText(
-            self, tr("New File"), tr("File name:"), text="Untitled.md"
+            self, tr("New File"),
+            tr("File name:\nFolder: {path}", path=save_dir),
+            text="Untitled.md",
         )
         if not ok or not name.strip():
             return
@@ -300,6 +309,15 @@ class MainWindow(QMainWindow):
         )
         if path:
             self._load(path)
+
+    def _open_folder(self) -> None:
+        if not self._maybe_save():
+            return
+        path = QFileDialog.getExistingDirectory(self, tr("Open Folder"))
+        if path:
+            self._file_tree.set_root(path)
+            self._file_tree.setVisible(True)
+            self._act_filetree.setChecked(True)
 
     def _import_pdf(self) -> None:
         if not self._maybe_save():

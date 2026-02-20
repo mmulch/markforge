@@ -43,9 +43,8 @@ def main() -> int:
     window = MainWindow()
 
     splash.set_progress(100, tr("Ready"))
-    splash.finish()
-
-    window.show()
+    window.show()           # show window first …
+    splash.finish(window)   # … then let QSplashScreen hide itself after first paint
     return app.exec()
 
 

@@ -21,7 +21,11 @@ _DE: dict[str, str] = {
     "&Import PDF …": "&PDF importieren …",
     "Import PDF": "PDF importieren",
     "New File": "Neue Datei",
-    "File name:": "Dateiname:",
+    "File name:\nFolder: {path}": "Dateiname:\nOrdner: {path}",
+    "Open &Folder …": "&Ordner öffnen …",
+    "Open Folder": "Ordner öffnen",
+    "Open or create a Markdown file to start editing.":
+        "Öffnen oder erstellen Sie eine Markdown-Datei, um mit der Bearbeitung zu beginnen.",
     "pymupdf4llm is not installed.\nInstall it with: pip install pymupdf4llm":
         "pymupdf4llm ist nicht installiert.\nInstallieren mit: pip install pymupdf4llm",
     "Could not import PDF:\n{exc}": "PDF konnte nicht importiert werden:\n{exc}",
