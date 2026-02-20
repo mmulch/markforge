@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import shutil
 
 from PyQt6.QtCore import QSettings, QThread, QTimer, Qt, QUrl, pyqtSignal
 from PyQt6.QtGui import QAction, QKeySequence
@@ -21,6 +22,8 @@ from PyQt6.QtWidgets import (
 
 from editor_widget import EditorWidget
 from file_tree_widget import FileTreeWidget
+from git_dialogs import GitCommitDialog, GitOpenDialog
+from git_manager import GitFileInfo, CommitSpec  # noqa: F401
 from i18n import tr
 from insert_media_dialogs import InsertImageDialog, InsertLinkDialog
 from insert_plantuml_dialog import InsertPlantUMLDialog
@@ -51,6 +54,69 @@ class _PdfWorker(QThread):
             self.failed.emit(str(exc), False)
 
 
+class _GitCloneWorker(QThread):
+    """Clones a git repo in the background and resolves the target file path."""
+
+    finished = pyqtSignal(object)        # GitFileInfo with local_* fields set
+    failed   = pyqtSignal(str, str)      # error message, tmpdir (for cleanup)
+    progress = pyqtSignal(int, str)      # percent, status message
+
+    def __init__(self, info: GitFileInfo, settings: QSettings, parent=None) -> None:
+        super().__init__(parent)
+        self._info     = info
+        self._settings = settings
+
+    def run(self) -> None:
+        from git_manager import clone_repo
+        tmpdir = ""
+        try:
+            tmpdir = clone_repo(self._info, self._settings, self._on_progress)
+            local_file = os.path.join(tmpdir, self._info.file_path)
+            if not os.path.isfile(local_file):
+                raise FileNotFoundError(
+                    tr("File not found in repository:\n{path}", path=self._info.file_path)
+                )
+            self._info.local_repo_path = tmpdir
+            self._info.local_file_path = local_file
+            self.finished.emit(self._info)
+        except Exception as exc:
+            self.failed.emit(str(exc), tmpdir)
+
+    def _on_progress(self, pct: int, msg: str) -> None:
+        self.progress.emit(pct, msg)
+
+
+class _GitPushWorker(QThread):
+    """Commits and pushes changes in the background."""
+
+    finished = pyqtSignal()
+    failed   = pyqtSignal(str)
+    progress = pyqtSignal(int, str)
+
+    def __init__(
+        self,
+        info:     GitFileInfo,
+        spec:     CommitSpec,
+        settings: QSettings,
+        parent=None,
+    ) -> None:
+        super().__init__(parent)
+        self._info     = info
+        self._spec     = spec
+        self._settings = settings
+
+    def run(self) -> None:
+        from git_manager import commit_and_push
+        try:
+            commit_and_push(self._info, self._spec, self._settings, self._on_progress)
+            self.finished.emit()
+        except Exception as exc:
+            self.failed.emit(str(exc))
+
+    def _on_progress(self, pct: int, msg: str) -> None:
+        self.progress.emit(pct, msg)
+
+
 class MainWindow(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
@@ -62,6 +128,12 @@ class MainWindow(QMainWindow):
         self._pdf_worker:      _PdfWorker | None      = None
         self._pdf_progress:    QProgressDialog | None = None
         self._pdf_output_path: str                    = ""
+
+        self._git_file_info:      GitFileInfo | None      = None
+        self._git_clone_worker:   _GitCloneWorker | None  = None
+        self._git_clone_progress: QProgressDialog | None  = None
+        self._git_push_worker:    _GitPushWorker | None   = None
+        self._git_push_progress:  QProgressDialog | None  = None
 
         self._build_ui()
         self._build_menu()
@@ -104,6 +176,7 @@ class MainWindow(QMainWindow):
         self._act_open        = self._mk_action(tr("&Open …"),        QKeySequence.StandardKey.Open, m)
         self._act_open_folder = self._mk_action(tr("Open &Folder …"), "Ctrl+Shift+O",                m)
         self._act_import_pdf  = self._mk_action(tr("&Import PDF …"),  "Ctrl+Shift+I",                m)
+        self._act_open_git    = self._mk_action(tr("Open from &Git …"), "Ctrl+Shift+G",              m)
         m.addSeparator()
         self._act_save    = self._mk_action(tr("&Save"),           QKeySequence.StandardKey.Save,   m)
         self._act_save_as = self._mk_action(tr("Save &As …"),      QKeySequence.StandardKey.SaveAs, m)
@@ -202,6 +275,7 @@ class MainWindow(QMainWindow):
         self._act_open.triggered.connect(self._open)
         self._act_open_folder.triggered.connect(self._open_folder)
         self._act_import_pdf.triggered.connect(self._import_pdf)
+        self._act_open_git.triggered.connect(self._open_from_git)
         self._act_save.triggered.connect(self._save)
         self._act_save_as.triggered.connect(self._save_as)
         self._act_export_pdf.triggered.connect(self._export_pdf)
@@ -429,7 +503,185 @@ class MainWindow(QMainWindow):
             self._pdf_progress.close()
             self._pdf_progress = None
 
+    # ── Git open ──────────────────────────────────────────────────────────────
+
+    def _open_from_git(self) -> None:
+        if self._git_clone_worker is not None:
+            return  # clone already running
+
+        if not self._maybe_save():
+            return
+
+        # Warn if no credentials configured (non-blocking — user can continue)
+        s = QSettings("MarkdownEditor", "MarkdownEditor")
+        user  = s.value("git/https_username", "")
+        token = s.value("git/https_token",    "")
+        key   = s.value("git/ssh_key_path",   "")
+        if not user and not token and not key:
+            reply = QMessageBox.information(
+                self,
+                tr("Open from Git"),
+                tr(
+                    "No credentials configured. Public repositories will still work.\n"
+                    "Configure credentials in View → Settings."
+                ),
+                QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Cancel,
+            )
+            if reply == QMessageBox.StandardButton.Cancel:
+                return
+
+        dlg = GitOpenDialog(self)
+        if dlg.exec() != QDialog.DialogCode.Accepted:
+            return
+        info = dlg.get_info()
+        if info is None:
+            return
+
+        self._git_clone_progress = QProgressDialog(
+            tr("Cloning repository …"), tr("Cancel"), 0, 100, self
+        )
+        self._git_clone_progress.setWindowTitle(tr("Open from Git"))
+        self._git_clone_progress.setWindowModality(Qt.WindowModality.ApplicationModal)
+        self._git_clone_progress.setAutoClose(False)
+        self._git_clone_progress.setAutoReset(False)
+        self._git_clone_progress.canceled.connect(self._on_clone_canceled)
+        self._git_clone_progress.show()
+
+        self._git_clone_worker = _GitCloneWorker(info, s, self)
+        self._git_clone_worker.finished.connect(self._on_clone_done)
+        self._git_clone_worker.failed.connect(self._on_clone_failed)
+        self._git_clone_worker.progress.connect(self._on_clone_progress)
+        self._git_clone_worker.start()
+
+    def _on_clone_progress(self, pct: int, msg: str) -> None:
+        if self._git_clone_progress is not None:
+            self._git_clone_progress.setValue(pct)
+            if msg:
+                self._git_clone_progress.setLabelText(
+                    tr("Cloning repository …") + f"\n{msg}"
+                )
+
+    def _on_clone_done(self, info: GitFileInfo) -> None:
+        if self._git_clone_progress is not None:
+            self._git_clone_progress.close()
+            self._git_clone_progress = None
+        self._git_clone_worker = None
+        self._git_file_info = info
+        self._load(info.local_file_path)
+        # Re-apply git marker (set_root inside _load clears it)
+        self._file_tree.mark_git_root(info.local_repo_path, info.repo)
+
+    def _on_clone_failed(self, msg: str, tmpdir: str) -> None:
+        if self._git_clone_progress is not None:
+            self._git_clone_progress.close()
+            self._git_clone_progress = None
+        self._git_clone_worker = None
+        if tmpdir:
+            shutil.rmtree(tmpdir, ignore_errors=True)
+        QMessageBox.critical(
+            self, tr("Open from Git"), tr("Clone failed:\n{exc}", exc=msg)
+        )
+
+    def _on_clone_canceled(self) -> None:
+        if self._git_clone_worker is not None:
+            try:
+                self._git_clone_worker.finished.disconnect(self._on_clone_done)
+                self._git_clone_worker.failed.disconnect(self._on_clone_failed)
+                self._git_clone_worker.progress.disconnect(self._on_clone_progress)
+            except RuntimeError:
+                pass
+            self._git_clone_worker.terminate()
+            self._git_clone_worker.wait()
+            self._git_clone_worker = None
+        if self._git_clone_progress is not None:
+            self._git_clone_progress.close()
+            self._git_clone_progress = None
+
+    # ── Git save (commit & push) ───────────────────────────────────────────────
+
+    def _git_save(self) -> None:
+        if self._git_push_worker is not None:
+            return  # push already running
+        if self._git_file_info is None:
+            return
+
+        dlg = GitCommitDialog(self._git_file_info, self)
+        if dlg.exec() != QDialog.DialogCode.Accepted:
+            return
+        spec = dlg.get_spec()
+
+        self._git_push_progress = QProgressDialog(
+            tr("Pushing to remote …"), tr("Cancel"), 0, 100, self
+        )
+        self._git_push_progress.setWindowTitle(tr("Git Push"))
+        self._git_push_progress.setWindowModality(Qt.WindowModality.ApplicationModal)
+        self._git_push_progress.setAutoClose(False)
+        self._git_push_progress.setAutoReset(False)
+        self._git_push_progress.canceled.connect(self._on_push_canceled)
+        self._git_push_progress.show()
+
+        s = QSettings("MarkdownEditor", "MarkdownEditor")
+        self._git_push_worker = _GitPushWorker(self._git_file_info, spec, s, self)
+        self._git_push_worker.finished.connect(self._on_push_done)
+        self._git_push_worker.failed.connect(self._on_push_failed)
+        self._git_push_worker.progress.connect(self._on_push_progress)
+        self._git_push_worker.start()
+
+    def _on_push_progress(self, pct: int, msg: str) -> None:
+        if self._git_push_progress is not None:
+            self._git_push_progress.setValue(pct)
+            if msg:
+                self._git_push_progress.setLabelText(
+                    tr("Pushing to remote …") + f"\n{msg}"
+                )
+
+    def _on_push_done(self) -> None:
+        if self._git_push_progress is not None:
+            self._git_push_progress.close()
+            self._git_push_progress = None
+        self._git_push_worker = None
+        self.statusBar().showMessage(tr("Pushed to remote."), 4000)
+
+    def _on_push_failed(self, msg: str) -> None:
+        if self._git_push_progress is not None:
+            self._git_push_progress.close()
+            self._git_push_progress = None
+        self._git_push_worker = None
+
+        msg_lower = msg.lower()
+        if "rejected" in msg_lower or "non-fast-forward" in msg_lower:
+            QMessageBox.warning(
+                self,
+                tr("Git Push"),
+                tr("Push rejected (non-fast-forward).\nTry saving again using 'New branch'."),
+            )
+        else:
+            QMessageBox.critical(
+                self, tr("Git Push"), tr("Git push failed:\n{exc}", exc=msg)
+            )
+
+    def _on_push_canceled(self) -> None:
+        if self._git_push_worker is not None:
+            try:
+                self._git_push_worker.finished.disconnect(self._on_push_done)
+                self._git_push_worker.failed.disconnect(self._on_push_failed)
+                self._git_push_worker.progress.disconnect(self._on_push_progress)
+            except RuntimeError:
+                pass
+            self._git_push_worker.terminate()
+            self._git_push_worker.wait()
+            self._git_push_worker = None
+        if self._git_push_progress is not None:
+            self._git_push_progress.close()
+            self._git_push_progress = None
+
     def _load(self, path: str) -> None:
+        # Clear git context if we're loading a file outside the current git repo
+        if self._git_file_info is not None:
+            if not path.startswith(self._git_file_info.local_repo_path):
+                self._git_file_info = None
+                self._file_tree.clear_git_marker()
+
         try:
             with open(path, encoding="utf-8") as fh:
                 self._editor.setPlainText(fh.read())
@@ -448,7 +700,10 @@ class MainWindow(QMainWindow):
         self._refresh_preview()
 
     def _save(self) -> None:
-        if self._file:
+        if self._file and self._git_file_info is not None:
+            self._write(self._file)   # persist to local temp file first
+            self._git_save()
+        elif self._file:
             self._write(self._file)
         else:
             self._save_as()
@@ -552,6 +807,31 @@ class MainWindow(QMainWindow):
         if self._pdf_worker is not None:
             self._pdf_worker.terminate()
             self._pdf_worker.wait()
+
+        # Stop any running git workers
+        if self._git_clone_worker is not None:
+            self._git_clone_worker.terminate()
+            self._git_clone_worker.wait()
+        if self._git_push_worker is not None:
+            self._git_push_worker.terminate()
+            self._git_push_worker.wait()
+
+        # Offer to delete the temporary git clone
+        if self._git_file_info is not None:
+            tmpdir = self._git_file_info.local_repo_path
+            if tmpdir and os.path.isdir(tmpdir):
+                reply = QMessageBox.question(
+                    self,
+                    tr("Delete Git Temp Directory?"),
+                    tr(
+                        "A temporary Git clone is open:\n{path}\n\nDelete it now?",
+                        path=tmpdir,
+                    ),
+                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                )
+                if reply == QMessageBox.StandardButton.Yes:
+                    shutil.rmtree(tmpdir, ignore_errors=True)
+
         self._settings.setValue("geometry", self.saveGeometry())
         self._settings.setValue("splitter", self._splitter.sizes())
         self._settings.setValue("outer_splitter", self._outer_splitter.sizes())

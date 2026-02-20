@@ -164,6 +164,46 @@ _DE: dict[str, str] = {
     "Preview theme:": "Vorschau-Theme:",
     "App theme:": "App-Theme:",
     "App theme requires restart.": "App-Theme erfordert einen Neustart.",
+    # ── Git integration ───────────────────────────────────────────────────────
+    "Open from &Git …": "Aus &Git öffnen …",
+    "Open File from Git": "Datei aus Git öffnen",
+    "GitHub / Bitbucket file URL:": "GitHub-/Bitbucket-Datei-URL:",
+    "Ref (branch/tag/commit):": "Ref (Branch/Tag/Commit):",
+    "Cloning repository …": "Repository wird geklont …",
+    "Open from Git": "Aus Git öffnen",
+    "Git Push": "Git Push",
+    "Pushing to remote …": "Zum Remote wird gepusht …",
+    "Pushed to remote.": "Zum Remote gepusht.",
+    "Git push failed:\n{exc}": "Git-Push fehlgeschlagen:\n{exc}",
+    "Clone failed:\n{exc}": "Klonen fehlgeschlagen:\n{exc}",
+    "File not found in repository:\n{path}": "Datei nicht im Repository gefunden:\n{path}",
+    "Delete Git Temp Directory?": "Git-Temp-Verzeichnis löschen?",
+    "A temporary Git clone is open:\n{path}\n\nDelete it now?":
+        "Ein temporärer Git-Klon ist geöffnet:\n{path}\n\nJetzt löschen?",
+    "Push to": "Pushen nach",
+    "Current branch ({branch})": "Aktueller Branch ({branch})",
+    "New branch:": "Neuer Branch:",
+    "Create Pull Request": "Pull Request erstellen",
+    "PR title:": "PR-Titel:",
+    "Target branch:": "Zielbranch:",
+    "Git Commit & Push": "Git Commit & Push",
+    "Git Authentication": "Git-Authentifizierung",
+    "Auth method:": "Auth-Methode:",
+    "HTTPS (username + token)": "HTTPS (Benutzername + Token)",
+    "SSH (key file)": "SSH (Schlüsseldatei)",
+    "Token:": "Token:",
+    "SSH key:": "SSH-Schlüssel:",
+    "Passphrase:": "Passphrase:",
+    "Select SSH Key File": "SSH-Schlüsseldatei auswählen",
+    "No credentials configured. Public repositories will still work.\n"
+    "Configure credentials in View → Settings.":
+        "Keine Anmeldedaten konfiguriert. Öffentliche Repos funktionieren weiterhin.\n"
+        "Anmeldedaten unter Ansicht → Einstellungen konfigurieren.",
+    "Push rejected (non-fast-forward).\nTry saving again using 'New branch'.":
+        "Push abgelehnt (non-fast-forward).\n"
+        "Versuche erneut zu speichern und 'Neuer Branch' zu wählen.",
+    "Commit message:": "Commit-Nachricht:",
+    "Username:": "Benutzername:",
 }
 
 
