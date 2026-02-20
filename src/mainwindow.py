@@ -116,6 +116,7 @@ class MainWindow(QMainWindow):
         m.addSeparator()
         self._act_wrap = self._mk_action(tr("Word wrap"), None, m, checkable=True)
         self._act_wrap.setChecked(True)
+        self._act_light = self._mk_action(tr("Light preview"), None, m, checkable=True)
         m.addSeparator()
         settings_act = self._mk_action(tr("Settings …"), None, m)
         settings_act.triggered.connect(self._open_settings)
@@ -180,6 +181,7 @@ class MainWindow(QMainWindow):
         self._act_filetree.toggled.connect(self._file_tree.setVisible)
         self._act_preview.toggled.connect(self._preview.setVisible)
         self._act_wrap.toggled.connect(self._editor.set_word_wrap)
+        self._act_light.toggled.connect(self._set_preview_theme)
         self._file_tree.file_activated.connect(self._load)
         self._preview.open_file.connect(self._load)
 
@@ -345,6 +347,9 @@ class MainWindow(QMainWindow):
             self._splitter.setSizes([int(s) for s in sizes])
         if sizes := self._settings.value("outer_splitter"):
             self._outer_splitter.setSizes([int(s) for s in sizes])
+        light = self._settings.value("light_preview", False, type=bool)
+        self._act_light.setChecked(light)
+        self._preview.set_theme(dark=not light)
 
     def _open_settings(self) -> None:
         dlg = SettingsDialog(self)
@@ -357,6 +362,7 @@ class MainWindow(QMainWindow):
         self._settings.setValue("geometry", self.saveGeometry())
         self._settings.setValue("splitter", self._splitter.sizes())
         self._settings.setValue("outer_splitter", self._outer_splitter.sizes())
+        self._settings.setValue("light_preview", self._act_light.isChecked())
         event.accept()
 
     # ── Insert actions ────────────────────────────────────────────────────────
@@ -409,6 +415,9 @@ class MainWindow(QMainWindow):
         self._editor.setFocus()
 
     # ── Markdown help ─────────────────────────────────────────────────────────
+
+    def _set_preview_theme(self, light: bool) -> None:
+        self._preview.set_theme(dark=not light)
 
     def _show_markdown_help(self) -> None:
         dlg = MarkdownHelpDialog(self)

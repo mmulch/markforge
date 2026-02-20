@@ -201,6 +201,184 @@ mjx-container { color: #c9d1d9; }
 .footnote { font-size: .875em; color: #848d97; }
 """
 
+_GITHUB_LIGHT_CSS = """
+* { box-sizing: border-box; }
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    color: #1f2328;
+    background-color: #ffffff;
+    padding: 24px 48px;
+    max-width: 980px;
+    margin: 0 auto;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: #1f2328;
+    font-weight: 600;
+    line-height: 1.25;
+    margin-top: 24px;
+    margin-bottom: 16px;
+    padding-bottom: .3em;
+    border-bottom: 1px solid #d1d9e0;
+}
+h1 { font-size: 2em; }
+h2 { font-size: 1.5em; }
+h3 { font-size: 1.25em; border-bottom: none; }
+h4, h5, h6 { border-bottom: none; }
+
+p { margin: 0 0 16px; }
+
+a { color: #0969da; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code, kbd, samp {
+    font-family: "Consolas", "Fira Code", "SFMono-Regular", Menlo, monospace;
+    font-size: .875em;
+    background-color: rgba(175, 184, 193, .2);
+    border-radius: 4px;
+    padding: .2em .4em;
+    color: #1f2328;
+}
+
+pre {
+    background-color: #f6f8fa;
+    border: 1px solid #d1d9e0;
+    border-radius: 6px;
+    font-size: .875em;
+    line-height: 1.45;
+    overflow: auto;
+    padding: 16px;
+    margin: 0 0 16px;
+}
+pre code {
+    background: transparent;
+    border: 0;
+    font-size: 100%;
+    padding: 0;
+    white-space: pre;
+    color: #1f2328;
+}
+
+blockquote {
+    border-left: 4px solid #d1d9e0;
+    color: #59636e;
+    margin: 0 0 16px;
+    padding: 0 1em;
+}
+blockquote > :first-child { margin-top: 0; }
+blockquote > :last-child  { margin-bottom: 0; }
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 0 0 16px;
+}
+th, td {
+    border: 1px solid #d1d9e0;
+    padding: 6px 13px;
+    text-align: left;
+}
+thead tr { background-color: #f6f8fa; font-weight: 600; }
+tbody tr:nth-child(odd)  { background-color: #ffffff; }
+tbody tr:nth-child(even) { background-color: #f6f8fa; }
+
+hr {
+    height: 2px;
+    background-color: #d1d9e0;
+    border: 0;
+    margin: 24px 0;
+}
+
+img { max-width: 100%; height: auto; }
+
+ul, ol { padding-left: 2em; margin: 0 0 16px; }
+ul { list-style-type: disc; }
+ol { list-style-type: decimal; }
+ul ul { list-style-type: circle; }
+ul ul ul { list-style-type: square; }
+li { display: list-item; }
+li + li { margin-top: .25em; }
+li > p  { margin-top: 16px; }
+
+/* ── Task lists ── */
+li.task-item {
+    list-style: none !important;
+    margin-left: -1.4em;
+    display: flex;
+    align-items: baseline;
+    gap: 0.5em;
+}
+
+li.task-item input[type="checkbox"] {
+    -webkit-appearance: none;
+    appearance: none;
+    flex-shrink: 0;
+    width: 15px;
+    height: 15px;
+    margin-top: 3px;
+    border: 1.5px solid #9aa1a9;
+    border-radius: 3px;
+    background-color: #ffffff;
+    position: relative;
+    cursor: default;
+    transition: background-color 0.15s, border-color 0.15s;
+}
+
+li.task-item input[type="checkbox"]:checked {
+    background-color: #0969da;
+    border-color: #0969da;
+}
+
+li.task-item input[type="checkbox"]:checked::after {
+    content: "";
+    position: absolute;
+    left: 4px;
+    top: 1px;
+    width: 4px;
+    height: 8px;
+    border: 2px solid #ffffff;
+    border-top: none;
+    border-left: none;
+    transform: rotate(40deg);
+}
+
+li.task-item.done > span {
+    color: #59636e;
+    text-decoration: line-through;
+    text-decoration-color: #9aa1a9;
+}
+
+del {
+    text-decoration: line-through;
+    text-decoration-color: #9aa1a9;
+    color: #59636e;
+}
+
+/* Math formulas */
+.math-block {
+    overflow-x: auto;
+    margin: 20px 0;
+    text-align: center;
+}
+mjx-container { color: #1f2328; }
+
+/* PlantUML diagrams */
+.plantuml-diagram {
+    text-align: center;
+    margin: 20px 0;
+}
+.plantuml-diagram img {
+    max-width: 100%;
+    height: auto;
+    background: transparent;
+}
+
+.footnote { font-size: .875em; color: #59636e; }
+"""
+
 _MD_EXTENSIONS = ["extra", "codehilite", "toc", "sane_lists"]
 _MD_EXT_CONFIG = {
     "codehilite": {"noclasses": False, "guess_lang": False},
@@ -405,7 +583,7 @@ def _restore_plantuml(html: str, store: dict) -> str:
     return html
 
 
-def _render(text: str) -> str:
+def _render(text: str, dark: bool = True) -> str:
     """Converts Markdown text into a complete HTML document."""
     # Extract PlantUML blocks before everything else
     text, puml_store = _extract_plantuml(text)
@@ -422,10 +600,11 @@ def _render(text: str) -> str:
     body = _restore_plantuml(body, puml_store)
     body = _postprocess(body)
     body = _autolink(body)
+    theme_css = _GITHUB_DARK_CSS if dark else _GITHUB_LIGHT_CSS
     return (
         "<!DOCTYPE html>\n<html>\n<head>\n"
         '<meta charset="UTF-8">\n'
-        f"<style>\n{_GITHUB_DARK_CSS}\n{_PYGMENTS_CSS}\n</style>\n"
+        f"<style>\n{theme_css}\n{_PYGMENTS_CSS}\n</style>\n"
         f"{_MATHJAX_SCRIPT}\n"
         f"</head>\n<body>\n{body}\n</body>\n</html>"
     )
@@ -520,6 +699,7 @@ class PreviewWidget(QWidget):
             self._page.open_file.connect(self.open_file)
             self._page.pdfPrintingFinished.connect(self._on_pdf_printing_finished)
             self._pdf_export_path = ""
+            self._dark = True
             self._view.setPage(self._page)
             self._page.setBackgroundColor(QColor("#0d1117"))
             # Allow file:// pages to load external https:// resources
@@ -529,6 +709,7 @@ class PreviewWidget(QWidget):
                 True,
             )
             self._pending_html = ""
+            self._last_md = ""
             self._scroll_y: float = 0.0
             self._view.loadFinished.connect(self._restore_scroll)
         else:
@@ -546,7 +727,8 @@ class PreviewWidget(QWidget):
         *base_url* is used as the base for resolving relative paths (e.g. images).
         If omitted, the current working directory is used.
         """
-        html = _render(text)
+        self._last_md = text
+        html = _render(text, self._dark if _HAS_WEBENGINE else True)
         if _HAS_WEBENGINE:
             self._pending_html = html
             self._base_url     = base_url or QUrl.fromLocalFile(
@@ -558,6 +740,19 @@ class PreviewWidget(QWidget):
             )
         else:
             self._view.setHtml(html)  # type: ignore[attr-defined]
+
+    def set_theme(self, dark: bool) -> None:
+        """Switch between dark and light preview theme and re-render."""
+        if not _HAS_WEBENGINE or self._dark == dark:
+            return
+        self._dark = dark
+        bg = "#0d1117" if dark else "#ffffff"
+        self._page.setBackgroundColor(QColor(bg))
+        # Re-render with the stored pending HTML base and current markdown
+        if self._pending_html:
+            self._view.setHtml(
+                _render(self._last_md, dark), self._base_url
+            )
 
     def export_to_pdf(self, path: str) -> None:
         """Renders the current preview page as a PDF file at *path*.

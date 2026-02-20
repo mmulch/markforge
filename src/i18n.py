@@ -28,6 +28,7 @@ _DE: dict[str, str] = {
     "Show file tree": "Dateibaum anzeigen",
     "Show preview": "Vorschau anzeigen",
     "Word wrap": "Zeilenumbruch",
+    "Light preview": "Helle Vorschau",
     "Settings …": "Einstellungen …",
     "&Help": "&Hilfe",
     "&Markdown …": "&Markdown …",
