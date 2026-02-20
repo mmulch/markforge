@@ -74,6 +74,7 @@ class FileTreeWidget(QWidget):
         self.setMaximumWidth(420)
         self._root_dir       = ""
         self._pending_select = ""
+        self._git_marked     = False
         self._build_ui()
 
     # ── UI setup ──────────────────────────────────────────────────────────────
@@ -134,8 +135,26 @@ class FileTreeWidget(QWidget):
 
     # ── Public API ────────────────────────────────────────────────────────────
 
+    def mark_git_root(self, repo_path: str, repo_name: str) -> None:
+        """Mark the file-tree header to show this is a git-managed repo."""
+        self._git_marked = True
+        self._dir_label.setText(f"[GIT] {repo_name}")
+        self._dir_label.setToolTip(repo_path)
+        self._dir_label.setStyleSheet("color: #4caf50; font-weight: bold;")
+
+    def clear_git_marker(self) -> None:
+        """Remove the git marker and restore the normal directory label."""
+        if not self._git_marked:
+            return
+        self._git_marked = False
+        label = os.path.basename(self._root_dir) or self._root_dir
+        self._dir_label.setText(label)
+        self._dir_label.setToolTip(self._root_dir)
+        self._dir_label.setStyleSheet("")
+
     def set_root(self, path: str) -> None:
         """Sets the root directory; parent directories are never shown."""
+        self.clear_git_marker()
         directory = path if os.path.isdir(path) else os.path.dirname(os.path.abspath(path))
         self._root_dir = os.path.normpath(directory)
 

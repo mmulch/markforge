@@ -7,8 +7,13 @@ from PyQt6.QtWidgets import (
     QComboBox,
     QDialog,
     QDialogButtonBox,
+    QFileDialog,
     QFormLayout,
+    QGroupBox,
+    QHBoxLayout,
     QLabel,
+    QLineEdit,
+    QPushButton,
     QVBoxLayout,
 )
 
@@ -22,7 +27,7 @@ class SettingsDialog(QDialog):
     def __init__(self, parent=None) -> None:
         super().__init__(parent)
         self.setWindowTitle(tr("Settings"))
-        self.setMinimumWidth(360)
+        self.setMinimumWidth(400)
         self._build_ui()
 
     def _build_ui(self) -> None:
@@ -84,6 +89,65 @@ class SettingsDialog(QDialog):
         app_theme_info.setStyleSheet("color: #888; font-size: 12px;")
         root.addWidget(app_theme_info)
 
+        # ── Git Authentication ─────────────────────────────────────────────────
+        git_grp = QGroupBox(tr("Git Authentication"))
+        git_layout = QVBoxLayout(git_grp)
+
+        auth_form = QFormLayout()
+
+        self._git_auth_combo = QComboBox()
+        self._git_auth_combo.addItem(tr("HTTPS (username + token)"), "https")
+        self._git_auth_combo.addItem(tr("SSH (key file)"),           "ssh")
+        auth_form.addRow(tr("Auth method:"), self._git_auth_combo)
+        git_layout.addLayout(auth_form)
+
+        # HTTPS sub-group
+        self._https_grp = QGroupBox()
+        https_form = QFormLayout(self._https_grp)
+        self._git_username_edit = QLineEdit()
+        self._git_username_edit.setPlaceholderText("your-username")
+        self._git_token_edit = QLineEdit()
+        self._git_token_edit.setEchoMode(QLineEdit.EchoMode.Password)
+        self._git_token_edit.setPlaceholderText("ghp_…")
+        https_form.addRow(tr("Username:"), self._git_username_edit)
+        https_form.addRow(tr("Token:"),    self._git_token_edit)
+        git_layout.addWidget(self._https_grp)
+
+        # SSH sub-group
+        self._ssh_grp = QGroupBox()
+        ssh_form = QFormLayout(self._ssh_grp)
+        ssh_key_row = QHBoxLayout()
+        self._git_ssh_key_edit = QLineEdit()
+        self._git_ssh_key_edit.setPlaceholderText("~/.ssh/id_ed25519")
+        ssh_browse_btn = QPushButton("…")
+        ssh_browse_btn.setFixedWidth(30)
+        ssh_browse_btn.clicked.connect(self._browse_ssh_key)
+        ssh_key_row.addWidget(self._git_ssh_key_edit)
+        ssh_key_row.addWidget(ssh_browse_btn)
+        self._git_passphrase_edit = QLineEdit()
+        self._git_passphrase_edit.setEchoMode(QLineEdit.EchoMode.Password)
+        ssh_form.addRow(tr("SSH key:"),    ssh_key_row)
+        ssh_form.addRow(tr("Passphrase:"), self._git_passphrase_edit)
+        git_layout.addWidget(self._ssh_grp)
+
+        root.addWidget(git_grp)
+
+        # Load saved git settings
+        s = QSettings("MarkdownEditor", "MarkdownEditor")
+        saved_method = s.value("git/auth_method", "https")
+        idx = self._git_auth_combo.findData(saved_method)
+        if idx >= 0:
+            self._git_auth_combo.setCurrentIndex(idx)
+        self._git_username_edit.setText(s.value("git/https_username", ""))
+        self._git_token_edit.setText(s.value("git/https_token",       ""))
+        self._git_ssh_key_edit.setText(s.value("git/ssh_key_path",    ""))
+        self._git_passphrase_edit.setText(s.value("git/ssh_passphrase", ""))
+
+        # Wire toggle
+        self._git_auth_combo.currentIndexChanged.connect(self._on_auth_changed)
+        self._on_auth_changed()
+
+        # ── Buttons ───────────────────────────────────────────────────────────
         btns = QDialogButtonBox(
             QDialogButtonBox.StandardButton.Ok
             | QDialogButtonBox.StandardButton.Cancel
@@ -91,6 +155,20 @@ class SettingsDialog(QDialog):
         btns.accepted.connect(self._save_and_accept)
         btns.rejected.connect(self.reject)
         root.addWidget(btns)
+
+    def _on_auth_changed(self) -> None:
+        is_ssh = self._git_auth_combo.currentData() == "ssh"
+        self._https_grp.setVisible(not is_ssh)
+        self._ssh_grp.setVisible(is_ssh)
+
+    def _browse_ssh_key(self) -> None:
+        path, _ = QFileDialog.getOpenFileName(
+            self,
+            tr("Select SSH Key File"),
+            "~/.ssh",
+        )
+        if path:
+            self._git_ssh_key_edit.setText(path)
 
     def _save_and_accept(self) -> None:
         lang = self._lang_combo.currentData()
@@ -100,4 +178,12 @@ class SettingsDialog(QDialog):
         theme_settings.setValue("editor_theme",  self._editor_theme_combo.currentText())
         theme_settings.setValue("preview_theme", self._preview_theme_combo.currentText())
         theme_settings.setValue("app_theme",     self._app_theme_combo.currentText())
+
+        # Git credentials
+        theme_settings.setValue("git/auth_method",    self._git_auth_combo.currentData())
+        theme_settings.setValue("git/https_username", self._git_username_edit.text())
+        theme_settings.setValue("git/https_token",    self._git_token_edit.text())
+        theme_settings.setValue("git/ssh_key_path",   self._git_ssh_key_edit.text())
+        theme_settings.setValue("git/ssh_passphrase", self._git_passphrase_edit.text())
+
         self.accept()
