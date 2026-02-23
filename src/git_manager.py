@@ -41,6 +41,14 @@ class GitFileInfo:
 
 
 @dataclass
+class CommitInfo:
+    sha:     str   # full SHA
+    message: str   # first line
+    author:  str
+    date:    str   # human-readable
+
+
+@dataclass
 class CommitSpec:
     message:    str
     push_mode:  str        # "current_branch" | "new_branch"
@@ -48,6 +56,7 @@ class CommitSpec:
     create_pr:  bool = False
     pr_title:   str  = ""
     pr_target:  str  = ""
+    amend:      bool = False   # amend the previous MarkForge commit (SSH only)
 
 
 # ── URL parsing ───────────────────────────────────────────────────────────────
@@ -502,14 +511,16 @@ def _make_paramiko_vendor(key_path: str, passphrase: str):
 def clone_repo(info: GitFileInfo, settings, progress_cb) -> str:
     """Fetch the repository file into a fresh temp directory.
 
-    HTTPS: downloads just the target file via the platform REST API —
-    no dulwich HTTP transport involved, so Windows TLS/proxy issues are avoided.
-
-    SSH: full clone via dulwich + optional paramiko (no git executable needed).
+    HTTPS (API):    downloads just the target file via the platform REST API.
+    HTTPS (git):    full clone via the system git binary.
+    SSH (dulwich):  full clone via dulwich + optional paramiko.
 
     Returns the temp directory path on success; cleans up and re-raises on error.
     """
     auth_method = settings.value("git/auth_method", "https")
+
+    if auth_method == "git":
+        return _clone_via_git_binary(info, settings, progress_cb)
 
     if auth_method != "ssh":
         return _clone_via_api(info, settings, progress_cb)
@@ -568,6 +579,336 @@ def _clone_via_api(info: GitFileInfo, settings, progress_cb) -> str:
         raise
 
 
+# ── Git binary helpers ────────────────────────────────────────────────────────
+
+def _git_env(settings) -> dict:
+    """Build the subprocess environment for git commands.
+
+    Forwards the proxy configured in MarkForge settings via the standard
+    http_proxy / https_proxy environment variables that git respects.
+    If no proxy is configured, the system environment is passed through
+    unchanged (so git uses whatever proxy the OS or git config provides).
+    GIT_TERMINAL_PROMPT is always disabled to prevent hanging on auth prompts.
+    """
+    env = {**os.environ, "GIT_TERMINAL_PROMPT": "0"}
+    proxy_url  = (settings.value("proxy/url",      "") or "").strip()
+    proxy_user = (settings.value("proxy/username", "") or "").strip()
+    proxy_pass = (settings.value("proxy/password", "") or "").strip()
+    if proxy_url:
+        if proxy_user:
+            scheme, rest = proxy_url.split("://", 1)
+            proxy_url = f"{scheme}://{proxy_user}:{proxy_pass}@{rest}"
+        env["http_proxy"]  = proxy_url
+        env["https_proxy"] = proxy_url
+        env["HTTP_PROXY"]  = proxy_url   # some git builds read uppercase
+        env["HTTPS_PROXY"] = proxy_url
+    return env
+
+
+def _clone_via_git_binary(info: GitFileInfo, settings, progress_cb) -> str:
+    """Full clone via the system git binary over HTTPS."""
+    import subprocess
+
+    user  = settings.value("git/https_username", "")
+    token = settings.value("git/https_token",    "")
+    clone_url = _build_https_clone_url(info.clone_url, user, token)
+    env = _git_env(settings)
+
+    tmpdir = tempfile.mkdtemp(prefix="markforge_git_")
+    try:
+        progress_cb(10, "Cloning repository …")
+        result = subprocess.run(
+            ["git", "clone", "--branch", info.branch,
+             "--single-branch", "--depth", "1", clone_url, tmpdir],
+            env=env, capture_output=True, text=True,
+        )
+        if result.returncode != 0:
+            err = result.stderr.strip()
+            if user and token:
+                err = err.replace(f"{user}:{token}@", "")
+            raise RuntimeError(f"git clone failed:\n{err}")
+        progress_cb(100, "Repository cloned.")
+        return tmpdir
+    except FileNotFoundError:
+        shutil.rmtree(tmpdir, ignore_errors=True)
+        raise RuntimeError(
+            "git executable not found.\nPlease install Git and make sure it is on PATH."
+        )
+    except Exception:
+        shutil.rmtree(tmpdir, ignore_errors=True)
+        raise
+
+
+def _push_via_git_binary(info: GitFileInfo, spec: CommitSpec,
+                         settings, progress_cb) -> None:
+    """Stage, commit (optionally amend), and push via the system git binary."""
+    import subprocess
+
+    user  = settings.value("git/https_username", "")
+    token = settings.value("git/https_token",    "")
+    name  = (settings.value("git/user_name",  "") or "").strip()
+    email = (settings.value("git/user_email", "") or "").strip()
+    repo_path = info.local_repo_path
+    env = _git_env(settings)
+
+    def _run(*cmd, step_msg: str) -> None:
+        progress_cb(0, step_msg)
+        result = subprocess.run(list(cmd), cwd=repo_path, env=env,
+                                capture_output=True, text=True)
+        if result.returncode != 0:
+            err = (result.stderr or result.stdout).strip()
+            if user and token:
+                err = err.replace(f"{user}:{token}@", "")
+            raise RuntimeError(f"{cmd[0]} {cmd[1]} failed:\n{err}")
+
+    # Build identity flags for git commit (-c user.name=… -c user.email=…)
+    identity: list[str] = []
+    if name:
+        identity += ["-c", f"user.name={name}"]
+    if email:
+        identity += ["-c", f"user.email={email}"]
+
+    _run("git", "add", info.file_path, step_msg="Staging …")
+
+    if spec.amend:
+        _run("git", *identity, "commit", "--amend", "-m", spec.message,
+             step_msg="Amending commit …")
+    else:
+        _run("git", *identity, "commit", "-m", spec.message,
+             step_msg="Committing …")
+
+    if spec.amend:
+        _run("git", "push", "--force-with-lease", step_msg="Force-pushing …")
+    elif spec.push_mode == "new_branch" and spec.new_branch:
+        _run("git", "push", "origin",
+             f"HEAD:refs/heads/{spec.new_branch}",
+             step_msg="Pushing new branch …")
+    else:
+        _run("git", "push", step_msg="Pushing …")
+
+    if spec.create_pr:
+        _create_pull_request(info, spec, settings)
+
+    progress_cb(100, "Done.")
+
+
+# ── Branch commit listing & squash ────────────────────────────────────────────
+
+def get_branch_commits(info: GitFileInfo, settings,
+                        base_branch: str = "main") -> list[CommitInfo]:
+    """Return commits on HEAD that are not in *base_branch*, newest first.
+
+    Compares HEAD against origin/<base_branch> so that commits which were
+    already on the feature branch before cloning are included.
+
+    Works for both the git-binary and SSH/dulwich auth paths.
+    Returns an empty list for the HTTPS-API path (no local repo).
+    """
+    auth_method = settings.value("git/auth_method", "https")
+
+    if auth_method == "git":
+        return _branch_commits_git(info, settings, base_branch)
+    if auth_method == "ssh":
+        return _branch_commits_ssh(info, base_branch)
+    return []
+
+
+def _branch_commits_git(info: GitFileInfo, settings,
+                         base_branch: str) -> list[CommitInfo]:
+    import subprocess
+    from datetime import datetime
+
+    env       = _git_env(settings)
+    repo_path = info.local_repo_path
+
+    # Fetch the base-branch tip so origin/<base_branch> exists locally.
+    # Errors are silently ignored (e.g. branch does not exist on remote).
+    subprocess.run(
+        ["git", "fetch", "origin", f"{base_branch}:refs/remotes/origin/{base_branch}",
+         "--depth=1", "--no-tags"],
+        cwd=repo_path, env=env, capture_output=True, text=True,
+    )
+    # Deepen the current branch so the divergence point is reachable.
+    subprocess.run(
+        ["git", "fetch", "--deepen=100", "--no-tags"],
+        cwd=repo_path, env=env, capture_output=True, text=True,
+    )
+
+    fmt    = "%H%x09%s%x09%an%x09%ci"
+    result = subprocess.run(
+        ["git", "log", f"--format={fmt}",
+         f"origin/{base_branch}..HEAD"],
+        cwd=repo_path, env=env, capture_output=True, text=True,
+    )
+    if result.returncode != 0:
+        raise RuntimeError(result.stderr.strip() or
+                           f"'origin/{base_branch}' not found – "
+                           "check the base branch name.")
+
+    commits: list[CommitInfo] = []
+    for line in result.stdout.splitlines():
+        parts = line.split("\t")
+        if len(parts) < 4:
+            continue
+        sha, msg, author, raw_date = parts[0], parts[1], parts[2], parts[3]
+        try:
+            dt   = datetime.fromisoformat(raw_date.strip())
+            date = dt.strftime("%Y-%m-%d %H:%M")
+        except ValueError:
+            date = raw_date.strip()
+        commits.append(CommitInfo(sha=sha, message=msg, author=author, date=date))
+    return commits
+
+
+def _branch_commits_ssh(info: GitFileInfo, base_branch: str) -> list[CommitInfo]:
+    from datetime import datetime, timezone
+    from dulwich.repo import Repo
+
+    commits: list[CommitInfo] = []
+    with Repo(info.local_repo_path) as repo:
+        # Prefer base branch ref; fall back to current branch's remote ref
+        for ref_candidate in (
+            b"refs/remotes/origin/" + base_branch.encode(),
+            b"refs/remotes/origin/" + info.branch.encode(),
+        ):
+            try:
+                exclude_sha = repo.refs[ref_candidate]
+                exclude     = [exclude_sha]
+                break
+            except KeyError:
+                continue
+        else:
+            exclude = []
+
+        for entry in repo.get_walker(include=[repo.head()], exclude=exclude):
+            c   = entry.commit
+            msg = c.message.decode("utf-8", errors="replace").splitlines()[0].strip()
+            author = c.author.decode("utf-8", errors="replace")
+            dt     = datetime.fromtimestamp(c.commit_time, tz=timezone.utc)
+            date   = dt.strftime("%Y-%m-%d %H:%M")
+            commits.append(CommitInfo(
+                sha     = c.id.decode("ascii"),
+                message = msg,
+                author  = author,
+                date    = date,
+            ))
+    return commits
+
+
+def squash_and_push(info: GitFileInfo, squash_count: int,
+                    message: str, settings, progress_cb) -> None:
+    """Squash the top *squash_count* commits into one and force-push.
+
+    The squash target is always HEAD~squash_count (contiguous from HEAD).
+    Works for both the git-binary and SSH/dulwich auth paths.
+    """
+    auth_method = settings.value("git/auth_method", "https")
+    if auth_method == "git":
+        _squash_via_git_binary(info, squash_count, message, settings, progress_cb)
+    elif auth_method == "ssh":
+        _squash_via_ssh(info, squash_count, message, settings, progress_cb)
+    else:
+        raise RuntimeError("Squash is only supported for SSH and git-binary auth methods.")
+
+
+def _squash_via_git_binary(info: GitFileInfo, squash_count: int,
+                            message: str, settings, progress_cb) -> None:
+    import subprocess
+
+    user  = settings.value("git/https_username", "")
+    token = settings.value("git/https_token",    "")
+    name  = (settings.value("git/user_name",  "") or "").strip()
+    email = (settings.value("git/user_email", "") or "").strip()
+
+    repo_path = info.local_repo_path
+    env       = _git_env(settings)
+    identity: list[str] = []
+    if name:  identity += ["-c", f"user.name={name}"]
+    if email: identity += ["-c", f"user.email={email}"]
+
+    def _run(*cmd, step_msg: str) -> None:
+        progress_cb(0, step_msg)
+        result = subprocess.run(list(cmd), cwd=repo_path, env=env,
+                                capture_output=True, text=True)
+        if result.returncode != 0:
+            err = (result.stderr or result.stdout).strip()
+            if user and token:
+                err = err.replace(f"{user}:{token}@", "")
+            raise RuntimeError(f"{cmd[1]} failed:\n{err}")
+
+    _run("git", "reset", "--soft", f"HEAD~{squash_count}",
+         step_msg="Squashing commits …")
+    _run("git", *identity, "commit", "-m", message,
+         step_msg="Creating squash commit …")
+    _run("git", "push", "--force-with-lease",
+         step_msg="Force-pushing …")
+    progress_cb(100, "Done.")
+
+
+def _squash_via_ssh(info: GitFileInfo, squash_count: int,
+                    message: str, settings, progress_cb) -> None:
+    from dulwich import porcelain
+    from dulwich.objects import Commit as _Commit
+    from dulwich.repo import Repo
+    from time import time as _time
+
+    repo_path = info.local_repo_path
+    author    = _git_author(repo_path)
+
+    progress_cb(20, "Squashing commits …")
+    with Repo(repo_path) as repo:
+        # Walk back squash_count steps to find the target parent
+        head_sha   = repo.head()
+        head_obj   = repo.get_object(head_sha)
+        target_parent = head_sha
+        current       = head_obj
+        for _ in range(squash_count):
+            if not current.parents:
+                break
+            target_parent = current.parents[0]
+            current       = repo.get_object(target_parent)
+
+        now = int(_time())
+        c = _Commit()
+        c.tree            = head_obj.tree   # keep final working-tree state
+        c.author          = author
+        c.committer       = author
+        c.author_time     = now
+        c.commit_time     = now
+        c.author_timezone = 0
+        c.commit_timezone = 0
+        c.encoding        = b"UTF-8"
+        msg = message.encode("utf-8")
+        c.message         = msg if msg.endswith(b"\n") else msg + b"\n"
+        c.parents         = [target_parent]
+
+        repo.object_store.add_object(c)
+        branch_ref = b"refs/heads/" + info.branch.encode()
+        repo.refs[branch_ref] = c.id
+
+    progress_cb(60, "Force-pushing …")
+    errstream  = _ProgressStream(progress_cb)
+    key_path   = settings.value("git/ssh_key_path",   "")
+    passphrase = settings.value("git/ssh_passphrase", "")
+    push_url   = _ssh_clone_url(info)
+    refspec    = f"+refs/heads/{info.branch}:refs/heads/{info.branch}".encode()
+
+    vendor = _make_paramiko_vendor(key_path, passphrase)
+    if vendor is not None:
+        import dulwich.client as _dc
+        _orig = _dc.get_ssh_vendor
+        _dc.get_ssh_vendor = lambda: vendor
+        try:
+            porcelain.push(repo_path, remote_location=push_url,
+                           refspecs=[refspec], errstream=errstream)
+        finally:
+            _dc.get_ssh_vendor = _orig
+    else:
+        porcelain.push(repo_path, remote_location=push_url,
+                       refspecs=[refspec], errstream=errstream)
+    progress_cb(100, "Done.")
+
+
 # ── Commit & push ─────────────────────────────────────────────────────────────
 
 def commit_and_push(info: GitFileInfo, spec: CommitSpec, settings, progress_cb) -> None:
@@ -577,6 +918,10 @@ def commit_and_push(info: GitFileInfo, spec: CommitSpec, settings, progress_cb) 
     SSH:   uses dulwich + optional paramiko.
     """
     auth_method = settings.value("git/auth_method", "https")
+
+    if auth_method == "git":
+        _push_via_git_binary(info, spec, settings, progress_cb)
+        return
 
     if auth_method != "ssh":
         _push_via_api(info, spec, settings, progress_cb)
@@ -590,16 +935,46 @@ def commit_and_push(info: GitFileInfo, spec: CommitSpec, settings, progress_cb) 
 
     repo_path = info.local_repo_path
     errstream = _ProgressStream(progress_cb)
+    author    = _git_author(repo_path)
 
-    porcelain.add(repo_path, paths=[info.file_path])
-    author = _git_author(repo_path)
-    porcelain.commit(repo_path,
-                     message=spec.message.encode("utf-8"),
-                     author=author,
-                     committer=author)
+    if spec.amend:
+        # Amend the previous MarkForge commit: replace it with a new commit
+        # that has the same parents, so history stays linear.
+        from dulwich.objects import Commit as _Commit
+        from time import time as _time
+
+        porcelain.add(repo_path, paths=[info.file_path])
+        with Repo(repo_path) as _repo:
+            old_commit = _repo.get_object(_repo.head())
+            index      = _repo.open_index()
+            tree_sha   = index.commit(_repo.object_store)
+
+            now = int(_time())
+            c = _Commit()
+            c.tree             = tree_sha
+            c.author           = author
+            c.committer        = author
+            c.author_time      = now
+            c.commit_time      = now
+            c.author_timezone  = 0
+            c.commit_timezone  = 0
+            c.encoding         = b"UTF-8"
+            msg = spec.message.encode("utf-8")
+            c.message          = msg if msg.endswith(b"\n") else msg + b"\n"
+            c.parents          = old_commit.parents  # skip the amended commit
+
+            _repo.object_store.add_object(c)
+            branch_ref = b"refs/heads/" + info.branch.encode()
+            _repo.refs[branch_ref] = c.id
+    else:
+        porcelain.add(repo_path, paths=[info.file_path])
+        porcelain.commit(repo_path,
+                         message=spec.message.encode("utf-8"),
+                         author=author,
+                         committer=author)
 
     push_branch = info.branch
-    if spec.push_mode == "new_branch" and spec.new_branch:
+    if not spec.amend and spec.push_mode == "new_branch" and spec.new_branch:
         with Repo(repo_path) as repo:
             head_sha = repo.head()
             new_ref  = b"refs/heads/" + spec.new_branch.encode()
@@ -607,7 +982,9 @@ def commit_and_push(info: GitFileInfo, spec: CommitSpec, settings, progress_cb) 
             repo.refs.set_symbolic_ref(b"HEAD", new_ref)
         push_branch = spec.new_branch
 
-    refspec    = f"refs/heads/{push_branch}:refs/heads/{push_branch}".encode()
+    # Use '+' prefix for force-push when amending (rewrites remote history)
+    force_prefix = "+" if spec.amend else ""
+    refspec    = f"{force_prefix}refs/heads/{push_branch}:refs/heads/{push_branch}".encode()
     key_path   = settings.value("git/ssh_key_path",   "")
     passphrase = settings.value("git/ssh_passphrase", "")
     push_url   = _ssh_clone_url(info)

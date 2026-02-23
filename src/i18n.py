@@ -190,6 +190,7 @@ _DE: dict[str, str] = {
     "Git Authentication": "Git-Authentifizierung",
     "Auth method:": "Auth-Methode:",
     "HTTPS (username + token)": "HTTPS (Benutzername + Token)",
+    "HTTPS (git binary)":       "HTTPS (git-Programm)",
     "SSH (key file)": "SSH (Schlüsseldatei)",
     "Token:": "Token:",
     "SSH key:": "SSH-Schlüssel:",
@@ -203,7 +204,40 @@ _DE: dict[str, str] = {
         "Push abgelehnt (non-fast-forward).\n"
         "Versuche erneut zu speichern und 'Neuer Branch' zu wählen.",
     "Commit message:": "Commit-Nachricht:",
+    "Amend previous commit":    "Vorherigen Commit überschreiben",
+    "Git &Squash …":            "Git &Squash …",
+    "Git Squash Commits":       "Git-Commits zusammenführen",
+    "Select all new commits":   "Alle neuen Commits auswählen",
+    "SHA":                      "SHA",
+    "Message":                  "Nachricht",
+    "Author":                   "Autor",
+    "Date":                     "Datum",
+    "Squash commit message:":   "Zusammengeführte Commit-Nachricht:",
+    "Enter the combined commit message …":
+        "Kombinierte Commit-Nachricht eingeben …",
+    "Squash && Push":           "Zusammenführen && Pushen",
+    "Select at least 2 commits to squash.":
+        "Bitte mindestens 2 Commits zum Zusammenführen auswählen.",
+    "The selected commits must form a contiguous range starting from the most recent commit (HEAD).":
+        "Die gewählten Commits müssen eine zusammenhängende Reihe ab dem neuesten Commit (HEAD) bilden.",
+    "Squash commit message:":   "Zusammengeführte Commit-Nachricht:",
+    "cannot be empty.":         "darf nicht leer sein.",
+    "Squashing commits …":      "Commits werden zusammengeführt …",
+    "Squash complete.":         "Zusammenführung abgeschlossen.",
+    "Git squash failed:\n{exc}": "Git-Squash fehlgeschlagen:\n{exc}",
+    "Could not read commit history:\n{exc}":
+        "Commit-Verlauf konnte nicht gelesen werden:\n{exc}",
+    "No new commits found on this branch.":
+        "Keine neuen Commits auf diesem Branch gefunden.",
+    "No new commits found compared to '{base}'.":
+        "Keine neuen Commits im Vergleich zu '{base}' gefunden.",
+    "Loading …": "Wird geladen …",
+    "Reload":    "Neu laden",
+    "Git squash is only available with SSH or git-binary authentication.":
+        "Git-Squash ist nur mit SSH- oder git-Binary-Authentifizierung verfügbar.",
     "Username:": "Benutzername:",
+    "Name:":     "Name:",
+    "Email:":    "E-Mail:",
     # ── Proxy ─────────────────────────────────────────────────────────────────
     "HTTP Proxy": "HTTP-Proxy",
     "Proxy URL:": "Proxy-URL:",

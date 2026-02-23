@@ -20,7 +20,7 @@ A modern, feature-rich Markdown editor built with Python and PyQt6. Includes a l
 - **Math formulas** — LaTeX notation rendered with MathJax
 - **PDF import** — import any PDF and convert it to Markdown automatically (headings, paragraphs, tables preserved)
 - **PDF export** — export the current document as a PDF
-- **Git integration** — open Markdown files directly from GitHub, GitHub Enterprise, Bitbucket Cloud, or Bitbucket Server; edit and push back without leaving the editor (see [Git Integration](#git-integration))
+- **Git integration** — open Markdown files directly from GitHub, GitHub Enterprise, Bitbucket Cloud, or Bitbucket Server; edit and push back without leaving the editor; amend the previous commit or squash multiple commits in one step (see [Git Integration](#git-integration))
 - **Word count & cursor position** — always visible in the status bar
 - **Multilingual** — English and German (Deutsch) UI
 - **Persistent settings** — window geometry, splitter positions, and theme preferences are saved across sessions
@@ -32,6 +32,7 @@ A modern, feature-rich Markdown editor built with Python and PyQt6. Includes a l
 | New | `Ctrl+N` |
 | Open | `Ctrl+O` |
 | Open from Git | `Ctrl+Shift+G` |
+| Git Squash | `Ctrl+Shift+Q` |
 | Save | `Ctrl+S` |
 | Save As | `Ctrl+Shift+S` |
 | Export as PDF | `Ctrl+Shift+E` |
@@ -49,7 +50,8 @@ A modern, feature-rich Markdown editor built with Python and PyQt6. Includes a l
 
 - Python 3.8+
 - CMake 3.16+
-- **No git installation required** — git operations use [dulwich](https://www.dulwich.io/), a pure-Python git implementation
+- **No git installation required** for HTTPS (API) and SSH modes — git operations use [dulwich](https://www.dulwich.io/), a pure-Python git implementation
+- **`git` binary required** only for the optional *HTTPS (git binary)* auth mode (e.g. [Git for Windows](https://git-scm.com/))
 
 Python dependencies (installed automatically by CMake):
 
@@ -93,7 +95,7 @@ python src/main.py
 
 ## Git Integration
 
-MarkForge can open Markdown files directly from any hosted git platform, let you edit them, and push changes back — without leaving the editor and without needing git installed on your system.
+MarkForge can open Markdown files directly from any hosted git platform, let you edit them, and push changes back — without leaving the editor. Advanced operations like **amend** and **squash** are supported for SSH and git-binary authentication.
 
 ### Supported platforms
 
@@ -121,10 +123,20 @@ The file tree header shows `[GIT] reponame` (in green) while a git-managed file 
 Press `Ctrl+S` while a git-managed file is open. A dialog appears with:
 
 - **Commit message** — required
+- **Amend previous commit** *(SSH & git binary, from the 2nd save onwards)* — replaces the previous commit instead of creating a new one; the previous commit message is pre-filled; uses force-push (`--force-with-lease`) automatically. Only commits created by MarkForge in the current session can be amended.
 - **Push to:**
   - *Current branch* — pushes directly to the branch you cloned from
   - *New branch* — creates a new branch; optionally tick **Create Pull Request** to open a PR automatically
 - **PR title / target branch** — shown when "Create Pull Request" is ticked
+
+### Squashing commits
+
+**File → Git Squash…** (`Ctrl+Shift+Q`) *(SSH & git binary only)*
+
+Opens a dialog showing all commits on the current branch that are not yet in a chosen base branch (default: `main`). Select a contiguous range from the most recent commit, enter a combined message, and click **Squash & Push** — MarkForge rewrites the branch history and force-pushes.
+
+- **Base branch** field: change the reference branch (e.g. `main`, `master`, `develop`) and click **Reload** to refresh the list
+- **Select all new commits**: checks all commits in the list at once
 
 ### Closing
 
@@ -136,7 +148,11 @@ Configure credentials in **View → Settings → Git Authentication**.
 
 #### HTTPS (username + token)
 
-Works on all platforms without any additional software.
+Works on all platforms without any additional software. Uses the platform REST API — no local git history is maintained, so **amend and squash are not available** in this mode.
+
+#### HTTPS (git binary)
+
+Uses the system `git` executable for all operations (full local clone, commit, push). Requires [Git for Windows](https://git-scm.com/) (or any `git` binary on PATH). Supports **amend** and **squash** just like SSH. Token authentication is configured via the same Username + Token fields.
 
 | Platform | Token type |
 |---|---|
