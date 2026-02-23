@@ -26,9 +26,11 @@ from git_dialogs import GitCommitDialog, GitOpenDialog, GitSquashDialog
 from git_manager import GitFileInfo, CommitSpec  # noqa: F401
 from i18n import tr
 from insert_media_dialogs import InsertImageDialog, InsertLinkDialog
+from insert_mermaid_dialog import InsertMermaidDialog
 from insert_plantuml_dialog import InsertPlantUMLDialog
 from insert_table_dialog import InsertTableDialog
 from markdown_help_dialog import MarkdownHelpDialog
+from mermaid_help_dialog import MermaidHelpDialog
 from plantuml_help_dialog import PlantUMLHelpDialog
 from preview_widget import PreviewWidget
 from settings_dialog import SettingsDialog
@@ -240,6 +242,7 @@ class MainWindow(QMainWindow):
         self._act_insert_link     = self._mk_action(tr("&Link …"),      "Ctrl+K",       m)
         self._act_insert_image    = self._mk_action(tr("&Image …"),     "Ctrl+Shift+K", m)
         self._act_insert_plantuml = self._mk_action(tr("&PlantUML …"),  "Ctrl+Shift+U", m)
+        self._act_insert_mermaid  = self._mk_action(tr("&Mermaid …"),   "Ctrl+Shift+M", m)
         m.addSeparator()
         self._act_insert_table    = self._mk_action(tr("&Table …"),     "Ctrl+Shift+T", m)
 
@@ -262,10 +265,15 @@ class MainWindow(QMainWindow):
 
         # ── Help ───────────────────────────────────────────────────────────
         m = mb.addMenu(tr("&Help"))
+        user_manual = self._mk_action(tr("&User Manual …"), None, m)
+        user_manual.triggered.connect(self._show_user_manual)
+        m.addSeparator()
         markdown_help = self._mk_action(tr("&Markdown …"), None, m)
         markdown_help.triggered.connect(self._show_markdown_help)
         plantuml_help = self._mk_action(tr("&PlantUML …"), None, m)
         plantuml_help.triggered.connect(self._show_plantuml_help)
+        mermaid_help = self._mk_action(tr("Mermaid …"), None, m)
+        mermaid_help.triggered.connect(self._show_mermaid_help)
         m.addSeparator()
         about = self._mk_action(tr("&About …"), None, m)
         about.triggered.connect(self._about)
@@ -320,6 +328,7 @@ class MainWindow(QMainWindow):
         self._act_insert_link.triggered.connect(self._insert_link)
         self._act_insert_image.triggered.connect(self._insert_image)
         self._act_insert_plantuml.triggered.connect(self._insert_plantuml)
+        self._act_insert_mermaid.triggered.connect(self._insert_mermaid)
         self._act_insert_table.triggered.connect(self._insert_table)
         self._act_filetree.toggled.connect(self._file_tree.setVisible)
         self._act_preview.toggled.connect(self._preview.setVisible)
@@ -377,7 +386,7 @@ class MainWindow(QMainWindow):
         for act in (
             self._act_save, self._act_save_as, self._act_export_pdf,
             self._act_insert_link, self._act_insert_image,
-            self._act_insert_plantuml, self._act_insert_table,
+            self._act_insert_plantuml, self._act_insert_mermaid, self._act_insert_table,
         ):
             act.setEnabled(active)
 
@@ -840,7 +849,10 @@ class MainWindow(QMainWindow):
         self._update_title()
         self._file_tree.set_root(os.path.dirname(os.path.abspath(path)))
         self._file_tree.select_file(path)
-        self._refresh_preview()
+        # Defer the preview so the editor becomes visible immediately; the
+        # preview (which may fetch remote resources like PlantUML) renders on
+        # the next event-loop iteration.
+        QTimer.singleShot(0, self._refresh_preview)
 
     def _save(self) -> None:
         if self._file and self._git_file_info is not None:
@@ -1016,6 +1028,18 @@ class MainWindow(QMainWindow):
             self._editor.setTextCursor(cursor)
             self._editor.setFocus()
 
+    def _insert_mermaid(self) -> None:
+        dlg = InsertMermaidDialog(self)
+        if dlg.exec() != QDialog.DialogCode.Accepted:
+            return
+        md = dlg.get_markdown()
+        if md:
+            cursor = self._editor.textCursor()
+            prefix = "\n" if cursor.columnNumber() > 0 else ""
+            cursor.insertText(f"{prefix}{md}\n")
+            self._editor.setTextCursor(cursor)
+            self._editor.setFocus()
+
     def _insert_table(self) -> None:
         dlg = InsertTableDialog(self)
         if dlg.exec() != QDialog.DialogCode.Accepted:
@@ -1029,6 +1053,16 @@ class MainWindow(QMainWindow):
         self._editor.setTextCursor(cursor)
         self._editor.setFocus()
 
+    # ── User manual ───────────────────────────────────────────────────────────
+
+    def _show_user_manual(self) -> None:
+        from PyQt6.QtGui import QDesktopServices
+        from i18n import current as _lang
+        filename = "de.html" if _lang() == "de" else "index.html"
+        docs_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "docs")
+        path = os.path.join(docs_dir, filename)
+        QDesktopServices.openUrl(QUrl.fromLocalFile(path))
+
     # ── Markdown help ─────────────────────────────────────────────────────────
 
     def _show_markdown_help(self) -> None:
@@ -1037,6 +1071,10 @@ class MainWindow(QMainWindow):
 
     def _show_plantuml_help(self) -> None:
         dlg = PlantUMLHelpDialog(self)
+        dlg.exec()
+
+    def _show_mermaid_help(self) -> None:
+        dlg = MermaidHelpDialog(self)
         dlg.exec()
 
     # ── About ─────────────────────────────────────────────────────────────────

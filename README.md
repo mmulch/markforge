@@ -1,10 +1,12 @@
 # MarkForge
 
-A modern, feature-rich Markdown editor built with Python and PyQt6. Includes a live side-by-side preview, syntax highlighting, PlantUML diagram support, math formulas, PDF export, and full Git integration — in a clean, dual-pane interface.
+A modern, feature-rich Markdown editor built with Python and PyQt6. Includes a live side-by-side preview, syntax highlighting, PlantUML and Mermaid diagram support, math formulas, PDF export, and full Git integration — in a clean, dual-pane interface.
 
 ![License](https://img.shields.io/badge/license-GPL--3.0-blue)
 ![Python](https://img.shields.io/badge/python-3.8%2B-blue)
 ![PyQt6](https://img.shields.io/badge/PyQt6-6.4%2B-green)
+
+📖 **[User Manual (English)](docs/index.html)** · **[Benutzerhandbuch (Deutsch)](docs/de.html)**
 
 ---
 
@@ -15,13 +17,15 @@ A modern, feature-rich Markdown editor built with Python and PyQt6. Includes a l
 - **Syntax highlighting** — Markdown-aware highlighting with matching dark/light colour schemes
 - **Line numbers** — gutter with current-line highlight
 - **File tree** — browse Markdown files and images in the project directory
-- **Insert dialogs** — guided dialogs for links, images, tables, and PlantUML diagrams
+- **Insert dialogs** — guided dialogs for links, images, tables, PlantUML diagrams, and Mermaid diagrams
 - **PlantUML support** — embed diagrams rendered via the PlantUML online service
+- **Mermaid support** — flowcharts, sequence, class, state, Gantt, pie, ER, git graph, mind map — rendered via kroki.io
 - **Math formulas** — LaTeX notation rendered with MathJax
 - **PDF import** — import any PDF and convert it to Markdown automatically (headings, paragraphs, tables preserved)
 - **PDF export** — export the current document as a PDF
 - **Git integration** — open Markdown files directly from GitHub, GitHub Enterprise, Bitbucket Cloud, or Bitbucket Server; edit and push back without leaving the editor; amend the previous commit or squash multiple commits in one step (see [Git Integration](#git-integration))
 - **Word count & cursor position** — always visible in the status bar
+- **Online user manual** — comprehensive EN/DE documentation (see [User Manual](docs/index.html))
 - **Multilingual** — English and German (Deutsch) UI
 - **Persistent settings** — window geometry, splitter positions, and theme preferences are saved across sessions
 
@@ -42,6 +46,7 @@ A modern, feature-rich Markdown editor built with Python and PyQt6. Includes a l
 | Insert link | `Ctrl+K` |
 | Insert image | `Ctrl+Shift+K` |
 | Insert PlantUML | `Ctrl+Shift+U` |
+| Insert Mermaid | `Ctrl+Shift+M` |
 | Insert table | `Ctrl+Shift+T` |
 
 ---
@@ -146,7 +151,7 @@ When you close the application while a git-managed file is open, MarkForge asks 
 
 Configure credentials in **View → Settings → Git Authentication**.
 
-#### HTTPS (username + token)
+#### HTTPS (embedded)
 
 Works on all platforms without any additional software. Uses the platform REST API — no local git history is maintained, so **amend and squash are not available** in this mode.
 
@@ -208,6 +213,7 @@ To build the Windows installer yourself you need:
 - Strikethrough (`~~text~~`)
 - Task lists
 - PlantUML diagram blocks
+- Mermaid diagram blocks (flowcharts, sequence, class, state, Gantt, pie, ER, git graph, mind map)
 - LaTeX math via MathJax
 
 ---

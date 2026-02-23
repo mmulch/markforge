@@ -164,6 +164,8 @@ _DE: dict[str, str] = {
     "Preview theme:": "Vorschau-Theme:",
     "App theme:": "App-Theme:",
     "App theme requires restart.": "App-Theme erfordert einen Neustart.",
+    # ── Help menu ─────────────────────────────────────────────────────────────
+    "&User Manual …": "&Benutzerhandbuch …",
     # ── Git integration ───────────────────────────────────────────────────────
     "Open from &Git …": "Aus &Git öffnen …",
     "Open File from Git": "Datei aus Git öffnen",
@@ -189,7 +191,7 @@ _DE: dict[str, str] = {
     "Git Commit & Push": "Git Commit & Push",
     "Git Authentication": "Git-Authentifizierung",
     "Auth method:": "Auth-Methode:",
-    "HTTPS (username + token)": "HTTPS (Benutzername + Token)",
+    "HTTPS (embedded)": "HTTPS (eingebettet)",
     "HTTPS (git binary)":       "HTTPS (git-Programm)",
     "SSH (key file)": "SSH (Schlüsseldatei)",
     "Token:": "Token:",
@@ -238,6 +240,21 @@ _DE: dict[str, str] = {
     "Username:": "Benutzername:",
     "Name:":     "Name:",
     "Email:":    "E-Mail:",
+    # ── Mermaid ───────────────────────────────────────────────────────────────
+    "Insert Mermaid Diagram": "Mermaid-Diagramm einfügen",
+    "Mermaid code:":          "Mermaid-Code:",
+    "Tip: The diagram preview appears automatically in the main window after inserting"
+    " (mermaid.js is loaded from CDN on first use).":
+        "Tipp: Die Vorschau des Diagramms erscheint nach dem Einfügen automatisch"
+        " im Hauptfenster (mermaid.js wird beim ersten Einsatz vom CDN geladen).",
+    "&Mermaid …": "&Mermaid …",
+    "Mermaid …":  "Mermaid …",
+    # Mermaid template names
+    "Flowchart":   "Flussdiagramm",
+    "Pie chart":   "Tortendiagramm",
+    "ER diagram":  "ER-Diagramm",
+    "Git graph":   "Git-Graph",
+    "Gantt":       "Gantt",
     # ── Proxy ─────────────────────────────────────────────────────────────────
     "HTTP Proxy": "HTTP-Proxy",
     "Proxy URL:": "Proxy-URL:",

@@ -96,7 +96,7 @@ class SettingsDialog(QDialog):
         auth_form = QFormLayout()
 
         self._git_auth_combo = QComboBox()
-        self._git_auth_combo.addItem(tr("HTTPS (username + token)"), "https")
+        self._git_auth_combo.addItem(tr("HTTPS (embedded)"), "https")
         self._git_auth_combo.addItem(tr("HTTPS (git binary)"),       "git")
         self._git_auth_combo.addItem(tr("SSH (key file)"),           "ssh")
         auth_form.addRow(tr("Auth method:"), self._git_auth_combo)

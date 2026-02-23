@@ -1,10 +1,10 @@
 ; Inno Setup script for MarkForge
 ; Build from project root: ISCC.exe build\windows\markforge.iss
-; Pass version via: ISCC.exe /DAppVersion=1.4.0 build\windows\markforge.iss
+; Pass version via: ISCC.exe /DAppVersion=1.5.0 build\windows\markforge.iss
 
 #define AppName    "MarkForge"
 #ifndef AppVersion
-  #define AppVersion "1.4.0"
+  #define AppVersion "1.5.0"
 #endif
 #define AppPublisher "MarkForge Contributors"
 #define AppURL     "https://github.com/mmulch/markforge"

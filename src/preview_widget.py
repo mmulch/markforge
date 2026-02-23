@@ -38,6 +38,12 @@ try:
 except ImportError:
     _HAS_PLANTUML = False
 
+try:
+    from mermaid_utils import png_data_uri as _mermaid_img
+    _HAS_MERMAID = True
+except ImportError:
+    _HAS_MERMAID = False
+
 # ── MathJax ───────────────────────────────────────────────────────────────────
 _MATHJAX_SCRIPT = r"""<script>
 MathJax = {
@@ -169,6 +175,65 @@ def _postprocess(html: str) -> str:
     return html
 
 
+# ── Mermaid extraction ────────────────────────────────────────────────────────
+
+_MERMAID_FENCE = _re.compile(
+    r"^```[ \t]*mermaid[ \t]*\n(.*?)\n```[ \t]*$",
+    _re.MULTILINE | _re.DOTALL | _re.IGNORECASE,
+)
+_MERM_PH = "XMERM{}XMERM"
+
+
+def _extract_mermaid(text: str) -> tuple[str, dict]:
+    """Replaces ```mermaid blocks with placeholders before Markdown processing."""
+    store: dict[str, str] = {}
+    counter = [0]
+
+    def _replace(m: _re.Match) -> str:
+        key = _MERM_PH.format(counter[0])
+        store[key] = m.group(1)
+        counter[0] += 1
+        return f"\n{key}\n"
+
+    text = _MERMAID_FENCE.sub(_replace, text)
+    return text, store
+
+
+def _restore_mermaid(html: str, store: dict) -> str:
+    """Replaces Mermaid placeholders with PNG images embedded as data URIs.
+
+    Uses the kroki.io public API for server-side rendering — the same pattern
+    as PlantUML.  This avoids all issues with running mermaid.js inside
+    Qt WebEngine pages loaded via setHtml() (opaque security origin).
+    """
+    if not store:
+        return html
+    for key, diagram_text in store.items():
+        if _HAS_MERMAID:
+            uri = _mermaid_img(diagram_text)
+            if uri:
+                replacement = (
+                    '<div class="mermaid-diagram">'
+                    f'<img src="{uri}" alt="Mermaid diagram"'
+                    ' style="max-width:100%;height:auto;"/>'
+                    '</div>'
+                )
+            else:
+                replacement = (
+                    '<div class="mermaid-diagram">'
+                    '<em style="color:#e57373">Mermaid: could not reach server</em>'
+                    '</div>'
+                )
+        else:
+            replacement = (
+                '<div class="mermaid-diagram">'
+                '<em>Mermaid nicht verfügbar</em>'
+                '</div>'
+            )
+        html = html.replace(key, replacement)
+    return html
+
+
 # ── PlantUML extraction ───────────────────────────────────────────────────────
 
 _PLANTUML_FENCE = _re.compile(
@@ -233,8 +298,9 @@ def _restore_plantuml(html: str, store: dict) -> str:
 
 def _render(text: str, theme_name: str = "GitHub Dark") -> str:
     """Converts Markdown text into a complete HTML document."""
-    text, puml_store = _extract_plantuml(text)
-    text, math_store = _extract_math(text)
+    text, puml_store  = _extract_plantuml(text)
+    text, merm_store  = _extract_mermaid(text)
+    text, math_store  = _extract_math(text)
 
     body = markdown.markdown(
         _preprocess(text),
@@ -243,6 +309,7 @@ def _render(text: str, theme_name: str = "GitHub Dark") -> str:
     )
     body = _restore_math(body, math_store)
     body = _restore_plantuml(body, puml_store)
+    body = _restore_mermaid(body, merm_store)
     body = _postprocess(body)
     body = _autolink(body)
 
