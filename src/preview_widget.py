@@ -15,7 +15,9 @@ try:
     from PyQt6.QtWebEngineCore import QWebEnginePage, QWebEngineSettings
     from PyQt6.QtWebEngineWidgets import QWebEngineView
     _HAS_WEBENGINE = True
-except ImportError:
+except Exception as _webengine_err:
+    import logging as _logging
+    _logging.getLogger(__name__).warning("WebEngine unavailable: %s", _webengine_err)
     _HAS_WEBENGINE = False
 
 try:
@@ -357,7 +359,8 @@ _PDF_CSS_REMOVE = """
 """
 
 
-class _NavigationPage(QWebEnginePage):
+if _HAS_WEBENGINE:
+  class _NavigationPage(QWebEnginePage):
     """Redirects external links to the system browser.
 
     Local Markdown files are forwarded to the editor via a signal.
