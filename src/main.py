@@ -3,7 +3,47 @@
 
 from __future__ import annotations
 
+import logging
+import os
+import pathlib
 import sys
+import traceback
+
+
+# ── Logging setup (must happen before any other import) ───────────────────────
+
+def _log_path() -> pathlib.Path:
+    if sys.platform == "win32":
+        base = pathlib.Path(os.environ.get("APPDATA", pathlib.Path.home()))
+    else:
+        base = pathlib.Path.home() / ".config"
+    log_dir = base / "MarkForge"
+    log_dir.mkdir(parents=True, exist_ok=True)
+    return log_dir / "markforge.log"
+
+
+_LOG_FILE = _log_path()
+logging.basicConfig(
+    filename=str(_LOG_FILE),
+    level=logging.DEBUG,
+    format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+    encoding="utf-8",
+)
+_log = logging.getLogger(__name__)
+_log.info("MarkForge starting — Python %s on %s", sys.version, sys.platform)
+_log.info("Log file: %s", _LOG_FILE)
+
+
+def _excepthook(exc_type, exc_value, exc_tb):
+    _log.critical("Unhandled exception", exc_info=(exc_type, exc_value, exc_tb))
+    with open(_LOG_FILE, "a", encoding="utf-8") as fh:
+        traceback.print_exception(exc_type, exc_value, exc_tb, file=fh)
+    sys.__excepthook__(exc_type, exc_value, exc_tb)
+
+
+sys.excepthook = _excepthook
+
+# ── Application ───────────────────────────────────────────────────────────────
 
 from PyQt6.QtCore import Qt, QSettings
 from PyQt6.QtWidgets import QApplication
