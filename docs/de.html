@@ -167,6 +167,20 @@
     background: rgba(88,166,255,0.08);
   }
 
+  .lang-btn.active {
+    color: var(--text);
+    border-color: var(--link);
+    background: rgba(88,166,255,0.12);
+    font-weight: 700;
+  }
+
+  .lang-switcher {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    align-items: center;
+  }
+
   /* ── Article ───────────────────────────────────────────────────────────── */
   article {
     max-width: 860px;
@@ -562,7 +576,16 @@
 <div id="content">
   <div id="topbar">
     <button id="menu-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')" aria-label="Menü umschalten">&#9776;</button>
-    <a href="index.html" class="lang-btn">&#127468;&#127463; English</a>
+    <div class="lang-switcher">
+      <a href="index.html" class="lang-btn">EN</a>
+      <a href="de.html" class="lang-btn active">DE</a>
+      <a href="ar.html" class="lang-btn">AR</a>
+      <a href="vi.html" class="lang-btn">VI</a>
+      <a href="sv.html" class="lang-btn">SV</a>
+      <a href="uk.html" class="lang-btn">UK</a>
+      <a href="kn.html" class="lang-btn">KN</a>
+      <a href="hi.html" class="lang-btn">HI</a>
+    </div>
   </div>
 
   <article>

@@ -21,6 +21,8 @@ def main() -> int:
     app.setOrganizationName("MarkdownEditor")
 
     i18n.setup(QSettings("Markforge", "Markforge").value("language", "en"))
+    if i18n.is_rtl():
+        app.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
     apply_app_theme(
         QSettings("MarkdownEditor", "MarkdownEditor").value("app_theme", "System"),
         app,

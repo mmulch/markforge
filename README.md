@@ -6,7 +6,7 @@ A modern, feature-rich Markdown editor built with Python and PyQt6. Includes a l
 ![Python](https://img.shields.io/badge/python-3.8%2B-blue)
 ![PyQt6](https://img.shields.io/badge/PyQt6-6.4%2B-green)
 
-📖 **[User Manual (English)](docs/index.html)** · **[Benutzerhandbuch (Deutsch)](docs/de.html)**
+📖 **[EN](docs/index.html)** · **[DE](docs/de.html)** · **[AR](docs/ar.html)** · **[VI](docs/vi.html)** · **[SV](docs/sv.html)** · **[UK](docs/uk.html)** · **[KN](docs/kn.html)** · **[HI](docs/hi.html)**
 
 ---
 
@@ -25,8 +25,8 @@ A modern, feature-rich Markdown editor built with Python and PyQt6. Includes a l
 - **PDF export** — export the current document as a PDF
 - **Git integration** — open Markdown files directly from GitHub, GitHub Enterprise, Bitbucket Cloud, or Bitbucket Server; edit and push back without leaving the editor; amend the previous commit or squash multiple commits in one step (see [Git Integration](#git-integration))
 - **Word count & cursor position** — always visible in the status bar
-- **Online user manual** — comprehensive EN/DE documentation (see [User Manual](docs/index.html))
-- **Multilingual** — English and German (Deutsch) UI
+- **Online user manual** — comprehensive documentation in 8 languages: EN, DE, AR, VI, SV, UK, KN, HI (see [User Manual](docs/index.html))
+- **Multilingual** — UI available in 8 languages: English, Deutsch, عربي, Tiếng Việt, Svenska, Українська, ಕನ್ನಡ, हिंदी
 - **Persistent settings** — window geometry, splitter positions, and theme preferences are saved across sessions
 
 ### Keyboard Shortcuts

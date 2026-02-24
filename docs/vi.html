@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MarkForge – Hướng dẫn sử dụng</title>
+<style>
+  /* ── Reset & base ──────────────────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:           #0d1117;
+    --sidebar-bg:   #161b22;
+    --border:       #30363d;
+    --text:         #e6edf3;
+    --text-muted:   #8b949e;
+    --link:         #58a6ff;
+    --accent:       #238636;
+    --accent-hover: #2ea043;
+    --code-bg:      #161b22;
+    --note-bg:      #0d2030;
+    --note-border:  #58a6ff;
+    --tip-bg:       #0d2613;
+    --tip-border:   #238636;
+    --warn-bg:      #2d1b00;
+    --warn-border:  #d29922;
+    --sidebar-w:    260px;
+    --font-mono:    'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* ── Sidebar ───────────────────────────────────────────────────────────── */
+  #sidebar {
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    width: var(--sidebar-w);
+    background: var(--sidebar-bg);
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+  }
+
+  #sidebar-header {
+    padding: 20px 16px 12px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  #sidebar-header .logo {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.3px;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  #sidebar-header .subtitle {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  #toc {
+    padding: 12px 0 20px;
+    flex: 1;
+  }
+
+  #toc h3 {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    padding: 0 16px 6px;
+  }
+
+  #toc ul { list-style: none; }
+
+  #toc > ul > li > a {
+    display: block;
+    padding: 5px 16px;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-decoration: none;
+    border-left: 2px solid transparent;
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+  }
+
+  #toc > ul > li > a:hover {
+    color: var(--text);
+    background: rgba(255,255,255,0.04);
+    border-left-color: var(--link);
+  }
+
+  #toc ul ul { padding-left: 14px; }
+
+  #toc ul ul li a {
+    display: block;
+    padding: 3px 16px 3px 14px;
+    font-size: 12.5px;
+    color: var(--text-muted);
+    text-decoration: none;
+    border-left: 2px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+
+  #toc ul ul li a:hover {
+    color: var(--link);
+    border-left-color: var(--link);
+  }
+
+  /* ── Main content ──────────────────────────────────────────────────────── */
+  #content {
+    margin-left: var(--sidebar-w);
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* ── Top bar ───────────────────────────────────────────────────────────── */
+  #topbar {
+    position: sticky;
+    top: 0;
+    background: rgba(13,17,23,0.92);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    z-index: 50;
+  }
+
+  .lang-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: var(--sidebar-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+  }
+
+  .lang-btn:hover {
+    color: var(--text);
+    border-color: var(--link);
+    background: rgba(88,166,255,0.08);
+  }
+
+  .lang-btn.active {
+    color: var(--text);
+    border-color: var(--link);
+    background: rgba(88,166,255,0.12);
+    font-weight: 700;
+  }
+
+  .lang-switcher {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    align-items: center;
+  }
+
+  /* ── Article ───────────────────────────────────────────────────────────── */
+  article {
+    max-width: 860px;
+    padding: 40px 40px 80px;
+  }
+
+  /* ── Headings ──────────────────────────────────────────────────────────── */
+  h1 {
+    font-size: 2.2em;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 16px;
+  }
+
+  h1 .version-badge {
+    font-size: 0.45em;
+    font-weight: 500;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 12px;
+    padding: 2px 10px;
+    vertical-align: middle;
+    margin-left: 10px;
+  }
+
+  h2 {
+    font-size: 1.5em;
+    font-weight: 700;
+    margin-top: 52px;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+
+  h3 {
+    font-size: 1.15em;
+    font-weight: 600;
+    margin-top: 32px;
+    margin-bottom: 10px;
+    color: var(--text);
+  }
+
+  h4 {
+    font-size: 1em;
+    font-weight: 600;
+    margin-top: 24px;
+    margin-bottom: 8px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 0.82em;
+  }
+
+  /* ── Paragraphs & lists ────────────────────────────────────────────────── */
+  p { margin-bottom: 14px; }
+
+  ul, ol {
+    margin: 0 0 14px 24px;
+  }
+
+  li { margin-bottom: 5px; }
+  li ul, li ol { margin-top: 5px; margin-bottom: 6px; }
+
+  /* ── Links ─────────────────────────────────────────────────────────────── */
+  a { color: var(--link); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* ── Code ──────────────────────────────────────────────────────────────── */
+  code {
+    font-family: var(--font-mono);
+    font-size: 0.875em;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.1em 0.4em;
+    color: #e6c07b;
+  }
+
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    overflow-x: auto;
+    margin: 16px 0;
+    font-family: var(--font-mono);
+    font-size: 0.875em;
+    line-height: 1.6;
+    color: #abb2bf;
+  }
+
+  pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    color: inherit;
+    font-size: inherit;
+  }
+
+  /* ── kbd ───────────────────────────────────────────────────────────────── */
+  kbd {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 0.78em;
+    font-weight: 600;
+    color: var(--text);
+    background: #21262d;
+    border: 1px solid #444c56;
+    border-bottom-width: 2px;
+    border-radius: 5px;
+    padding: 2px 7px;
+    white-space: nowrap;
+    box-shadow: inset 0 -1px 0 #444c56;
+  }
+
+  /* ── Tables ────────────────────────────────────────────────────────────── */
+  .table-wrap { overflow-x: auto; margin: 16px 0; }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 0.9em;
+  }
+
+  th {
+    background: #161b22;
+    color: var(--text);
+    font-weight: 600;
+    text-align: left;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+  }
+
+  td {
+    padding: 9px 14px;
+    border: 1px solid var(--border);
+    vertical-align: top;
+  }
+
+  tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+
+  /* ── Callouts ──────────────────────────────────────────────────────────── */
+  .callout {
+    border-left: 4px solid;
+    border-radius: 0 8px 8px 0;
+    padding: 14px 18px;
+    margin: 20px 0;
+    font-size: 0.95em;
+  }
+
+  .callout-title {
+    font-weight: 700;
+    font-size: 0.82em;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+  }
+
+  .callout p:last-child { margin-bottom: 0; }
+
+  .note  { background: var(--note-bg);  border-color: var(--note-border); }
+  .note  .callout-title { color: var(--note-border); }
+
+  .tip   { background: var(--tip-bg);   border-color: var(--tip-border); }
+  .tip   .callout-title { color: var(--tip-border); }
+
+  .warn  { background: var(--warn-bg);  border-color: var(--warn-border); }
+  .warn  .callout-title { color: var(--warn-border); }
+
+  /* ── Sections ──────────────────────────────────────────────────────────── */
+  section { scroll-margin-top: 64px; }
+
+  /* ── Step list ─────────────────────────────────────────────────────────── */
+  .steps { list-style: none; margin: 0 0 14px; counter-reset: step; }
+  .steps li {
+    counter-increment: step;
+    padding: 8px 0 8px 40px;
+    position: relative;
+    border-bottom: 1px solid rgba(48,54,61,0.5);
+  }
+  .steps li:last-child { border-bottom: none; }
+  .steps li::before {
+    content: counter(step);
+    position: absolute;
+    left: 0; top: 8px;
+    width: 26px; height: 26px;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ── Feature grid ──────────────────────────────────────────────────────── */
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+    margin: 16px 0;
+  }
+
+  .feature-card {
+    background: var(--sidebar-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+
+  .feature-card strong {
+    display: block;
+    color: var(--link);
+    font-size: 0.9em;
+    margin-bottom: 4px;
+  }
+
+  .feature-card span {
+    font-size: 0.82em;
+    color: var(--text-muted);
+  }
+
+  /* ── Shortcut row ──────────────────────────────────────────────────────── */
+  .shortcut-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(48,54,61,0.5);
+  }
+  .shortcut-row:last-child { border-bottom: none; }
+  .shortcut-row .label { font-size: 0.9em; }
+
+  /* ── Markdown example block ────────────────────────────────────────────── */
+  .md-example {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 12px 0;
+    font-size: 0.875em;
+  }
+  .md-example-col { padding: 12px 16px; }
+  .md-example-col:first-child {
+    background: #1c2028;
+    border-right: 1px solid var(--border);
+    font-family: var(--font-mono);
+    color: #abb2bf;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .md-example-col:last-child {
+    background: var(--code-bg);
+    color: var(--text);
+  }
+  .md-example-label {
+    font-size: 0.75em;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+  .md-example-col:last-child h1,
+  .md-example-col:last-child h2,
+  .md-example-col:last-child h3 {
+    margin: 0 0 6px;
+    border: none;
+    padding: 0;
+    font-size: 1.1em;
+    color: var(--text);
+  }
+
+  /* ── Responsive ────────────────────────────────────────────────────────── */
+  @media (max-width: 768px) {
+    #sidebar { transform: translateX(-100%); transition: transform 0.25s; }
+    #sidebar.open { transform: translateX(0); }
+    #content { margin-left: 0; }
+    article { padding: 20px 18px 60px; }
+    #topbar { padding: 10px 18px; }
+    .md-example { grid-template-columns: 1fr; }
+    .md-example-col:first-child { border-right: none; border-bottom: 1px solid var(--border); }
+    #menu-toggle { display: flex; }
+  }
+
+  #menu-toggle {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 36px; height: 36px;
+    background: var(--sidebar-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    margin-right: auto;
+    color: var(--text-muted);
+    font-size: 18px;
+  }
+
+  /* ── Intro hero ────────────────────────────────────────────────────────── */
+  .hero {
+    background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px 28px;
+    margin-bottom: 24px;
+  }
+  .hero p { margin-bottom: 0; color: var(--text-muted); font-size: 1.05em; }
+
+  hr.section-divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 40px 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════ SIDEBAR ══════════════════════════════════════════ -->
+<nav id="sidebar">
+  <div id="sidebar-header">
+    <span class="logo">MarkForge</span>
+    <span class="subtitle">Hướng dẫn sử dụng</span>
+  </div>
+  <div id="toc">
+    <h3>Mục lục</h3>
+    <ul>
+      <li><a href="#introduction">1. Giới thiệu</a></li>
+      <li><a href="#installation">2. Cài đặt</a>
+        <ul>
+          <li><a href="#install-linux">Linux (Debian/Ubuntu)</a></li>
+          <li><a href="#install-windows">Windows</a></li>
+          <li><a href="#install-source">Từ mã nguồn</a></li>
+        </ul>
+      </li>
+      <li><a href="#interface">3. Tổng quan giao diện</a>
+        <ul>
+          <li><a href="#layout">Bố cục</a></li>
+          <li><a href="#toolbar">Thanh công cụ</a></li>
+          <li><a href="#statusbar">Thanh trạng thái</a></li>
+          <li><a href="#menubar">Thanh menu</a></li>
+        </ul>
+      </li>
+      <li><a href="#editor">4. Trình soạn thảo</a></li>
+      <li><a href="#preview">5. Xem trước trực tiếp</a></li>
+      <li><a href="#fileops">6. Thao tác với tệp</a></li>
+      <li><a href="#markdown-ref">7. Tài liệu tham khảo Markdown</a>
+        <ul>
+          <li><a href="#md-headings">Tiêu đề</a></li>
+          <li><a href="#md-emphasis">Định dạng chữ</a></li>
+          <li><a href="#md-lists">Danh sách</a></li>
+          <li><a href="#md-links">Liên kết &amp; Hình ảnh</a></li>
+          <li><a href="#md-tables">Bảng</a></li>
+          <li><a href="#md-code">Khối mã</a></li>
+          <li><a href="#md-other">Các thành phần khác</a></li>
+        </ul>
+      </li>
+      <li><a href="#math">8. Công thức toán học</a></li>
+      <li><a href="#inserts">9. Hộp thoại chèn</a>
+        <ul>
+          <li><a href="#insert-link">Liên kết</a></li>
+          <li><a href="#insert-image">Hình ảnh</a></li>
+          <li><a href="#insert-table">Bảng</a></li>
+          <li><a href="#insert-plantuml">PlantUML</a></li>
+          <li><a href="#insert-mermaid">Mermaid</a></li>
+        </ul>
+      </li>
+      <li><a href="#pdf">10. Tính năng PDF</a></li>
+      <li><a href="#git">11. Tích hợp Git</a>
+        <ul>
+          <li><a href="#git-platforms">Nền tảng hỗ trợ</a></li>
+          <li><a href="#git-open">Mở tệp</a></li>
+          <li><a href="#git-save">Lưu (Commit &amp; Push)</a></li>
+          <li><a href="#git-squash">Squash Commit</a></li>
+          <li><a href="#git-auth">Xác thực</a></li>
+          <li><a href="#git-proxy">Proxy</a></li>
+          <li><a href="#git-close">Đóng</a></li>
+        </ul>
+      </li>
+      <li><a href="#settings">12. Cài đặt</a></li>
+      <li><a href="#shortcuts">13. Phím tắt bàn phím</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ══════════════════════ MAIN ═══════════════════════════════════════════ -->
+<div id="content">
+  <div id="topbar">
+    <button id="menu-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')" aria-label="Toggle menu">&#9776;</button>
+    <div class="lang-switcher">
+      <a href="index.html" class="lang-btn">EN</a>
+      <a href="de.html" class="lang-btn">DE</a>
+      <a href="ar.html" class="lang-btn">AR</a>
+      <a href="vi.html" class="lang-btn active">VI</a>
+      <a href="sv.html" class="lang-btn">SV</a>
+      <a href="uk.html" class="lang-btn">UK</a>
+      <a href="kn.html" class="lang-btn">KN</a>
+      <a href="hi.html" class="lang-btn">HI</a>
+    </div>
+  </div>
+
+  <article>
+
+    <!-- ─── TITLE ─────────────────────────────────────────────────────────── -->
+    <h1>Hướng dẫn sử dụng MarkForge <span class="version-badge">v1.0</span></h1>
+
+    <!-- ═══ 1. GIỚI THIỆU ════════════════════════════════════════════════ -->
+    <section id="introduction">
+      <h2>1. Giới thiệu</h2>
+
+      <div class="hero">
+        <p>MarkForge là trình soạn thảo Markdown hiện đại, giàu tính năng, được xây dựng bằng Python và PyQt6. Ứng dụng kết hợp trải nghiệm viết không phân tâm với tính năng xem trước song song theo thời gian thực, tích hợp đầy đủ quy trình làm việc với Git, hỗ trợ sơ đồ, hiển thị công thức toán học, cũng như nhập/xuất PDF — tất cả trong một ứng dụng desktop hai ngăn gọn gàng.</p>
+      </div>
+
+      <p>Dù bạn đang viết tài liệu kỹ thuật, tệp README cho dự án, hay xuất bản nội dung trực tiếp lên kho lưu trữ GitHub, MarkForge xử lý toàn bộ vòng đời soạn thảo và xuất bản mà không cần mở terminal.</p>
+
+      <div class="feature-grid">
+        <div class="feature-card"><strong>Xem trước trực tiếp</strong><span>Hiển thị HTML theo phong cách GitHub song song khi bạn gõ</span></div>
+        <div class="feature-card"><strong>Tô sáng cú pháp</strong><span>Bảng màu nhận biết Markdown, hỗ trợ giao diện tối &amp; sáng</span></div>
+        <div class="feature-card"><strong>Tích hợp Git</strong><span>Mở, chỉnh sửa, commit và push lên GitHub hoặc Bitbucket</span></div>
+        <div class="feature-card"><strong>Sơ đồ</strong><span>PlantUML (12 mẫu) và Mermaid (9 mẫu)</span></div>
+        <div class="feature-card"><strong>Công thức toán học</strong><span>Ký hiệu LaTeX được hiển thị bằng MathJax</span></div>
+        <div class="feature-card"><strong>Nhập PDF</strong><span>Tự động chuyển đổi bất kỳ PDF nào sang Markdown</span></div>
+        <div class="feature-card"><strong>Xuất PDF</strong><span>Tạo PDF tối ưu cho in ấn từ bất kỳ tài liệu nào</span></div>
+        <div class="feature-card"><strong>Đa ngôn ngữ</strong><span>Giao diện người dùng bằng tiếng Anh và tiếng Đức (Deutsch)</span></div>
+      </div>
+    </section>
+
+    <!-- ═══ 2. CÀI ĐẶT ════════════════════════════════════════════════════ -->
+    <section id="installation">
+      <h2>2. Cài đặt</h2>
+
+      <section id="install-linux">
+        <h3>Linux (Debian / Ubuntu)</h3>
+        <p>Tải gói <code>.deb</code> từ trang <strong>Releases</strong> trên GitHub, sau đó cài đặt bằng lệnh:</p>
+        <pre><code>sudo apt install ./markforge_*.deb</code></pre>
+        <p>Gói sẽ tự động cài đặt tất cả các phụ thuộc cần thiết ở cấp hệ thống (<code>python3-pyqt6</code>, <code>python3-pyqt6.qtwebengine</code>, <code>python3-markdown</code>, <code>python3-pygments</code>). Không cần môi trường ảo.</p>
+      </section>
+
+      <section id="install-windows">
+        <h3>Windows</h3>
+        <p>Tải <strong>MarkForge-Setup.exe</strong> từ trang <strong>Releases</strong> và chạy trình cài đặt. Trình hướng dẫn cài đặt sẽ dẫn bạn qua các bước và tự động tạo các lối tắt trong menu Start.</p>
+
+        <div class="callout note">
+          <div class="callout-title">Lưu ý</div>
+          <p>Trình cài đặt Windows đã bao gồm sẵn Python runtime và tất cả các phụ thuộc. Không cần cài đặt Python riêng.</p>
+        </div>
+      </section>
+
+      <section id="install-source">
+        <h3>Từ mã nguồn</h3>
+        <p>Yêu cầu: Python 3.8 trở lên, CMake 3.16 trở lên.</p>
+
+        <p><strong>Sử dụng CMake (khuyến nghị):</strong></p>
+        <pre><code># 1. Clone the repository
+git clone https://github.com/mmulch/markforge.git
+cd markforge
+
+# 2. Configure the build (creates a local virtual environment)
+cmake -B build
+
+# 3. Install Python dependencies into the local venv
+cmake --build build --target install_deps
+
+# 4. Run the application
+cmake --build build --target run</code></pre>
+
+        <p><strong>Khởi chạy Python trực tiếp (không cần CMake):</strong></p>
+        <pre><code>pip install -r requirements.txt
+python src/main.py</code></pre>
+
+        <div class="callout tip">
+          <div class="callout-title">Mẹo</div>
+          <p>Để sử dụng các thao tác Git qua SSH, hãy cài thêm <code>paramiko</code>: <code>pip install paramiko</code></p>
+        </div>
+      </section>
+    </section>
+
+    <!-- ═══ 3. TỔNG QUAN GIAO DIỆN ════════════════════════════════════════ -->
+    <section id="interface">
+      <h2>3. Tổng quan giao diện</h2>
+
+      <section id="layout">
+        <h3>Bố cục</h3>
+        <p>Cửa sổ MarkForge được chia thành ba ngăn có thể thay đổi kích thước, ngăn cách nhau bằng các thanh kéo:</p>
+
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>Ngăn</th><th>Vị trí</th><th>Mô tả</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Cây tệp</strong></td><td>Trái</td><td>Duyệt các tệp <code>.md</code> và hình ảnh trong thư mục hiện tại. Bật/tắt bằng <kbd>Ctrl</kbd>+<kbd>B</kbd>.</td></tr>
+            <tr><td><strong>Trình soạn thảo</strong></td><td>Giữa</td><td>Trình soạn thảo văn bản thuần có tô sáng cú pháp Markdown và số dòng.</td></tr>
+            <tr><td><strong>Xem trước</strong></td><td>Phải</td><td>Hiển thị HTML trực tiếp của tài liệu hiện tại. Bật/tắt bằng <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>.</td></tr>
+          </tbody>
+        </table>
+        </div>
+
+        <p>Kéo bất kỳ thanh phân cách nào để thay đổi kích thước ngăn. Kích thước ngăn được ghi nhớ giữa các phiên làm việc.</p>
+      </section>
+
+      <section id="toolbar">
+        <h3>Thanh công cụ</h3>
+        <p>Thanh công cụ bên dưới thanh menu cung cấp truy cập một lần nhấp vào các thao tác phổ biến nhất: Mới, Mở, Lưu, Chèn liên kết, Chèn hình ảnh, Chèn bảng, Chèn PlantUML, Chèn Mermaid, Bật/tắt xem trước và Cài đặt. Tất cả hành động thanh công cụ đều trùng với các mục menu và phím tắt bàn phím.</p>
+      </section>
+
+      <section id="statusbar">
+        <h3>Thanh trạng thái</h3>
+        <p>Thanh trạng thái ở cuối cửa sổ luôn hiển thị hai thông tin:</p>
+        <ul>
+          <li><strong>Số từ</strong> — tổng số từ trong tài liệu (cập nhật trực tiếp khi bạn gõ).</li>
+          <li><strong>Vị trí con trỏ</strong> — số dòng và cột hiện tại, ví dụ <em>Dòng 12, Cột 5</em>.</li>
+        </ul>
+      </section>
+
+      <section id="menubar">
+        <h3>Thanh menu</h3>
+        <p>Thanh menu gồm năm menu cấp cao nhất:</p>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>Menu</th><th>Nội dung</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Tệp</strong></td><td>Mới, Mở, Mở thư mục, Nhập PDF, Mở từ Git, Git Squash, Lưu, Lưu thành, Xuất dạng PDF, Thoát</td></tr>
+            <tr><td><strong>Chỉnh sửa</strong></td><td>Hoàn tác, Làm lại, Cắt, Sao chép, Dán</td></tr>
+            <tr><td><strong>Chèn</strong></td><td>Liên kết, Hình ảnh, PlantUML, Mermaid, Bảng</td></tr>
+            <tr><td><strong>Xem</strong></td><td>Hiển thị cây tệp, Hiển thị xem trước, Xuống dòng tự động, Cài đặt</td></tr>
+            <tr><td><strong>Trợ giúp</strong></td><td>Tài liệu tham khảo Markdown, Giới thiệu</td></tr>
+          </tbody>
+        </table>
+        </div>
+      </section>
+
+      <h3>Tiêu đề cửa sổ</h3>
+      <p>Tiêu đề cửa sổ hiển thị tên tệp đang mở. Khi bạn thực hiện thay đổi chưa được lưu, một dấu hoa thị (<strong>*</strong>) sẽ được thêm vào sau tên tệp, ví dụ <em>README.md *</em>. Khi không có tệp nào đang mở, tiêu đề hiển thị <em>Untitled</em>.</p>
+    </section>
+
+    <!-- ═══ 4. TRÌNH SOẠN THẢO ════════════════════════════════════════════ -->
+    <section id="editor">
+      <h2>4. Trình soạn thảo</h2>
+
+      <p>Ngăn giữa chứa trình soạn thảo văn bản thuần đầy đủ tính năng, được tối ưu hóa cho việc viết Markdown.</p>
+
+      <h3>Tô sáng cú pháp</h3>
+      <p>MarkForge áp dụng tô sáng cú pháp nhận biết Markdown cho tài liệu khi bạn gõ. Các tiêu đề, ký hiệu nhấn mạnh, liên kết, đoạn mã nội tuyến, khối mã có hàng rào và các cấu trúc Markdown khác được tô màu riêng biệt. Tô sáng tự động thích nghi khi bạn chuyển đổi giữa giao diện trình soạn thảo Sáng và Tối.</p>
+
+      <h3>Số dòng</h3>
+      <p>Một lề bên trái của trình soạn thảo hiển thị số dòng. Dòng hiện tại được tô sáng bằng màu nền tinh tế để giúp bạn theo dõi vị trí trong các tài liệu dài.</p>
+
+      <h3>Xuống dòng tự động</h3>
+      <p>Xuống dòng tự động được bật theo mặc định. Các dòng dài sẽ xuống dòng vừa với chiều rộng hiển thị của trình soạn thảo. Bật/tắt xuống dòng tự động bất cứ lúc nào qua <strong>Xem → Xuống dòng tự động</strong>. Tùy chọn này được lưu giữa các phiên làm việc.</p>
+
+      <h3>Giao diện trình soạn thảo</h3>
+      <p>Có hai giao diện trình soạn thảo tích hợp sẵn:</p>
+      <ul>
+        <li><strong>Tối</strong> (mặc định) — nền tối với màu cú pháp tương phản cao.</li>
+        <li><strong>Sáng</strong> — nền trắng phù hợp với môi trường sáng.</li>
+      </ul>
+      <p>Chuyển đổi giao diện trong <strong>Xem → Cài đặt → Giao diện trình soạn thảo</strong>. Thay đổi có hiệu lực ngay lập tức mà không cần khởi động lại.</p>
+
+      <h3>Văn bản giữ chỗ</h3>
+      <p>Khi không có tệp nào đang mở, trình soạn thảo bị tắt và hiển thị thông báo: <em>"Open or create a Markdown file to start editing."</em> Trình soạn thảo sẽ kích hoạt ngay khi bạn tạo tệp mới hoặc mở tệp hiện có.</p>
+
+      <h3>Các thao tác chỉnh sửa</h3>
+      <p>Tất cả các thao tác chỉnh sửa văn bản tiêu chuẩn đều khả dụng:</p>
+      <ul>
+        <li><kbd>Ctrl</kbd>+<kbd>Z</kbd> — Hoàn tác</li>
+        <li><kbd>Ctrl</kbd>+<kbd>Y</kbd> — Làm lại</li>
+        <li><kbd>Ctrl</kbd>+<kbd>X</kbd> / <kbd>Ctrl</kbd>+<kbd>C</kbd> / <kbd>Ctrl</kbd>+<kbd>V</kbd> — Cắt / Sao chép / Dán</li>
+      </ul>
+    </section>
+
+    <!-- ═══ 5. XEM TRƯỚC TRỰC TIẾP ════════════════════════════════════════ -->
+    <section id="preview">
+      <h2>5. Xem trước trực tiếp</h2>
+
+      <p>Ngăn bên phải hiển thị phiên bản HTML được kết xuất đầy đủ của tài liệu Markdown, tự động cập nhật khi bạn gõ.</p>
+
+      <h3>Kết xuất</h3>
+      <p>Phần xem trước sử dụng bảng kiểu lấy cảm hứng từ GitHub để có đầu ra rõ ràng, dễ đọc. Nó hỗ trợ tất cả các phần mở rộng Markdown bao gồm bảng, danh sách tác vụ, chú thích cuối trang, tô sáng mã, toán học và sơ đồ. Quy trình kết xuất xử lý văn bản của bạn qua thư viện Python <code>markdown</code> với các phần mở rộng <code>extra</code>, <code>codehilite</code>, <code>toc</code> và <code>sane_lists</code>.</p>
+
+      <h3>Giữ nguyên vị trí cuộn</h3>
+      <p>Khi bạn chỉnh sửa tài liệu, bản xem trước cập nhật sau độ trễ debounce ngắn 300 mili giây. Trước khi làm mới HTML, MarkForge đọc vị trí cuộn hiện tại từ chế độ xem web và khôi phục nó sau khi kết xuất, vì vậy bản xem trước không nhảy lên đầu trong khi bạn đang làm việc ở giữa tài liệu.</p>
+
+      <h3>Giao diện xem trước</h3>
+      <p>Có hai giao diện xem trước:</p>
+      <ul>
+        <li><strong>Tối</strong> (mặc định) — nền tối phù hợp với giao diện tổng thể của ứng dụng.</li>
+        <li><strong>Sáng</strong> — nền trắng cho trải nghiệm đọc như in ấn.</li>
+      </ul>
+      <p>Chuyển đổi qua <strong>Xem → Cài đặt → Giao diện xem trước</strong>. Thay đổi có hiệu lực ngay lập tức.</p>
+
+      <h3>Bật/tắt xem trước</h3>
+      <p>Nhấn <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> hoặc dùng <strong>Xem → Hiển thị xem trước</strong> để ẩn hoặc hiện ngăn xem trước. Ẩn xem trước sẽ cho trình soạn thảo nhiều không gian màn hình hơn.</p>
+
+      <div class="callout note">
+        <div class="callout-title">Lưu ý</div>
+        <p>Công thức toán học (MathJax) và sơ đồ Mermaid yêu cầu kết nối internet khi sử dụng lần đầu vì các thư viện được tải từ CDN. Sơ đồ PlantUML luôn được tải từ <code>plantuml.com</code> và yêu cầu truy cập internet.</p>
+      </div>
+    </section>
+
+    <!-- ═══ 6. THAO TÁC VỚI TỆP ════════════════════════════════════════════ -->
+    <section id="fileops">
+      <h2>6. Thao tác với tệp</h2>
+
+      <h3>Tệp mới</h3>
+      <p>Nhấn <kbd>Ctrl</kbd>+<kbd>N</kbd> hoặc chọn <strong>Tệp → Mới</strong>. Nếu tài liệu hiện tại có thay đổi chưa lưu, MarkForge sẽ nhắc bạn lưu trước khi tiếp tục. Một tài liệu trống mới sẽ được mở và trình soạn thảo được kích hoạt.</p>
+
+      <h3>Mở tệp</h3>
+      <p>Nhấn <kbd>Ctrl</kbd>+<kbd>O</kbd> hoặc chọn <strong>Tệp → Mở…</strong> để mở hộp thoại trình duyệt tệp. Các tệp Markdown (<code>.md</code>, <code>.markdown</code>), tệp văn bản (<code>.txt</code>) và tất cả các tệp khác đều có thể chọn. Cây tệp sẽ cập nhật để hiển thị thư mục chứa tệp đã mở.</p>
+
+      <h3>Mở thư mục</h3>
+      <p>Chọn <strong>Tệp → Mở thư mục…</strong> (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>O</kbd>) để chọn một thư mục. Cây tệp sau đó hiển thị tất cả các tệp <code>.md</code> và hình ảnh trong thư mục đó. Nhấp vào bất kỳ tệp nào trong cây để mở nó trong trình soạn thảo.</p>
+
+      <h3>Lưu</h3>
+      <p>Nhấn <kbd>Ctrl</kbd>+<kbd>S</kbd> hoặc chọn <strong>Tệp → Lưu</strong>. Nếu tệp được mở từ kho lưu trữ Git, hộp thoại commit &amp; push Git sẽ xuất hiện thay thế (xem <a href="#git-save">Lưu qua Git</a>). Đối với các tệp cục bộ, tệp được ghi ngay lập tức vào đĩa và dấu hoa thị trong thanh tiêu đề biến mất.</p>
+
+      <h3>Lưu thành</h3>
+      <p>Nhấn <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>S</kbd> hoặc chọn <strong>Tệp → Lưu thành…</strong> để lưu tài liệu hiện tại vào vị trí mới hoặc với tên mới.</p>
+
+      <h3>Cây tệp</h3>
+      <p>Ngăn bên trái hiển thị danh sách phẳng các tệp <code>.md</code> và hình ảnh trong thư mục gốc hiện tại. Các thư mục con không chứa tệp liên quan trực tiếp sẽ bị ẩn để giảm lộn xộn. Nhấp vào tệp để mở nó. Tiêu đề cây hiển thị <strong>[GIT] reponame</strong> bằng màu xanh lá khi tệp được quản lý bởi Git đang mở.</p>
+
+      <div class="callout tip">
+        <div class="callout-title">Mẹo</div>
+        <p>Bật/tắt cây tệp bằng <kbd>Ctrl</kbd>+<kbd>B</kbd> để tối đa hóa không gian trình soạn thảo. Tùy chọn của bạn được lưu giữa các phiên làm việc.</p>
+      </div>
+    </section>
+
+    <!-- ═══ 7. TÀI LIỆU THAM KHẢO MARKDOWN ════════════════════════════════ -->
+    <section id="markdown-ref">
+      <h2>7. Tài liệu tham khảo Markdown</h2>
+      <p>MarkForge hỗ trợ Markdown CommonMark tiêu chuẩn cộng với các phần mở rộng sau: <code>extra</code> (bảng, chú thích cuối trang, viết tắt), <code>codehilite</code> (khối mã có tô sáng cú pháp), <code>toc</code> (mục lục), <code>sane_lists</code> và gạch ngang.</p>
+
+      <section id="md-headings">
+        <h3>Tiêu đề</h3>
+        <div class="md-example">
+          <div class="md-example-col"><div class="md-example-label">Markdown</div># Heading 1
+## Heading 2
+### Heading 3
+#### Heading 4
+##### Heading 5
+###### Heading 6</div>
+          <div class="md-example-col"><div class="md-example-label">Kết quả</div><h1>Heading 1</h1><h2>Heading 2</h2><h3>Heading 3</h3></div>
+        </div>
+      </section>
+
+      <section id="md-emphasis">
+        <h3>Nhấn mạnh &amp; Định dạng nội tuyến</h3>
+        <div class="md-example">
+          <div class="md-example-col"><div class="md-example-label">Markdown</div>**bold text**
+*italic text*
+~~strikethrough~~
+`inline code`
+**_bold italic_**</div>
+          <div class="md-example-col"><div class="md-example-label">Kết quả</div><strong>bold text</strong><br><em>italic text</em><br><del>strikethrough</del><br><code>inline code</code><br><strong><em>bold italic</em></strong></div>
+        </div>
+      </section>
+
+      <section id="md-lists">
+        <h3>Danh sách</h3>
+        <p><strong>Danh sách không có thứ tự:</strong></p>
+        <div class="md-example">
+          <div class="md-example-col"><div class="md-example-label">Markdown</div>- First item
+- Second item
+  - Nested item
+- Third item</div>
+          <div class="md-example-col"><div class="md-example-label">Kết quả</div><ul><li>First item</li><li>Second item<ul><li>Nested item</li></ul></li><li>Third item</li></ul></div>
+        </div>
+        <p><strong>Danh sách có thứ tự:</strong></p>
+        <div class="md-example">
+          <div class="md-example-col"><div class="md-example-label">Markdown</div>1. First item
+2. Second item
+3. Third item</div>
+          <div class="md-example-col"><div class="md-example-label">Kết quả</div><ol><li>First item</li><li>Second item</li><li>Third item</li></ol></div>
+        </div>
+        <p><strong>Danh sách tác vụ (hộp kiểm):</strong></p>
+        <div class="md-example">
+          <div class="md-example-col"><div class="md-example-label">Markdown</div>- [x] Done task
+- [ ] Pending task
+- [ ] Another task</div>
+          <div class="md-example-col"><div class="md-example-label">Kết quả</div><ul style="list-style:none;padding-left:0"><li>&#9989; Done task</li><li>&#9744; Pending task</li><li>&#9744; Another task</li></ul></div>
+        </div>
+      </section>
+
+      <section id="md-links">
+        <h3>Liên kết &amp; Hình ảnh</h3>
+        <div class="md-example">
+          <div class="md-example-col"><div class="md-example-label">Markdown</div>[Link text](https://example.com)
+[Tooltip link](https://example.com "My tooltip")
+
+![Alt text](image.png)
+![Alt text](https://example.com/img.png)</div>
+          <div class="md-example-col"><div class="md-example-label">Kết quả</div><a href="#">Link text</a><br><a href="#" title="My tooltip">Tooltip link</a><br><br><em>[image: Alt text]</em></div>
+        </div>
+      </section>
+
+      <section id="md-tables">
+        <h3>Bảng (GFM)</h3>
+        <div class="md-example">
+          <div class="md-example-col"><div class="md-example-label">Markdown</div>| Left | Center | Right |
+|:-----|:------:|------:|
+| A    |   B    |     C |
+| D    |   E    |     F |</div>
+          <div class="md-example-col"><div class="md-example-label">Kết quả</div>
+            <table style="font-size:0.85em">
+              <thead><tr><th style="text-align:left">Left</th><th style="text-align:center">Center</th><th style="text-align:right">Right</th></tr></thead>
+              <tbody><tr><td>A</td><td style="text-align:center">B</td><td style="text-align:right">C</td></tr><tr><td>D</td><td style="text-align:center">E</td><td style="text-align:right">F</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+        <p>Căn chỉnh cột được kiểm soát bởi vị trí dấu hai chấm trong hàng phân cách: <code>:---</code> trái, <code>:---:</code> giữa, <code>---:</code> phải.</p>
+      </section>
+
+      <section id="md-code">
+        <h3>Khối mã</h3>
+        <div class="md-example">
+          <div class="md-example-col"><div class="md-example-label">Markdown</div>```python
+def hello(name):
+    print(f"Hello, {name}!")
+```</div>
+          <div class="md-example-col"><div class="md-example-label">Kết quả</div><pre style="margin:0;font-size:0.85em;background:#1c2028;padding:8px"><code>def hello(name):
+    print(f"Hello, {name}!")</code></pre></div>
+        </div>
+        <p>Chỉ định bất kỳ định danh ngôn ngữ nào sau dấu ba backtick mở để tô sáng cú pháp: <code>python</code>, <code>javascript</code>, <code>bash</code>, <code>sql</code>, <code>json</code>, v.v. (được cung cấp bởi Pygments).</p>
+      </section>
+
+      <section id="md-other">
+        <h3>Các thành phần khác</h3>
+
+        <h4>Trích dẫn khối</h4>
+        <div class="md-example">
+          <div class="md-example-col"><div class="md-example-label">Markdown</div>&gt; This is a blockquote.
+&gt; It can span multiple lines.</div>
+          <div class="md-example-col"><div class="md-example-label">Kết quả</div><blockquote style="border-left:3px solid #58a6ff;padding-left:12px;color:#8b949e">This is a blockquote. It can span multiple lines.</blockquote></div>
+        </div>
+
+        <h4>Chú thích cuối trang</h4>
+        <div class="md-example">
+          <div class="md-example-col"><div class="md-example-label">Markdown</div>Some text[^1] with a footnote.
+
+[^1]: The footnote content.</div>
+          <div class="md-example-col"><div class="md-example-label">Kết quả</div>Some text<sup>[1]</sup> with a footnote.</div>
+        </div>
+
+        <h4>Viết tắt</h4>
+        <div class="md-example">
+          <div class="md-example-col"><div class="md-example-label">Markdown</div>The HTML spec is long.
+
+*[HTML]: HyperText Markup Language</div>
+          <div class="md-example-col"><div class="md-example-label">Kết quả</div>The <abbr title="HyperText Markup Language">HTML</abbr> spec is long.</div>
+        </div>
+
+        <h4>Mục lục</h4>
+        <p>Đặt <code>[TOC]</code> ở bất kỳ đâu trong tài liệu để chèn mục lục được tạo tự động dựa trên các tiêu đề trong tài liệu.</p>
+
+        <h4>Đường kẻ ngang</h4>
+        <div class="md-example">
+          <div class="md-example-col"><div class="md-example-label">Markdown</div>---
+
+or
+
+***</div>
+          <div class="md-example-col"><div class="md-example-label">Kết quả</div><hr style="border:none;border-top:1px solid #444"></div>
+        </div>
+      </section>
+    </section>
+
+    <!-- ═══ 8. CÔNG THỨC TOÁN HỌC ════════════════════════════════════════ -->
+    <section id="math">
+      <h2>8. Công thức toán học</h2>
+
+      <p>MarkForge kết xuất ký hiệu toán LaTeX bằng <strong>MathJax</strong>. Yêu cầu kết nối internet khi sử dụng lần đầu (MathJax được tải từ CDN).</p>
+
+      <h3>Toán học nội tuyến</h3>
+      <p>Bao một biểu thức trong dấu đô la đơn để kết xuất nó nội tuyến trong một đoạn văn:</p>
+      <pre><code>The famous equation $E = mc^2$ was published in 1905.</code></pre>
+      <p>Kết quả: Phương trình nổi tiếng <em>E = mc²</em> được công bố năm 1905.</p>
+
+      <h3>Toán học hiển thị (khối)</h3>
+      <p>Bao biểu thức trong dấu đô la kép để kết xuất nó căn giữa trên dòng riêng:</p>
+      <pre><code>$$\int_0^\infty e^{-x}\, dx = 1$$</code></pre>
+
+      <h3>Toán học khối một dòng</h3>
+      <p>Bạn cũng có thể dùng ký hiệu <code>$</code> đơn trên dòng riêng để mở và đóng một khối toán hiển thị:</p>
+      <pre><code>$
+\sum_{n=1}^{\infty} \frac{1}{n^2} = \frac{\pi^2}{6}
+$</code></pre>
+
+      <div class="callout tip">
+        <div class="callout-title">Mẹo</div>
+        <p>MathJax hỗ trợ toàn bộ chế độ toán LaTeX, bao gồm phân số, ma trận, chữ cái Hy Lạp, toán tử và macro tùy chỉnh. Tham khảo <a href="https://docs.mathjax.org/" target="_blank" rel="noopener">tài liệu MathJax</a> để biết cú pháp đầy đủ.</p>
+      </div>
+    </section>
+
+    <!-- ═══ 9. HỘP THOẠI CHÈN ════════════════════════════════════════════ -->
+    <section id="inserts">
+      <h2>9. Hộp thoại chèn</h2>
+      <p>MarkForge cung cấp các hộp thoại có hướng dẫn để chèn các cấu trúc Markdown phổ biến. Tất cả hộp thoại đều chèn văn bản tại vị trí con trỏ hiện tại trong trình soạn thảo.</p>
+
+      <section id="insert-link">
+        <h3>Chèn liên kết <kbd>Ctrl</kbd>+<kbd>K</kbd></h3>
+        <p>Mở qua <strong>Chèn → Liên kết…</strong> hoặc nhấn <kbd>Ctrl</kbd>+<kbd>K</kbd>.</p>
+        <p>Hộp thoại có ba trường:</p>
+        <ul>
+          <li><strong>Văn bản hiển thị</strong> — nhãn liên kết hiển thị (ví dụ <em>Nhấp vào đây</em>).</li>
+          <li><strong>URL</strong> — địa chỉ đích (ví dụ <code>https://example.com</code>).</li>
+          <li><strong>Tiêu đề (tùy chọn)</strong> — tooltip hiển thị khi người dùng di chuột qua liên kết.</li>
+        </ul>
+        <p>Nhấp <strong>Chèn</strong> để đặt <code>[Văn bản hiển thị](URL "Tiêu đề")</code> trong trình soạn thảo.</p>
+      </section>
+
+      <section id="insert-image">
+        <h3>Chèn hình ảnh <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>K</kbd></h3>
+        <p>Mở qua <strong>Chèn → Hình ảnh…</strong> hoặc nhấn <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>K</kbd>.</p>
+        <p>Hộp thoại có hai trường:</p>
+        <ul>
+          <li><strong>Văn bản thay thế</strong> — mô tả ngắn gọn cho trình đọc màn hình.</li>
+          <li><strong>URL / Đường dẫn</strong> — URL từ xa hoặc đường dẫn tệp cục bộ. Dùng nút duyệt để chọn tệp hình ảnh cục bộ.</li>
+        </ul>
+        <p>Nhấp <strong>Chèn</strong> để đặt <code>![Văn bản thay thế](URL)</code> trong trình soạn thảo.</p>
+      </section>
+
+      <section id="insert-table">
+        <h3>Chèn bảng <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd></h3>
+        <p>Mở qua <strong>Chèn → Bảng…</strong> hoặc nhấn <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd>.</p>
+        <p>Cấu hình cấu trúc bảng của bạn:</p>
+        <ul>
+          <li><strong>Hàng dữ liệu</strong> — số hàng không tính hàng tiêu đề.</li>
+          <li><strong>Cột</strong> — số cột (tối đa được hỗ trợ).</li>
+          <li><strong>Tên cột</strong> — nhập tiêu đề cho mỗi cột.</li>
+          <li><strong>Căn chỉnh</strong> — chọn Trái, Giữa hoặc Phải cho từng cột độc lập.</li>
+        </ul>
+        <p>Bản xem trước Markdown trực tiếp cập nhật ở cuối hộp thoại. Nhấp <strong>Chèn</strong> để đặt bảng trong trình soạn thảo.</p>
+      </section>
+
+      <section id="insert-plantuml">
+        <h3>Chèn PlantUML <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>U</kbd></h3>
+        <p>Mở qua <strong>Chèn → PlantUML…</strong> hoặc nhấn <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>U</kbd>.</p>
+        <p>Chọn từ 12 mẫu sơ đồ trong danh sách thả xuống:</p>
+        <ul>
+          <li>Sơ đồ tuần tự</li>
+          <li>Sơ đồ lớp</li>
+          <li>Sơ đồ hoạt động</li>
+          <li>Sơ đồ trạng thái</li>
+          <li>Sơ đồ thành phần</li>
+          <li>Sơ đồ ca sử dụng</li>
+          <li>Sơ đồ Gantt</li>
+          <li>Bản đồ tư duy</li>
+          <li>WBS (Phân rã công việc)</li>
+          <li>Sơ đồ thời gian</li>
+          <li>Sơ đồ triển khai</li>
+          <li>JSON</li>
+        </ul>
+        <p>Mẫu đã chọn điền vào trình soạn thảo mã PlantUML. Chỉnh sửa mã theo nhu cầu, sau đó nhấp <strong>Chèn</strong>. Sơ đồ được bao trong khối mã có hàng rào và được kết xuất qua dịch vụ trực tuyến <code>plantuml.com</code> trong phần xem trước. Yêu cầu kết nối internet.</p>
+
+        <div class="callout note">
+          <div class="callout-title">Lưu ý</div>
+          <p>Bản xem trước sơ đồ tự động xuất hiện trong cửa sổ chính sau khi chèn. Quá trình kết xuất sử dụng máy chủ công cộng <code>plantuml.com</code>; không cần cài đặt PlantUML cục bộ.</p>
+        </div>
+      </section>
+
+      <section id="insert-mermaid">
+        <h3>Chèn Mermaid <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>M</kbd></h3>
+        <p>Mở qua <strong>Chèn → Mermaid…</strong> hoặc nhấn <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>M</kbd>.</p>
+        <p>Chọn từ 9 mẫu sơ đồ:</p>
+        <ul>
+          <li>Lưu đồ</li>
+          <li>Sơ đồ tuần tự</li>
+          <li>Sơ đồ lớp</li>
+          <li>Sơ đồ trạng thái</li>
+          <li>Gantt</li>
+          <li>Biểu đồ tròn</li>
+          <li>Bản đồ tư duy</li>
+          <li>Sơ đồ ER</li>
+          <li>Đồ thị Git</li>
+        </ul>
+        <p>Chỉnh sửa mã Mermaid trong vùng văn bản và nhấp <strong>Chèn</strong>. Sơ đồ được bao trong khối mã <code>mermaid</code> có hàng rào và được kết xuất trong phần xem trước qua <code>kroki.io</code>. Yêu cầu kết nối internet.</p>
+      </section>
+    </section>
+
+    <!-- ═══ 10. TÍNH NĂNG PDF ════════════════════════════════════════════ -->
+    <section id="pdf">
+      <h2>10. Tính năng PDF</h2>
+
+      <h3>Xuất dạng PDF <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>E</kbd></h3>
+      <p>Chọn <strong>Tệp → Xuất dạng PDF…</strong> hoặc nhấn <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>E</kbd>. MarkForge kết xuất tài liệu hiện tại thành tệp PDF bằng cùng quy trình như bản xem trước trực tiếp, nhưng với nền trắng và CSS tối ưu hóa cho in ấn. Hộp thoại lưu tệp xuất hiện để bạn có thể chọn vị trí đầu ra và tên tệp.</p>
+
+      <div class="callout tip">
+        <div class="callout-title">Mẹo</div>
+        <p>Chuyển xem trước sang giao diện Sáng trước khi xuất PDF để có đầu ra sẵn sàng in đẹp nhất.</p>
+      </div>
+
+      <h3>Nhập PDF <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>I</kbd></h3>
+      <p>Chọn <strong>Tệp → Nhập PDF…</strong> hoặc nhấn <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>I</kbd>. MarkForge chuyển đổi bất kỳ tệp PDF nào sang Markdown bằng thư viện <code>pymupdf4llm</code>. Quá trình chuyển đổi thông minh bảo toàn cấu trúc tài liệu:</p>
+      <ul>
+        <li>Tiêu đề và đoạn văn</li>
+        <li>Bảng</li>
+        <li>Danh sách</li>
+        <li>Khối mã khi được phát hiện</li>
+      </ul>
+      <p>Quá trình chuyển đổi chạy trong một luồng nền để giao diện vẫn phản hồi. Khi hoàn tất, MarkForge nhắc bạn chọn vị trí lưu cho tệp <code>.md</code> kết quả và sau đó tải nó trong trình soạn thảo.</p>
+
+      <div class="callout note">
+        <div class="callout-title">Lưu ý</div>
+        <p>Nhập PDF yêu cầu gói <code>pymupdf4llm</code>. Nếu chưa được cài đặt, MarkForge sẽ nhắc bạn cài đặt: <code>pip install pymupdf4llm</code></p>
+      </div>
+    </section>
+
+    <!-- ═══ 11. TÍCH HỢP GIT ════════════════════════════════════════════ -->
+    <section id="git">
+      <h2>11. Tích hợp Git</h2>
+
+      <p>MarkForge có thể mở tệp Markdown trực tiếp từ các kho lưu trữ Git được lưu trữ, cho phép bạn chỉnh sửa chúng và đẩy các thay đổi trở lại — mà không cần mở terminal. Các thao tác nâng cao như <strong>amend</strong> và <strong>squash</strong> cũng được hỗ trợ.</p>
+
+      <section id="git-platforms">
+        <h3>Nền tảng được hỗ trợ</h3>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>Nền tảng</th><th>Ví dụ mẫu URL</th></tr></thead>
+          <tbody>
+            <tr><td>GitHub</td><td><code>https://github.com/owner/repo/blob/main/README.md</code></td></tr>
+            <tr><td>GitHub Enterprise</td><td><code>https://github.mycompany.com/owner/repo/blob/main/docs/guide.md</code></td></tr>
+            <tr><td>Bitbucket Cloud</td><td><code>https://bitbucket.org/owner/repo/src/main/README.md</code></td></tr>
+            <tr><td>Bitbucket Server / Data Center</td><td><code>https://bitbucket.mycompany.com/projects/PROJ/repos/myrepo/browse/README.md?at=main</code></td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p>Nền tảng được tự động phát hiện từ cấu trúc URL, không chỉ từ tên máy chủ — vì vậy các phiên bản tự lưu trữ hoạt động tự động.</p>
+      </section>
+
+      <section id="git-open">
+        <h3>Mở tệp từ Git</h3>
+        <ol class="steps">
+          <li>Chọn <strong>Tệp → Mở từ Git…</strong> hoặc nhấn <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>G</kbd>.</li>
+          <li>Dán URL của tệp bạn muốn mở (sao chép từ trình duyệt tệp GitHub hoặc Bitbucket).</li>
+          <li>MarkForge xác nhận URL và hiển thị dòng xem trước: <em>nền tảng · chủ sở hữu/repo · đường dẫn/tới/tệp.md</em>.</li>
+          <li>Tùy chọn ghi đè nhánh, thẻ hoặc mã hash commit trong trường <strong>Ref</strong>.</li>
+          <li>Nhấp <strong>OK</strong> — kho lưu trữ được sao chép trong nền và tệp mở trong trình soạn thảo.</li>
+        </ol>
+        <p>Trong khi tệp được quản lý bởi Git đang mở, tiêu đề cây tệp hiển thị <strong>[GIT] reponame</strong> bằng màu xanh lá.</p>
+
+        <div class="callout tip">
+          <div class="callout-title">Mẹo</div>
+          <p>Các kho lưu trữ công khai hoạt động mà không cần cấu hình thông tin đăng nhập. Đối với kho lưu trữ riêng tư, hãy cấu hình thông tin đăng nhập của bạn trong <strong>Xem → Cài đặt → Xác thực Git</strong> trước khi mở.</p>
+        </div>
+      </section>
+
+      <section id="git-save">
+        <h3>Lưu (Commit &amp; Push)</h3>
+        <p>Khi tệp được quản lý bởi Git đang mở, nhấn <kbd>Ctrl</kbd>+<kbd>S</kbd> sẽ mở hộp thoại <strong>Git Commit &amp; Push</strong> thay vì lưu tệp thông thường. Hộp thoại chứa:</p>
+        <ul>
+          <li><strong>Thông điệp commit</strong> — bắt buộc. Nhập mô tả có ý nghĩa về các thay đổi của bạn.</li>
+          <li><strong>Sửa đổi commit trước</strong> — có sẵn từ lần lưu thứ hai trở đi khi sử dụng xác thực SSH hoặc git-binary. Thay thế commit trước đó thay vì tạo mới; điền trước thông điệp commit trước đó; tự động sử dụng force-push (<code>--force-with-lease</code>). Chỉ có thể sửa đổi các commit được tạo bởi MarkForge trong phiên hiện tại.</li>
+          <li><strong>Push lên:</strong>
+            <ul>
+              <li><em>Nhánh hiện tại</em> — push trực tiếp lên nhánh bạn đã sao chép từ.</li>
+              <li><em>Nhánh mới</em> — tạo nhánh mới với tên bạn chỉ định.</li>
+            </ul>
+          </li>
+          <li><strong>Tạo Pull Request</strong> — có sẵn khi "Nhánh mới" được chọn. Tự động mở pull request sau khi push. Hiển thị các trường cho tiêu đề PR và nhánh đích.</li>
+        </ul>
+      </section>
+
+      <section id="git-squash">
+        <h3>Squash Commit <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Q</kbd></h3>
+        <p>Chỉ khả dụng với xác thực <strong>SSH</strong> và <strong>HTTPS (git binary)</strong>.</p>
+        <p>Chọn <strong>Tệp → Git Squash…</strong> hoặc nhấn <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Q</kbd>. Hộp thoại Squash Commit hiển thị bảng tất cả các commit trên nhánh hiện tại chưa có trong nhánh cơ sở đã chọn.</p>
+        <ul>
+          <li><strong>Trường nhánh cơ sở</strong> — nhánh tham chiếu (ví dụ <code>main</code>, <code>master</code>, <code>develop</code>). Nhấp <strong>Tải lại</strong> sau khi thay đổi.</li>
+          <li><strong>Chọn tất cả commit mới</strong> — kiểm tra tất cả các commit được liệt kê cùng một lúc.</li>
+          <li><strong>Thông điệp commit squash</strong> — thông điệp duy nhất sẽ thay thế tất cả các commit đã chọn.</li>
+          <li><strong>Squash &amp; Push</strong> — viết lại lịch sử nhánh và force-push lên remote.</li>
+        </ul>
+        <p>Bạn phải chọn ít nhất 2 commit và chúng phải tạo thành một dải liên tục bắt đầu từ commit gần nhất (HEAD).</p>
+      </section>
+
+      <section id="git-auth">
+        <h3>Chế độ xác thực</h3>
+        <p>Cấu hình phương thức xác thực của bạn trong <strong>Xem → Cài đặt → Xác thực Git</strong>.</p>
+
+        <h4>HTTPS (nhúng sẵn)</h4>
+        <p>Hoạt động trên tất cả các nền tảng mà không cần thêm phần mềm. Sử dụng trực tiếp API REST của nền tảng. Không yêu cầu git binary cục bộ.</p>
+        <div class="callout warn">
+          <div class="callout-title">Hạn chế</div>
+          <p>Các tính năng amend và squash <strong>không có sẵn</strong> trong chế độ này vì không có lịch sử git cục bộ đầy đủ được duy trì.</p>
+        </div>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>Nền tảng</th><th>Loại token</th></tr></thead>
+          <tbody>
+            <tr><td>GitHub</td><td>Token truy cập cá nhân (<code>ghp_…</code>) — yêu cầu quyền <code>repo</code></td></tr>
+            <tr><td>GitHub Enterprise</td><td>Token truy cập cá nhân — giống GitHub</td></tr>
+            <tr><td>Bitbucket Cloud</td><td>Mật khẩu ứng dụng (Tài khoản → Mật khẩu ứng dụng)</td></tr>
+            <tr><td>Bitbucket Server</td><td>Token truy cập cá nhân hoặc token truy cập HTTP</td></tr>
+          </tbody>
+        </table>
+        </div>
+
+        <h4>HTTPS (git binary)</h4>
+        <p>Sử dụng tệp thực thi <code>git</code> của hệ thống cho tất cả các thao tác — sao chép cục bộ đầy đủ, commit và push. Yêu cầu <a href="https://git-scm.com/" target="_blank" rel="noopener">Git for Windows</a> (hoặc bất kỳ tệp nhị phân <code>git</code> nào trong PATH của bạn). Hỗ trợ <strong>amend</strong> và <strong>squash</strong>. Sử dụng cùng các trường tên người dùng và token như chế độ HTTPS (nhúng sẵn). Bạn cũng phải cung cấp <strong>Tên</strong> và <strong>Email</strong> cho danh tính commit.</p>
+
+        <h4>SSH (tệp khóa)</h4>
+        <p>Chọn <strong>SSH (tệp khóa)</strong> và cung cấp đường dẫn đến khóa SSH riêng tư và cụm mật khẩu tùy chọn. Chế độ này sử dụng <a href="https://www.paramiko.org/" target="_blank" rel="noopener">paramiko</a> cho kết nối SSH thuần Python (không yêu cầu client ssh hệ thống). Nếu paramiko chưa được cài đặt, MarkForge sẽ dự phòng sang client <code>ssh</code> hệ thống.</p>
+        <pre><code>pip install paramiko</code></pre>
+        <p>Xác thực SSH hỗ trợ <strong>amend</strong> và <strong>squash</strong>.</p>
+      </section>
+
+      <section id="git-proxy">
+        <h3>HTTP Proxy</h3>
+        <p>Nếu mạng của bạn yêu cầu HTTP proxy để đến các máy chủ Git, hãy cấu hình trong <strong>Xem → Cài đặt → HTTP Proxy</strong>:</p>
+        <ul>
+          <li><strong>URL Proxy</strong> — ví dụ <code>http://proxy.company.com:8080</code></li>
+          <li><strong>Tên người dùng proxy</strong> — để trống nếu không yêu cầu xác thực.</li>
+          <li><strong>Mật khẩu proxy</strong> — để trống nếu không yêu cầu xác thực.</li>
+        </ul>
+        <p>Để trống tất cả các trường proxy để sử dụng cài đặt proxy mặc định của hệ thống.</p>
+      </section>
+
+      <section id="git-close">
+        <h3>Đóng</h3>
+        <p>Khi bạn đóng MarkForge trong khi tệp được quản lý bởi Git đang mở, MarkForge sẽ hỏi có xóa thư mục sao chép tạm thời không. Xóa thư mục sẽ giải phóng dung lượng đĩa; giữ lại sẽ cho phép bạn kiểm tra các tệp đã sao chép sau đó.</p>
+      </section>
+    </section>
+
+    <!-- ═══ 12. CÀI ĐẶT ════════════════════════════════════════════════ -->
+    <section id="settings">
+      <h2>12. Cài đặt</h2>
+      <p>Mở hộp thoại Cài đặt qua <strong>Xem → Cài đặt…</strong>. Các cài đặt được lưu giữa các phiên làm việc.</p>
+
+      <div class="table-wrap">
+      <table>
+        <thead><tr><th>Cài đặt</th><th>Tùy chọn</th><th>Ghi chú</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Ngôn ngữ</strong></td><td>English, Deutsch</td><td>Yêu cầu khởi động lại để áp dụng</td></tr>
+          <tr><td><strong>Giao diện trình soạn thảo</strong></td><td>Light, Dark</td><td>Có hiệu lực ngay lập tức</td></tr>
+          <tr><td><strong>Giao diện xem trước</strong></td><td>Light, Dark</td><td>Có hiệu lực ngay lập tức</td></tr>
+          <tr><td><strong>Giao diện ứng dụng</strong></td><td>Light, Dark</td><td>Yêu cầu khởi động lại để áp dụng</td></tr>
+          <tr><td><strong>Phương thức xác thực Git</strong></td><td>HTTPS (token), HTTPS (git), SSH</td><td>Xem <a href="#git-auth">Chế độ xác thực</a></td></tr>
+          <tr><td><strong>Tên người dùng</strong></td><td>Trường văn bản</td><td>Chế độ HTTPS</td></tr>
+          <tr><td><strong>Token</strong></td><td>Trường văn bản</td><td>Chế độ HTTPS</td></tr>
+          <tr><td><strong>Tên</strong></td><td>Trường văn bản</td><td>HTTPS (git binary) — danh tính commit</td></tr>
+          <tr><td><strong>Email</strong></td><td>Trường văn bản</td><td>HTTPS (git binary) — danh tính commit</td></tr>
+          <tr><td><strong>Khóa SSH</strong></td><td>Đường dẫn tệp</td><td>Chế độ SSH</td></tr>
+          <tr><td><strong>Cụm mật khẩu</strong></td><td>Trường văn bản</td><td>Chế độ SSH — tùy chọn</td></tr>
+          <tr><td><strong>URL Proxy</strong></td><td>Trường văn bản</td><td>Để trống cho proxy hệ thống</td></tr>
+          <tr><td><strong>Tên người dùng proxy</strong></td><td>Trường văn bản</td><td>Xác thực proxy tùy chọn</td></tr>
+          <tr><td><strong>Mật khẩu proxy</strong></td><td>Trường văn bản</td><td>Xác thực proxy tùy chọn</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </section>
+
+    <!-- ═══ 13. PHÍM TẮT BÀN PHÍM ═════════════════════════════════════════ -->
+    <section id="shortcuts">
+      <h2>13. Phím tắt bàn phím</h2>
+
+      <p>Tất cả phím tắt bàn phím hoạt động khi ngăn trình soạn thảo đang có tiêu điểm.</p>
+
+      <div class="shortcut-row"><span class="label">Tệp mới</span><span><kbd>Ctrl</kbd>+<kbd>N</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Mở tệp</span><span><kbd>Ctrl</kbd>+<kbd>O</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Mở từ Git</span><span><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>G</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Git Squash Commit</span><span><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Q</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Lưu</span><span><kbd>Ctrl</kbd>+<kbd>S</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Lưu thành</span><span><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>S</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Xuất dạng PDF</span><span><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>E</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Nhập PDF</span><span><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>I</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Bật/tắt cây tệp</span><span><kbd>Ctrl</kbd>+<kbd>B</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Bật/tắt xem trước</span><span><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Chèn liên kết</span><span><kbd>Ctrl</kbd>+<kbd>K</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Chèn hình ảnh</span><span><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>K</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Chèn sơ đồ PlantUML</span><span><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>U</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Chèn sơ đồ Mermaid</span><span><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>M</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Chèn bảng</span><span><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Hoàn tác</span><span><kbd>Ctrl</kbd>+<kbd>Z</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Làm lại</span><span><kbd>Ctrl</kbd>+<kbd>Y</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Cắt</span><span><kbd>Ctrl</kbd>+<kbd>X</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Sao chép</span><span><kbd>Ctrl</kbd>+<kbd>C</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Dán</span><span><kbd>Ctrl</kbd>+<kbd>V</kbd></span></div>
+
+      <hr class="section-divider">
+      <p style="color:var(--text-muted);font-size:0.85em;">MarkForge — Copyright &copy; Marcel Mulch. Phát hành theo Giấy phép Công cộng GNU phiên bản 3.0.</p>
+    </section>
+
+  </article>
+</div>
+
+<script>
+  // Close sidebar overlay when a link is clicked on mobile
+  document.querySelectorAll('#toc a').forEach(function(link) {
+    link.addEventListener('click', function() {
+      document.getElementById('sidebar').classList.remove('open');
+    });
+  });
+</script>
+</body>
+</html>

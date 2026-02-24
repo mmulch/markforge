@@ -17,7 +17,7 @@ from PyQt6.QtWidgets import (
     QVBoxLayout,
 )
 
-from i18n import tr
+from i18n import LANGUAGES, tr
 from themes import APP_THEMES, EDITOR_THEMES, PREVIEW_THEMES
 
 
@@ -38,8 +38,8 @@ class SettingsDialog(QDialog):
 
         # ── Language ──────────────────────────────────────────────────────────
         self._lang_combo = QComboBox()
-        self._lang_combo.addItem("Deutsch", "de")
-        self._lang_combo.addItem("English", "en")
+        for code, name in LANGUAGES.items():
+            self._lang_combo.addItem(name, code)
 
         lang_settings = QSettings("Markforge", "Markforge")
         current_lang = lang_settings.value("language", "en")
