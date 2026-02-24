@@ -4,7 +4,7 @@
 
 #define AppName    "MarkForge"
 #ifndef AppVersion
-  #define AppVersion "1.5.5"
+  #define AppVersion "1.5.6"
 #endif
 #define AppPublisher "MarkForge Contributors"
 #define AppURL     "https://github.com/mmulch/markforge"

@@ -13,8 +13,10 @@ _UNUSED_QT = {
     'qt6location',
     'qt6multimedia', 'qt6multimediaquick', 'qt6multimediawidgets',
     'qt6nfc',
-    'qt6positioning', 'qt6positioningquick',
-    'qt6quick', 'qt6quickcontrols2', 'qt6quickdialogs2',
+    # qt6positioning and qt6quick are kept — Qt6WebEngineCore.dll depends on
+    # both at load time; filtering them causes "DLL load failed" on end-user
+    # machines that don't have the full Qt runtime installed system-wide.
+    'qt6quickcontrols2', 'qt6quickdialogs2',
     'qt6quicklayouts', 'qt6quickparticles', 'qt6quickshapes',
     'qt6quicktemplates2', 'qt6quicktimeline', 'qt6quickwidgets',
     'qt6remoteobjects',
