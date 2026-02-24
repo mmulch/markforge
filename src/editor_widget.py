@@ -82,7 +82,9 @@ class EditorWidget(QPlainTextEdit):
             return
         self._theme_name = theme_name
         self._apply_theme()
+        old = self.blockSignals(True)
         self._highlighter.set_theme(theme_name)
+        self.blockSignals(old)
         self._highlight_current_line()
         self._gutter.update()
 

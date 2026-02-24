@@ -48,6 +48,12 @@ sys.excepthook = _excepthook
 from PyQt6.QtCore import Qt, QSettings
 from PyQt6.QtWidgets import QApplication
 
+# QtWebEngineWidgets must be imported before QCoreApplication is created.
+try:
+    import PyQt6.QtWebEngineWidgets  # noqa: F401
+except ImportError:
+    pass
+
 import i18n
 from themes import apply_app_theme
 
