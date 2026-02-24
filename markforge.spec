@@ -49,6 +49,7 @@ hiddenimports += [
     'markdown.extensions.fenced_code',
     'markdown.extensions.tables',
     'markdown.extensions.toc',
+    'markdown.extensions.sane_lists',
     'pygments',
     'pygments.lexers',
     'pygments.formatters',
