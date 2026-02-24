@@ -35,6 +35,7 @@ def _needed(name):
     return stem not in _UNUSED_QT
 
 datas, binaries, hiddenimports = collect_all('PyQt6')
+datas += [('docs', 'docs')]
 
 _dulwich_datas, _dulwich_binaries, _dulwich_hidden = collect_all('dulwich')
 datas     += _dulwich_datas

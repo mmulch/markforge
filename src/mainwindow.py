@@ -4,8 +4,9 @@ from __future__ import annotations
 
 import os
 import shutil
+import sys
 
-from PyQt6.QtCore import QSettings, QThread, QTimer, Qt, QUrl, pyqtSignal
+from PyQt6.QtCore import QSettings, QStandardPaths, QThread, QTimer, Qt, QUrl, pyqtSignal
 from PyQt6.QtGui import QAction, QKeySequence
 from PyQt6.QtWidgets import (
     QApplication,
@@ -403,7 +404,11 @@ class MainWindow(QMainWindow):
     def _new(self) -> None:
         if not self._maybe_save():
             return
-        save_dir = self._file_tree._root_dir or os.getcwd()
+        save_dir = self._file_tree._root_dir or (
+            QStandardPaths.writableLocation(
+                QStandardPaths.StandardLocation.DocumentsLocation
+            ) or os.path.expanduser("~")
+        )
         name, ok = QInputDialog.getText(
             self, tr("New File"),
             tr("File name:\nFolder: {path}", path=save_dir),
@@ -1059,7 +1064,11 @@ class MainWindow(QMainWindow):
         from PyQt6.QtGui import QDesktopServices
         from i18n import current as _lang
         filename = "de.html" if _lang() == "de" else "index.html"
-        docs_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "docs")
+        if getattr(sys, "frozen", False):
+            base = sys._MEIPASS
+        else:
+            base = os.path.dirname(os.path.dirname(__file__))
+        docs_dir = os.path.join(base, "docs")
         path = os.path.join(docs_dir, filename)
         QDesktopServices.openUrl(QUrl.fromLocalFile(path))
 
