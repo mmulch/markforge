@@ -295,6 +295,11 @@ _DE: dict[str, str] = {
     # ── Outline ───────────────────────────────────────────────────────────────
     "Outline":       "Gliederung",
     "Show outline":  "Gliederung anzeigen",
+    # ── Recent files ──────────────────────────────────────────────────────────
+    "Recent &Files":      "Zuletzt &geöffnet",
+    "Clear Recent Files": "Liste leeren",
+    "Recent Files":       "Zuletzt geöffnet",
+    "File not found:\n{path}": "Datei nicht gefunden:\n{path}",
 }
 
 # ── Arabic (Egyptian / MSA) ───────────────────────────────────────────────────

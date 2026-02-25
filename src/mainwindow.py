@@ -176,6 +176,8 @@ class MainWindow(QMainWindow):
         self._git_last_commit_msg:   str = ""
         self._git_pending_commit_msg: str = ""
 
+        self._recent_files: list[str] = []
+
         self._build_ui()
         self._build_menu()
         self._build_toolbar()
@@ -239,6 +241,13 @@ class MainWindow(QMainWindow):
         self._act_git_squash  = self._mk_action(tr("Git &Squash …"),   "Ctrl+Shift+Q",              m)
         self._act_git_squash.setEnabled(False)
         m.addSeparator()
+        self._recent_menu = m.addMenu(tr("Recent &Files"))
+        self._act_clear_recent = self._recent_menu.addAction(tr("Clear Recent Files"))
+        self._act_clear_recent.triggered.connect(self._clear_recent_files)
+        self._recent_menu.addSeparator()
+        # File entries are inserted above the separator at index 0; rebuilt in
+        # _rebuild_recent_menu() whenever the list changes.
+        m.addSeparator()
         self._act_save    = self._mk_action(tr("&Save"),           QKeySequence.StandardKey.Save,   m)
         self._act_save_as = self._mk_action(tr("Save &As …"),      QKeySequence.StandardKey.SaveAs, m)
         self._act_export_pdf = self._mk_action(tr("Export as PDF …"), "Ctrl+Shift+E", m)
@@ -281,7 +290,7 @@ class MainWindow(QMainWindow):
         )
         self._act_filetree.setChecked(True)
         self._act_outline = self._mk_action(
-            tr("Show outline"), "Ctrl+Shift+O", m, checkable=True
+            tr("Show outline"), None, m, checkable=True
         )
         self._act_outline.setChecked(True)
         self._act_preview = self._mk_action(
@@ -903,10 +912,57 @@ class MainWindow(QMainWindow):
         self._update_title()
         self._file_tree.set_root(os.path.dirname(os.path.abspath(path)))
         self._file_tree.select_file(path)
+        self._add_to_recent(path)
         # Defer the preview so the editor becomes visible immediately; the
         # preview (which may fetch remote resources like PlantUML) renders on
         # the next event-loop iteration.
         QTimer.singleShot(0, self._refresh_preview)
+
+    # ── Recent files ──────────────────────────────────────────────────────────
+
+    _MAX_RECENT = 10
+
+    def _add_to_recent(self, path: str) -> None:
+        path = os.path.abspath(path)
+        if path in self._recent_files:
+            self._recent_files.remove(path)
+        self._recent_files.insert(0, path)
+        self._recent_files = self._recent_files[: self._MAX_RECENT]
+        self._rebuild_recent_menu()
+
+    def _rebuild_recent_menu(self) -> None:
+        # Remove old file actions (everything before the permanent separator)
+        # The menu has: [Clear] [separator] [file actions...]
+        actions = self._recent_menu.actions()
+        # actions[0] = Clear, actions[1] = separator — remove everything after
+        for act in actions[2:]:
+            self._recent_menu.removeAction(act)
+
+        self._recent_menu.setEnabled(bool(self._recent_files))
+
+        for i, path in enumerate(self._recent_files):
+            label = os.path.basename(path)
+            prefix = f"&{i}" if i < 10 else ""
+            act = self._recent_menu.addAction(f"{prefix} {label}".strip())
+            act.setToolTip(path)
+            act.setEnabled(os.path.isfile(path))
+            act.triggered.connect(lambda checked=False, p=path: self._open_recent(p))
+
+    def _open_recent(self, path: str) -> None:
+        if not os.path.isfile(path):
+            QMessageBox.warning(
+                self, tr("Recent Files"),
+                tr("File not found:\n{path}", path=path),
+            )
+            self._recent_files = [p for p in self._recent_files if p != path]
+            self._rebuild_recent_menu()
+            return
+        if self._maybe_save():
+            self._load(path)
+
+    def _clear_recent_files(self) -> None:
+        self._recent_files.clear()
+        self._rebuild_recent_menu()
 
     def _save(self) -> None:
         if self._file and self._git_file_info is not None:
@@ -1001,6 +1057,11 @@ class MainWindow(QMainWindow):
         outline_visible = self._settings.value("outline_visible", True, type=bool)
         self._act_outline.setChecked(outline_visible)
         self._outline.setVisible(outline_visible)
+        recent = self._settings.value("recent_files", [])
+        if isinstance(recent, str):
+            recent = [recent]
+        self._recent_files = [p for p in recent if isinstance(p, str)]
+        self._rebuild_recent_menu()
         self._apply_themes()
 
     def _apply_themes(self) -> None:
@@ -1051,6 +1112,7 @@ class MainWindow(QMainWindow):
         self._settings.setValue("outer_splitter", self._outer_splitter.sizes())
         self._settings.setValue("left_splitter", self._left_splitter.sizes())
         self._settings.setValue("outline_visible", self._act_outline.isChecked())
+        self._settings.setValue("recent_files", self._recent_files)
         event.accept()
 
     # ── Insert actions ────────────────────────────────────────────────────────
