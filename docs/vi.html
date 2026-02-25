@@ -541,6 +541,7 @@
       <li><a href="#fileops">6. Thao tác với tệp</a>
         <ul>
           <li><a href="#recent-files">Tệp gần đây</a></li>
+          <li><a href="#drag-drop">Kéo &amp; Thả</a></li>
         </ul>
       </li>
       <li><a href="#markdown-ref">7. Tài liệu tham khảo Markdown</a>
@@ -629,6 +630,7 @@
         <div class="feature-card"><strong>Xuất PDF</strong><span>Tạo PDF tối ưu cho in ấn từ bất kỳ tài liệu nào</span></div>
         <div class="feature-card"><strong>Xuất HTML</strong><span>HTML độc lập với CSS và hình ảnh nhúng nội tuyến</span></div>
         <div class="feature-card"><strong>Xuất qua Pandoc</strong><span>DOCX, EPUB, LaTeX qua pandoc (tùy chọn)</span></div>
+        <div class="feature-card"><strong>Kéo &amp; Thả</strong><span>Thả hình ảnh, Markdown hoặc PDF với tùy chọn sao chép/nhập thông minh</span></div>
         <div class="feature-card"><strong>Đa ngôn ngữ</strong><span>Giao diện người dùng bằng tiếng Anh và tiếng Đức (Deutsch)</span></div>
       </div>
     </section>
@@ -875,6 +877,19 @@ python src/main.py</code></pre>
         <li>Chọn <strong>Xóa tệp gần đây</strong> ở đầu menu con để xóa toàn bộ lịch sử.</li>
         <li>Danh sách được lưu giữa các phiên làm việc.</li>
       </ul>
+
+      <h3 id="drag-drop">Kéo &amp; Thả</h3>
+      <p>Bạn có thể kéo tệp từ trình quản lý tệp vào trình soạn thảo. MarkForge hiển thị hộp thoại để chọn cách xử lý từng loại tệp:</p>
+      <ul>
+        <li><strong>Tệp hình ảnh</strong> (<code>.png</code>, <code>.jpg</code>, <code>.gif</code>, v.v.) — chọn chèn bằng <em>đường dẫn gốc</em> hoặc <em>sao chép vào thư mục <code>assets/</code></em> và chèn liên kết tương đối.</li>
+        <li><strong>Tệp Markdown</strong> (<code>.md</code>, <code>.markdown</code>) — <em>Mở</em> tệp từ vị trí gốc hoặc <em>Sao chép vào thư mục</em> (sao chép vào cùng thư mục với tài liệu hiện tại và mở bản sao).</li>
+        <li><strong>Tệp PDF</strong> — <em>Nhập …</em> (quy trình nhập tiêu chuẩn với hộp thoại lưu) hoặc <em>Nhập vào thư mục</em> (tự động nhập vào thư mục của tài liệu hiện tại).</li>
+        <li><strong>Tệp khác</strong> — chèn liên kết Markdown <code>[tên tệp](đường/dẫn/tệp)</code>.</li>
+      </ul>
+      <div class="callout note">
+        <div class="callout-title">Lưu ý</div>
+        <p>Đối với các thao tác sao chép hoặc nhập vào thư mục của tài liệu hiện tại, một tệp phải được mở và lưu để MarkForge biết thư mục đích.</p>
+      </div>
     </section>
 
     <!-- ═══ 7. TÀI LIỆU THAM KHẢO MARKDOWN ════════════════════════════════ -->

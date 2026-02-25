@@ -552,6 +552,7 @@
       <li><a href="#amaliyat-file">۶. عملیات فایل</a>
         <ul>
           <li><a href="#fayl-akhir">فایل‌های اخیر</a></li>
+          <li><a href="#drag-drop">کشیدن و رها کردن</a></li>
         </ul>
       </li>
       <li><a href="#marja-markdown">۷. مرجع Markdown</a>
@@ -640,6 +641,7 @@
         <div class="feature-card"><strong>صادر کردن PDF</strong><span>PDF بهینه‌شده برای چاپ از هر سندی</span></div>
         <div class="feature-card"><strong>صادر کردن HTML</strong><span>HTML مستقل با CSS و تصاویر تعبیه‌شده</span></div>
         <div class="feature-card"><strong>صادر کردن Pandoc</strong><span>DOCX، EPUB، LaTeX از طریق pandoc (اختیاری)</span></div>
+        <div class="feature-card"><strong>کشیدن و رها کردن</strong><span>تصاویر، Markdown یا فایل‌های PDF را با گزینه‌های هوشمند کپی/وارد کردن رها کنید</span></div>
         <div class="feature-card"><strong>چندزبانه</strong><span>رابط کاربری به زبان‌های انگلیسی و آلمانی</span></div>
       </div>
     </section>
@@ -885,6 +887,19 @@ python src/main.py</code></pre>
         <li><strong>پاک کردن فایل‌های اخیر</strong> را در بالای زیرمنو انتخاب کنید تا کل تاریخچه پاک شود.</li>
         <li>فهرست بین جلسات ذخیره می‌شود.</li>
       </ul>
+
+      <h3 id="drag-drop">کشیدن و رها کردن</h3>
+      <p>می‌توانید فایل‌ها را از مدیر فایل خود به ویرایشگر بکشید. MarkForge یک کادر محاوره‌ای نمایش می‌دهد تا نحوه مدیریت هر نوع فایل را انتخاب کنید:</p>
+      <ul>
+        <li><strong>فایل‌های تصویری</strong> (<code>.png</code>، <code>.jpg</code>، <code>.gif</code> و غیره) — انتخاب کنید با <em>مسیر اصلی</em> درج شود یا <em>به پوشه <code>assets/</code> کپی</em> شده و یک پیوند نسبی درج شود.</li>
+        <li><strong>فایل‌های Markdown</strong> (<code>.md</code>، <code>.markdown</code>) — <em>باز کردن</em> فایل از مکان اصلی یا <em>کپی به پوشه</em> (به همان پوشه سند فعلی کپی می‌شود و نسخه کپی باز می‌شود).</li>
+        <li><strong>فایل‌های PDF</strong> — <em>وارد کردن …</em> (جریان وارد کردن استاندارد با کادر ذخیره) یا <em>وارد کردن به پوشه</em> (به طور خودکار به پوشه سند فعلی وارد می‌شود).</li>
+        <li><strong>هر فایل دیگری</strong> — یک پیوند Markdown <code>[نام فایل](مسیر/به/فایل)</code> درج می‌کند.</li>
+      </ul>
+      <div class="callout note">
+        <div class="callout-title">توجه</div>
+        <p>برای عملیاتی که به پوشه سند فعلی کپی یا وارد می‌کنند، باید یک فایل باز و ذخیره شده باشد تا MarkForge پوشه مقصد را بشناسد.</p>
+      </div>
     </section>
 
     <!-- ═══ ۷. مرجع Markdown ══════════════════════════════════════════ -->

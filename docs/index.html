@@ -541,6 +541,7 @@
       <li><a href="#fileops">6. File Operations</a>
         <ul>
           <li><a href="#recent-files">Recent Files</a></li>
+          <li><a href="#drag-drop">Drag &amp; Drop</a></li>
         </ul>
       </li>
       <li><a href="#markdown-ref">7. Markdown Reference</a>
@@ -629,6 +630,7 @@
         <div class="feature-card"><strong>PDF Export</strong><span>Print-optimised PDF from any document</span></div>
         <div class="feature-card"><strong>HTML Export</strong><span>Self-contained HTML with inline CSS and images</span></div>
         <div class="feature-card"><strong>Pandoc Export</strong><span>DOCX, EPUB, LaTeX via pandoc (optional)</span></div>
+        <div class="feature-card"><strong>Drag &amp; Drop</strong><span>Drop images, Markdown, or PDF files with smart copy/import prompts</span></div>
         <div class="feature-card"><strong>Multilingual</strong><span>English and German (Deutsch) user interface</span></div>
       </div>
     </section>
@@ -875,6 +877,19 @@ python src/main.py</code></pre>
         <li>Choose <strong>Clear Recent Files</strong> at the top of the submenu to clear the entire history.</li>
         <li>The list is saved between sessions.</li>
       </ul>
+
+      <h3 id="drag-drop">Drag &amp; Drop</h3>
+      <p>You can drag files from your file manager onto the editor. MarkForge shows a dialog to choose how to handle each file type:</p>
+      <ul>
+        <li><strong>Image files</strong> (<code>.png</code>, <code>.jpg</code>, <code>.gif</code>, etc.) — choose to insert using the <em>original path</em> or <em>copy to the <code>assets/</code> folder</em> and insert a relative link.</li>
+        <li><strong>Markdown files</strong> (<code>.md</code>, <code>.markdown</code>) — choose to <em>Open</em> the file (loads from its original location) or <em>Copy to folder</em> (copies to the same directory as the current document and opens the copy).</li>
+        <li><strong>PDF files</strong> — choose <em>Import…</em> (standard import flow with save dialog) or <em>Import to folder</em> (auto-imports to the directory of the current document).</li>
+        <li><strong>Any other file</strong> — inserts a <code>[filename](path/to/file)</code> Markdown link.</li>
+      </ul>
+      <div class="callout note">
+        <div class="callout-title">Note</div>
+        <p>For operations that copy or import to the current document's folder, a file must already be open and saved so MarkForge knows the target directory.</p>
+      </div>
     </section>
 
     <!-- ═══ 7. MARKDOWN REFERENCE ═════════════════════════════════════════ -->

@@ -641,6 +641,39 @@ class MainWindow(QMainWindow):
         self._pdf_output_path = os.path.join(save_dir, name)
 
         # ── Step 3: show progress dialog and start worker ─────────────────
+        self._start_pdf_import(pdf_path, self._pdf_output_path)
+
+    def _import_pdf_dropped(self, pdf_path: str, output_dir: str | None = None) -> None:
+        """Start PDF import with a pre-set input path (called from drag & drop)."""
+        if self._pdf_worker is not None:
+            return
+        if not self._maybe_save():
+            return
+        if output_dir is not None:
+            draft_name = os.path.splitext(os.path.basename(pdf_path))[0] + ".md"
+            output_path = os.path.join(output_dir, draft_name)
+        else:
+            save_dir = (
+                os.path.dirname(os.path.abspath(self._file)) if self._file
+                else self._file_tree._root_dir or os.path.dirname(pdf_path)
+            )
+            draft_name = os.path.splitext(os.path.basename(pdf_path))[0] + ".md"
+            name, ok = QInputDialog.getText(
+                self, tr("Import PDF"),
+                tr("File name:\nFolder: {path}", path=save_dir),
+                text=draft_name,
+            )
+            if not ok or not name.strip():
+                return
+            name = name.strip()
+            if "." not in name:
+                name += ".md"
+            output_path = os.path.join(save_dir, name)
+        self._start_pdf_import(pdf_path, output_path)
+
+    def _start_pdf_import(self, pdf_path: str, output_path: str) -> None:
+        """Show progress dialog and start the PDF worker."""
+        self._pdf_output_path = output_path
         self._pdf_progress = QProgressDialog(
             tr("Importing PDF …"), tr("Cancel"), 0, 0, self
         )

@@ -541,6 +541,7 @@
       <li><a href="#fileops">6. Filhantering</a>
         <ul>
           <li><a href="#recent-files">Senaste filer</a></li>
+          <li><a href="#drag-drop">Dra &amp; Släpp</a></li>
         </ul>
       </li>
       <li><a href="#markdown-ref">7. Markdown-referens</a>
@@ -629,6 +630,7 @@
         <div class="feature-card"><strong>PDF-export</strong><span>Utskriftsoptimerad PDF från valfritt dokument</span></div>
         <div class="feature-card"><strong>HTML-export</strong><span>Fristående HTML med inbäddad CSS och bilder</span></div>
         <div class="feature-card"><strong>Pandoc-export</strong><span>DOCX, EPUB, LaTeX via pandoc (valfritt)</span></div>
+        <div class="feature-card"><strong>Dra &amp; Släpp</strong><span>Släpp bilder, Markdown- eller PDF-filer med smarta kopiera/importera-alternativ</span></div>
         <div class="feature-card"><strong>Flerspråkig</strong><span>Engelska och tyska (Deutsch) användargränssnitt</span></div>
       </div>
     </section>
@@ -875,6 +877,19 @@ python src/main.py</code></pre>
         <li>Välj <strong>Rensa senaste filer</strong> högst upp i undermenyn för att rensa hela historiken.</li>
         <li>Listan sparas mellan sessioner.</li>
       </ul>
+
+      <h3 id="drag-drop">Dra &amp; Släpp</h3>
+      <p>Du kan dra filer från din filhanterare till redigeraren. MarkForge visar en dialog för att välja hur varje filtyp ska hanteras:</p>
+      <ul>
+        <li><strong>Bildfiler</strong> (<code>.png</code>, <code>.jpg</code>, <code>.gif</code> m.fl.) — välj att infoga med <em>ursprunglig sökväg</em> eller <em>kopiera till mappen <code>assets/</code></em> och infoga en relativ länk.</li>
+        <li><strong>Markdown-filer</strong> (<code>.md</code>, <code>.markdown</code>) — <em>Öppna</em> filen från dess ursprungliga plats eller <em>Kopiera till mapp</em> (kopierar till samma katalog som det aktuella dokumentet och öppnar kopian).</li>
+        <li><strong>PDF-filer</strong> — <em>Importera …</em> (standardimportflöde med spara-dialog) eller <em>Importera till mapp</em> (importerar automatiskt till det aktuella dokumentets katalog).</li>
+        <li><strong>Andra filer</strong> — infogar en Markdown-länk <code>[filnamn](sökväg/till/fil)</code>.</li>
+      </ul>
+      <div class="callout note">
+        <div class="callout-title">Obs</div>
+        <p>För åtgärder som kopierar eller importerar till det aktuella dokumentets mapp måste en fil vara öppnad och sparad så att MarkForge känner till målkatalogen.</p>
+      </div>
     </section>
 
     <!-- ═══ 7. MARKDOWN-REFERENS ═════════════════════════════════════════ -->

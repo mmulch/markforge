@@ -364,6 +364,13 @@ _DE: dict[str, str] = {
     "How would you like to add <b>{name}</b>?": "Wie möchten Sie <b>{name}</b> einfügen?",
     "Original path": "Originalpfad",
     "Copy to assets": "In Ressourcenordner kopieren",
+    # ── Drag-and-drop (MD / PDF) ────────────────────────────────────────────
+    "Open Markdown File": "Markdown-Datei öffnen",
+    "What would you like to do with <b>{name}</b>?": "Was möchten Sie mit <b>{name}</b> tun?",
+    "Open": "Öffnen",
+    "Copy to folder": "In Ordner kopieren",
+    "Import …": "Importieren …",
+    "Import to folder": "In Ordner importieren",
     # ── Word count / reading time ─────────────────────────────────────────────
     "{n} words · {read}":          "{n} Wörter · {read}",
     "{n} / {goal} words · {read}": "{n} / {goal} Wörter · {read}",
@@ -696,6 +703,13 @@ _AR: dict[str, str] = {
     "How would you like to add <b>{name}</b>?": "كيف تريد إضافة <b>{name}</b>؟",
     "Original path": "المسار الأصلي",
     "Copy to assets": "نسخ إلى مجلد الموارد",
+    # ── Drag-and-drop (MD / PDF) ────────────────────────────────────────────
+    "Open Markdown File": "فتح ملف Markdown",
+    "What would you like to do with <b>{name}</b>?": "ماذا تريد أن تفعل مع <b>{name}</b>؟",
+    "Open": "فتح",
+    "Copy to folder": "نسخ إلى المجلد",
+    "Import …": "استيراد …",
+    "Import to folder": "استيراد إلى المجلد",
     # ── Word count / reading time ─────────────────────────────────────────────
     "{n} words · {read}":          "{n} كلمات · {read}",
     "{n} / {goal} words · {read}": "{n} / {goal} كلمات · {read}",
@@ -1029,6 +1043,13 @@ _VI: dict[str, str] = {
     "How would you like to add <b>{name}</b>?": "Bạn muốn thêm <b>{name}</b> như thế nào?",
     "Original path": "Đường dẫn gốc",
     "Copy to assets": "Sao chép vào thư mục tài nguyên",
+    # ── Drag-and-drop (MD / PDF) ────────────────────────────────────────────
+    "Open Markdown File": "Mở tệp Markdown",
+    "What would you like to do with <b>{name}</b>?": "Bạn muốn làm gì với <b>{name}</b>?",
+    "Open": "Mở",
+    "Copy to folder": "Sao chép vào thư mục",
+    "Import …": "Nhập …",
+    "Import to folder": "Nhập vào thư mục",
     # ── Word count / reading time ─────────────────────────────────────────────
     "{n} words · {read}":          "{n} từ · {read}",
     "{n} / {goal} words · {read}": "{n} / {goal} từ · {read}",
@@ -1362,6 +1383,13 @@ _SV: dict[str, str] = {
     "How would you like to add <b>{name}</b>?": "Hur vill du lägga till <b>{name}</b>?",
     "Original path": "Ursprunglig sökväg",
     "Copy to assets": "Kopiera till resursmapp",
+    # ── Drag-and-drop (MD / PDF) ────────────────────────────────────────────
+    "Open Markdown File": "Öppna Markdown-fil",
+    "What would you like to do with <b>{name}</b>?": "Vad vill du göra med <b>{name}</b>?",
+    "Open": "Öppna",
+    "Copy to folder": "Kopiera till mapp",
+    "Import …": "Importera …",
+    "Import to folder": "Importera till mapp",
     # ── Word count / reading time ─────────────────────────────────────────────
     "{n} words · {read}":          "{n} ord · {read}",
     "{n} / {goal} words · {read}": "{n} / {goal} ord · {read}",
@@ -1695,6 +1723,13 @@ _UK: dict[str, str] = {
     "How would you like to add <b>{name}</b>?": "Як ви хочете додати <b>{name}</b>?",
     "Original path": "Оригінальний шлях",
     "Copy to assets": "Копіювати до папки ресурсів",
+    # ── Drag-and-drop (MD / PDF) ────────────────────────────────────────────
+    "Open Markdown File": "Відкрити файл Markdown",
+    "What would you like to do with <b>{name}</b>?": "Що ви хочете зробити з <b>{name}</b>?",
+    "Open": "Відкрити",
+    "Copy to folder": "Копіювати до папки",
+    "Import …": "Імпортувати …",
+    "Import to folder": "Імпортувати до папки",
     # ── Word count / reading time ─────────────────────────────────────────────
     "{n} words · {read}":          "{n} слів · {read}",
     "{n} / {goal} words · {read}": "{n} / {goal} слів · {read}",
@@ -2028,6 +2063,13 @@ _KN: dict[str, str] = {
     "How would you like to add <b>{name}</b>?": "<b>{name}</b> ಅನ್ನು ಹೇಗೆ ಸೇರಿಸಲು ಬಯಸುತ್ತೀರಿ?",
     "Original path": "ಮೂಲ ಮಾರ್ಗ",
     "Copy to assets": "ಆಸ್ತಿ ಫೋಲ್ಡರ್‌ಗೆ ನಕಲಿಸಿ",
+    # ── Drag-and-drop (MD / PDF) ────────────────────────────────────────────
+    "Open Markdown File": "Markdown ಫೈಲ್ ತೆರೆಯಿರಿ",
+    "What would you like to do with <b>{name}</b>?": "<b>{name}</b> ಜೊತೆ ಏನು ಮಾಡಲು ಬಯಸುತ್ತೀರಿ?",
+    "Open": "ತೆರೆಯಿರಿ",
+    "Copy to folder": "ಫೋಲ್ಡರ್‌ಗೆ ನಕಲಿಸಿ",
+    "Import …": "ಆಮದು ಮಾಡಿ …",
+    "Import to folder": "ಫೋಲ್ಡರ್‌ಗೆ ಆಮದು ಮಾಡಿ",
     # ── Word count / reading time ─────────────────────────────────────────────
     "{n} words · {read}":          "{n} ಪದಗಳು · {read}",
     "{n} / {goal} words · {read}": "{n} / {goal} ಪದಗಳು · {read}",
@@ -2361,6 +2403,13 @@ _HI: dict[str, str] = {
     "How would you like to add <b>{name}</b>?": "<b>{name}</b> को कैसे जोड़ना चाहते हैं?",
     "Original path": "मूल पथ",
     "Copy to assets": "संपत्ति फ़ोल्डर में कॉपी करें",
+    # ── Drag-and-drop (MD / PDF) ────────────────────────────────────────────
+    "Open Markdown File": "Markdown फ़ाइल खोलें",
+    "What would you like to do with <b>{name}</b>?": "<b>{name}</b> के साथ क्या करना चाहते हैं?",
+    "Open": "खोलें",
+    "Copy to folder": "फ़ोल्डर में कॉपी करें",
+    "Import …": "आयात करें …",
+    "Import to folder": "फ़ोल्डर में आयात करें",
     # ── Word count / reading time ─────────────────────────────────────────────
     "{n} words · {read}":          "{n} शब्द · {read}",
     "{n} / {goal} words · {read}": "{n} / {goal} शब्द · {read}",
@@ -2668,6 +2717,13 @@ _ES: dict[str, str] = {
     "How would you like to add <b>{name}</b>?": "¿Cómo desea añadir <b>{name}</b>?",
     "Original path": "Ruta original",
     "Copy to assets": "Copiar a la carpeta de recursos",
+    # ── Drag-and-drop (MD / PDF) ────────────────────────────────────────────
+    "Open Markdown File": "Abrir archivo Markdown",
+    "What would you like to do with <b>{name}</b>?": "¿Qué desea hacer con <b>{name}</b>?",
+    "Open": "Abrir",
+    "Copy to folder": "Copiar a la carpeta",
+    "Import …": "Importar …",
+    "Import to folder": "Importar a la carpeta",
     # ── Word count / reading time ─────────────────────────────────────────────
     "{n} words · {read}":          "{n} palabras · {read}",
     "{n} / {goal} words · {read}": "{n} / {goal} palabras · {read}",
@@ -2976,6 +3032,13 @@ _FR: dict[str, str] = {
     "How would you like to add <b>{name}</b>?": "Comment souhaitez-vous ajouter <b>{name}</b> ?",
     "Original path": "Chemin d'origine",
     "Copy to assets": "Copier dans le dossier ressources",
+    # ── Drag-and-drop (MD / PDF) ────────────────────────────────────────────
+    "Open Markdown File": "Ouvrir un fichier Markdown",
+    "What would you like to do with <b>{name}</b>?": "Que voulez-vous faire avec <b>{name}</b> ?",
+    "Open": "Ouvrir",
+    "Copy to folder": "Copier dans le dossier",
+    "Import …": "Importer …",
+    "Import to folder": "Importer dans le dossier",
     # ── Word count / reading time ─────────────────────────────────────────────
     "{n} words · {read}":          "{n} mots · {read}",
     "{n} / {goal} words · {read}": "{n} / {goal} mots · {read}",
@@ -3284,6 +3347,13 @@ _IT: dict[str, str] = {
     "How would you like to add <b>{name}</b>?": "Come vuoi aggiungere <b>{name}</b>?",
     "Original path": "Percorso originale",
     "Copy to assets": "Copia nella cartella risorse",
+    # ── Drag-and-drop (MD / PDF) ────────────────────────────────────────────
+    "Open Markdown File": "Apri file Markdown",
+    "What would you like to do with <b>{name}</b>?": "Cosa vuoi fare con <b>{name}</b>?",
+    "Open": "Apri",
+    "Copy to folder": "Copia nella cartella",
+    "Import …": "Importa …",
+    "Import to folder": "Importa nella cartella",
     # ── Word count / reading time ─────────────────────────────────────────────
     "{n} words · {read}":          "{n} parole · {read}",
     "{n} / {goal} words · {read}": "{n} / {goal} parole · {read}",
@@ -3592,6 +3662,13 @@ _NL: dict[str, str] = {
     "How would you like to add <b>{name}</b>?": "Hoe wilt u <b>{name}</b> toevoegen?",
     "Original path": "Origineel pad",
     "Copy to assets": "Kopiëren naar bronmap",
+    # ── Drag-and-drop (MD / PDF) ────────────────────────────────────────────
+    "Open Markdown File": "Markdown-bestand openen",
+    "What would you like to do with <b>{name}</b>?": "Wat wilt u doen met <b>{name}</b>?",
+    "Open": "Openen",
+    "Copy to folder": "Kopiëren naar map",
+    "Import …": "Importeren …",
+    "Import to folder": "Importeren naar map",
     # ── Word count / reading time ─────────────────────────────────────────────
     "{n} words · {read}":          "{n} woorden · {read}",
     "{n} / {goal} words · {read}": "{n} / {goal} woorden · {read}",
@@ -3900,6 +3977,13 @@ _PT: dict[str, str] = {
     "How would you like to add <b>{name}</b>?": "Como deseja adicionar <b>{name}</b>?",
     "Original path": "Caminho original",
     "Copy to assets": "Copiar para pasta de recursos",
+    # ── Drag-and-drop (MD / PDF) ────────────────────────────────────────────
+    "Open Markdown File": "Abrir arquivo Markdown",
+    "What would you like to do with <b>{name}</b>?": "O que deseja fazer com <b>{name}</b>?",
+    "Open": "Abrir",
+    "Copy to folder": "Copiar para pasta",
+    "Import …": "Importar …",
+    "Import to folder": "Importar para pasta",
     # ── Word count / reading time ─────────────────────────────────────────────
     "{n} words · {read}":          "{n} palavras · {read}",
     "{n} / {goal} words · {read}": "{n} / {goal} palavras · {read}",
@@ -4208,6 +4292,13 @@ _FA: dict[str, str] = {
     "How would you like to add <b>{name}</b>?": "چگونه می‌خواهید <b>{name}</b> را اضافه کنید؟",
     "Original path": "مسیر اصلی",
     "Copy to assets": "کپی به پوشه منابع",
+    # ── Drag-and-drop (MD / PDF) ────────────────────────────────────────────
+    "Open Markdown File": "باز کردن فایل Markdown",
+    "What would you like to do with <b>{name}</b>?": "با <b>{name}</b> چه می‌خواهید انجام دهید؟",
+    "Open": "باز کردن",
+    "Copy to folder": "کپی به پوشه",
+    "Import …": "وارد کردن …",
+    "Import to folder": "وارد کردن به پوشه",
     # ── Word count / reading time ─────────────────────────────────────────────
     "{n} words · {read}":          "{n} کلمه · {read}",
     "{n} / {goal} words · {read}": "{n} / {goal} کلمه · {read}",

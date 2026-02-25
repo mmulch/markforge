@@ -541,6 +541,7 @@
       <li><a href="#fileops">6. फ़ाइल संचालन</a>
         <ul>
           <li><a href="#recent-files">हाल की फ़ाइलें</a></li>
+          <li><a href="#drag-drop">ड्रैग &amp; ड्रॉप</a></li>
         </ul>
       </li>
       <li><a href="#markdown-ref">7. Markdown संदर्भ</a>
@@ -629,6 +630,7 @@
         <div class="feature-card"><strong>PDF निर्यात</strong><span>किसी भी दस्तावेज़ से प्रिंट-अनुकूलित PDF</span></div>
         <div class="feature-card"><strong>HTML निर्यात</strong><span>इनलाइन CSS और छवियों के साथ स्व-निहित HTML</span></div>
         <div class="feature-card"><strong>Pandoc निर्यात</strong><span>pandoc के माध्यम से DOCX, EPUB, LaTeX (वैकल्पिक)</span></div>
+        <div class="feature-card"><strong>ड्रैग &amp; ड्रॉप</strong><span>स्मार्ट कॉपी/आयात विकल्पों के साथ छवियाँ, Markdown या PDF फ़ाइलें छोड़ें</span></div>
         <div class="feature-card"><strong>बहुभाषी</strong><span>अंग्रेज़ी और जर्मन (Deutsch) उपयोगकर्ता इंटरफ़ेस</span></div>
       </div>
     </section>
@@ -875,6 +877,19 @@ python src/main.py</code></pre>
         <li>पूरा इतिहास साफ़ करने के लिए सबमेनू के शीर्ष पर <strong>हाल की फ़ाइलें साफ़ करें</strong> चुनें।</li>
         <li>सूची सत्रों के बीच सहेजी जाती है।</li>
       </ul>
+
+      <h3 id="drag-drop">ड्रैग &amp; ड्रॉप</h3>
+      <p>आप अपने फ़ाइल मैनेजर से संपादक पर फ़ाइलें खींच सकते हैं। MarkForge प्रत्येक फ़ाइल प्रकार को संभालने का तरीका चुनने के लिए एक संवाद दिखाता है:</p>
+      <ul>
+        <li><strong>छवि फ़ाइलें</strong> (<code>.png</code>, <code>.jpg</code>, <code>.gif</code> आदि) — <em>मूल पथ</em> का उपयोग करके सम्मिलित करने या <em><code>assets/</code> फ़ोल्डर में कॉपी करने</em> और सापेक्ष लिंक सम्मिलित करने का चुनाव करें।</li>
+        <li><strong>Markdown फ़ाइलें</strong> (<code>.md</code>, <code>.markdown</code>) — <em>खोलें</em> (मूल स्थान से लोड करता है) या <em>फ़ोल्डर में कॉपी करें</em> (वर्तमान दस्तावेज़ के समान निर्देशिका में कॉपी करता है और कॉपी खोलता है)।</li>
+        <li><strong>PDF फ़ाइलें</strong> — <em>आयात करें …</em> (सेव डायलॉग के साथ मानक आयात प्रवाह) या <em>फ़ोल्डर में आयात करें</em> (वर्तमान दस्तावेज़ की निर्देशिका में स्वचालित रूप से आयात करता है)।</li>
+        <li><strong>कोई अन्य फ़ाइल</strong> — Markdown लिंक <code>[फ़ाइलनाम](पथ/फ़ाइल/तक)</code> सम्मिलित करता है।</li>
+      </ul>
+      <div class="callout note">
+        <div class="callout-title">नोट</div>
+        <p>वर्तमान दस्तावेज़ के फ़ोल्डर में कॉपी या आयात करने वाले संचालनों के लिए, MarkForge को लक्ष्य निर्देशिका जानने के लिए एक फ़ाइल खुली और सहेजी हुई होनी चाहिए।</p>
+      </div>
     </section>
 
     <!-- ═══ 7. MARKDOWN REFERENCE ═════════════════════════════════════════ -->

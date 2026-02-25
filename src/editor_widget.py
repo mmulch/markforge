@@ -254,6 +254,10 @@ class EditorWidget(QPlainTextEdit):
                 ext = os.path.splitext(dropped_path)[1].lower()
                 if ext in _IMAGE_EXTENSIONS:
                     self._handle_dropped_image_file(dropped_path)
+                elif ext in {".md", ".markdown"}:
+                    self._handle_dropped_md_file(dropped_path)
+                elif ext == ".pdf":
+                    self._handle_dropped_pdf_file(dropped_path)
                 else:
                     assets_dir = self._get_assets_dir()
                     if not assets_dir:
@@ -306,6 +310,75 @@ class EditorWidget(QPlainTextEdit):
             rel_path = self._copy_file_to_assets(dropped_path)
             if rel_path:
                 self._insert_md_image(rel_path)
+
+    def _handle_dropped_md_file(self, dropped_path: str) -> None:
+        """Dialog: open MD from original path, or copy to current working folder first."""
+        from i18n import tr
+        fname = os.path.basename(dropped_path)
+        msg = QMessageBox(self)
+        msg.setWindowTitle(tr("Open Markdown File"))
+        msg.setIcon(QMessageBox.Icon.Question)
+        msg.setText(tr("What would you like to do with <b>{name}</b>?", name=fname))
+        btn_open = msg.addButton(tr("Open"),           QMessageBox.ButtonRole.AcceptRole)
+        btn_copy = msg.addButton(tr("Copy to folder"), QMessageBox.ButtonRole.ActionRole)
+        msg.addButton(QMessageBox.StandardButton.Cancel)
+        msg.setDefaultButton(btn_open)
+        msg.exec()
+        clicked = msg.clickedButton()
+        win = self.window()
+        if clicked == btn_open:
+            if hasattr(win, "_load"):
+                win._load(dropped_path)
+        elif clicked == btn_copy:
+            assets_dir = self._get_assets_dir()
+            if not assets_dir:
+                self._show_no_file_message()
+                return
+            doc_dir = os.path.dirname(assets_dir)
+            dest = self._copy_to_dir(dropped_path, doc_dir)
+            if dest and hasattr(win, "_load"):
+                win._load(dest)
+
+    def _handle_dropped_pdf_file(self, dropped_path: str) -> None:
+        """Dialog: import PDF with save dialog, or auto-import to current working folder."""
+        from i18n import tr
+        fname = os.path.basename(dropped_path)
+        msg = QMessageBox(self)
+        msg.setWindowTitle(tr("Import PDF"))
+        msg.setIcon(QMessageBox.Icon.Question)
+        msg.setText(tr("What would you like to do with <b>{name}</b>?", name=fname))
+        btn_import = msg.addButton(tr("Import …"),        QMessageBox.ButtonRole.AcceptRole)
+        btn_folder = msg.addButton(tr("Import to folder"), QMessageBox.ButtonRole.ActionRole)
+        msg.addButton(QMessageBox.StandardButton.Cancel)
+        msg.setDefaultButton(btn_import)
+        msg.exec()
+        clicked = msg.clickedButton()
+        win = self.window()
+        if clicked == btn_import:
+            if hasattr(win, "_import_pdf_dropped"):
+                win._import_pdf_dropped(dropped_path)
+        elif clicked == btn_folder:
+            assets_dir = self._get_assets_dir()
+            if not assets_dir:
+                self._show_no_file_message()
+                return
+            doc_dir = os.path.dirname(assets_dir)
+            if hasattr(win, "_import_pdf_dropped"):
+                win._import_pdf_dropped(dropped_path, output_dir=doc_dir)
+
+    def _copy_to_dir(self, src_path: str, dest_dir: str) -> str | None:
+        """Copy src_path into dest_dir, preserving filename (adds suffix on collision)."""
+        import shutil
+        name, ext = os.path.splitext(os.path.basename(src_path))
+        dest = os.path.join(dest_dir, f"{name}{ext}")
+        n = 1
+        while os.path.exists(dest):
+            if os.path.abspath(dest) == os.path.abspath(src_path):
+                return dest   # already in place — nothing to copy
+            dest = os.path.join(dest_dir, f"{name}_{n:03d}{ext}")
+            n += 1
+        shutil.copy2(src_path, dest)
+        return dest
 
     def _save_image_to_assets(self, image: QImage, hint: str) -> str | None:
         """Save QImage to the assets directory. Returns a relative path like assets/image_001.png."""

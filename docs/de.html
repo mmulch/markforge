@@ -540,6 +540,7 @@
       <li><a href="#dateioperationen">6. Dateioperationen</a>
         <ul>
           <li><a href="#zuletzt-geoeffnet">Zuletzt geöffnet</a></li>
+          <li><a href="#drag-drop">Drag &amp; Drop</a></li>
         </ul>
       </li>
       <li><a href="#markdown-referenz">7. Markdown-Referenz</a>
@@ -628,6 +629,7 @@
         <div class="feature-card"><strong>PDF-Export</strong><span>Druckoptimiertes PDF aus jedem Dokument erstellen</span></div>
         <div class="feature-card"><strong>HTML-Export</strong><span>Eigenständiges HTML mit eingebettetem CSS und Bildern</span></div>
         <div class="feature-card"><strong>Pandoc-Export</strong><span>DOCX, EPUB, LaTeX über pandoc (optional)</span></div>
+        <div class="feature-card"><strong>Drag &amp; Drop</strong><span>Bilder, Markdown- oder PDF-Dateien per Drag &amp; Drop mit Kopier-/Importoptionen einfügen</span></div>
         <div class="feature-card"><strong>Mehrsprachig</strong><span>Deutsch und Englische Benutzeroberfläche</span></div>
       </div>
     </section>
@@ -874,6 +876,19 @@ python src/main.py</code></pre>
         <li>Wählen Sie <strong>Zuletzt geöffnete löschen</strong> am Anfang des Untermenüs, um den gesamten Verlauf zu löschen.</li>
         <li>Die Liste wird sitzungsübergreifend gespeichert.</li>
       </ul>
+
+      <h3 id="drag-drop">Drag &amp; Drop</h3>
+      <p>Sie können Dateien aus Ihrem Dateimanager auf den Editor ziehen. MarkForge zeigt einen Dialog zur Auswahl der Behandlung jedes Dateityps:</p>
+      <ul>
+        <li><strong>Bilddateien</strong> (<code>.png</code>, <code>.jpg</code>, <code>.gif</code> usw.) — wählen Sie, ob der <em>Originalpfad</em> eingefügt oder die Datei in den <em>Ordner <code>assets/</code> kopiert</em> und ein relativer Link eingefügt wird.</li>
+        <li><strong>Markdown-Dateien</strong> (<code>.md</code>, <code>.markdown</code>) — <em>Öffnen</em> (lädt vom Originalpfad) oder <em>In Ordner kopieren</em> (kopiert in das Verzeichnis des aktuellen Dokuments und öffnet die Kopie).</li>
+        <li><strong>PDF-Dateien</strong> — <em>Importieren …</em> (Standardimport mit Speicherdialog) oder <em>In Ordner importieren</em> (importiert automatisch ins Verzeichnis des aktuellen Dokuments).</li>
+        <li><strong>Alle anderen Dateien</strong> — fügt einen <code>[Dateiname](Pfad/zur/Datei)</code>-Link ein.</li>
+      </ul>
+      <div class="callout note">
+        <div class="callout-title">Hinweis</div>
+        <p>Für Operationen, die in den Ordner des aktuellen Dokuments kopieren oder importieren, muss eine Datei geöffnet und gespeichert sein, damit MarkForge das Zielverzeichnis kennt.</p>
+      </div>
     </section>
 
     <!-- ═══ 7. MARKDOWN-REFERENZ ══════════════════════════════════════════ -->

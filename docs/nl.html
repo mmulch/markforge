@@ -540,6 +540,7 @@
       <li><a href="#bestandsbewerkingen">6. Bestandsbewerkingen</a>
         <ul>
           <li><a href="#recente-bestanden">Recente bestanden</a></li>
+          <li><a href="#drag-drop">Slepen &amp; Neerzetten</a></li>
         </ul>
       </li>
       <li><a href="#markdown-referentie">7. Markdown-referentie</a>
@@ -628,6 +629,7 @@
         <div class="feature-card"><strong>PDF exporteren</strong><span>Afdrukgeoptimaliseerde PDF van elk document</span></div>
         <div class="feature-card"><strong>HTML exporteren</strong><span>Zelfstandige HTML met ingesloten CSS en afbeeldingen</span></div>
         <div class="feature-card"><strong>Pandoc exporteren</strong><span>DOCX, EPUB, LaTeX via pandoc (optioneel)</span></div>
+        <div class="feature-card"><strong>Slepen &amp; Neerzetten</strong><span>Zet afbeeldingen, Markdown of PDF neer met slimme kopieer-/importopties</span></div>
         <div class="feature-card"><strong>Meertalig</strong><span>Gebruikersinterface in het Engels en Duits</span></div>
       </div>
     </section>
@@ -873,6 +875,19 @@ python src/main.py</code></pre>
         <li>Kies <strong>Recente bestanden wissen</strong> bovenaan het submenu om de volledige geschiedenis te wissen.</li>
         <li>De lijst wordt opgeslagen tussen sessies.</li>
       </ul>
+
+      <h3 id="drag-drop">Slepen &amp; Neerzetten</h3>
+      <p>U kunt bestanden van uw bestandsbeheerder naar de editor slepen. MarkForge toont een dialoogvenster om te kiezen hoe elk bestandstype wordt verwerkt:</p>
+      <ul>
+        <li><strong>Afbeeldingsbestanden</strong> (<code>.png</code>, <code>.jpg</code>, <code>.gif</code>, enz.) — kies om in te voegen met het <em>originele pad</em> of om het bestand naar de map <em><code>assets/</code> te kopiëren</em> en een relatieve koppeling in te voegen.</li>
+        <li><strong>Markdown-bestanden</strong> (<code>.md</code>, <code>.markdown</code>) — <em>Openen</em> (laadt van de oorspronkelijke locatie) of <em>Kopiëren naar map</em> (kopieert naar dezelfde map als het huidige document en opent de kopie).</li>
+        <li><strong>PDF-bestanden</strong> — <em>Importeren …</em> (standaard importstroom met opslaan-dialoog) of <em>Importeren naar map</em> (importeert automatisch naar de map van het huidige document).</li>
+        <li><strong>Elk ander bestand</strong> — voegt een Markdown-koppeling in <code>[bestandsnaam](pad/naar/bestand)</code>.</li>
+      </ul>
+      <div class="callout note">
+        <div class="callout-title">Opmerking</div>
+        <p>Voor bewerkingen die kopiëren of importeren naar de map van het huidige document, moet een bestand open en opgeslagen zijn zodat MarkForge de doelmap kent.</p>
+      </div>
     </section>
 
     <!-- ═══ 7. MARKDOWN-REFERENTIE ════════════════════════════════════════ -->

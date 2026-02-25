@@ -541,6 +541,7 @@
       <li><a href="#fileops">6. ಫೈಲ್ ಕಾರ್ಯಾಚರಣೆಗಳು</a>
         <ul>
           <li><a href="#recent-files">ಇತ್ತೀಚಿನ ಫೈಲ್‌ಗಳು</a></li>
+          <li><a href="#drag-drop">ಡ್ರ್ಯಾಗ್ &amp; ಡ್ರಾಪ್</a></li>
         </ul>
       </li>
       <li><a href="#markdown-ref">7. Markdown ಉಲ್ಲೇಖ</a>
@@ -629,6 +630,7 @@
         <div class="feature-card"><strong>PDF ರಫ್ತು</strong><span>ಯಾವುದೇ ದಾಖಲೆಯಿಂದ ಮುದ್ರಣ-ಅನುಕೂಲ PDF</span></div>
         <div class="feature-card"><strong>HTML ರಫ್ತು</strong><span>ಇನ್‌ಲೈನ್ CSS ಮತ್ತು ಚಿತ್ರಗಳೊಂದಿಗೆ ಸ್ವಯಂ-ಸಂಪೂರ್ಣ HTML</span></div>
         <div class="feature-card"><strong>Pandoc ರಫ್ತು</strong><span>pandoc ಮೂಲಕ DOCX, EPUB, LaTeX (ಐಚ್ಛಿಕ)</span></div>
+        <div class="feature-card"><strong>ಡ್ರ್ಯಾಗ್ &amp; ಡ್ರಾಪ್</strong><span>ಚಿತ್ರಗಳು, Markdown ಅಥವಾ PDF ಫೈಲ್‌ಗಳನ್ನು ಸ್ಮಾರ್ಟ್ ನಕಲು/ಆಮದು ಆಯ್ಕೆಗಳೊಂದಿಗೆ ಬಿಡಿ</span></div>
         <div class="feature-card"><strong>ಬಹುಭಾಷಾ</strong><span>ಇಂಗ್ಲಿಷ್ ಮತ್ತು ಜರ್ಮನ್ (Deutsch) ಬಳಕೆದಾರ ಇಂಟರ್‌ಫೇಸ್</span></div>
       </div>
     </section>
@@ -875,6 +877,19 @@ python src/main.py</code></pre>
         <li>ಇಡೀ ಇತಿಹಾಸ ಅಳಿಸಲು ಉಪಮೆನುವಿನ ಮೇಲ್ಭಾಗದಲ್ಲಿ <strong>ಇತ್ತೀಚಿನ ಫೈಲ್‌ಗಳನ್ನು ತೆರವುಗೊಳಿಸಿ</strong> ಆರಿಸಿ.</li>
         <li>ಪಟ್ಟಿ ಸೆಶನ್‌ಗಳ ನಡುವೆ ಉಳಿಸಲ್ಪಡುತ್ತದೆ.</li>
       </ul>
+
+      <h3 id="drag-drop">ಡ್ರ್ಯಾಗ್ &amp; ಡ್ರಾಪ್</h3>
+      <p>ನಿಮ್ಮ ಫೈಲ್ ಮ್ಯಾನೇಜರ್‌ನಿಂದ ಸಂಪಾದಕಕ್ಕೆ ಫೈಲ್‌ಗಳನ್ನು ಎಳೆಯಬಹುದು. MarkForge ಪ್ರತಿ ಫೈಲ್ ಪ್ರಕಾರವನ್ನು ಹೇಗೆ ನಿರ್ವಹಿಸಬೇಕು ಎಂದು ಆಯ್ಕೆ ಮಾಡಲು ಸಂವಾದ ತೋರಿಸುತ್ತದೆ:</p>
+      <ul>
+        <li><strong>ಚಿತ್ರ ಫೈಲ್‌ಗಳು</strong> (<code>.png</code>, <code>.jpg</code>, <code>.gif</code> ಇತ್ಯಾದಿ) — <em>ಮೂಲ ಮಾರ್ಗ</em> ಬಳಸಿ ಸೇರಿಸಲು ಅಥವಾ <em><code>assets/</code> ಫೋಲ್ಡರ್‌ಗೆ ನಕಲಿಸಿ</em> ಮತ್ತು ಸಾಪೇಕ್ಷ ಲಿಂಕ್ ಸೇರಿಸಲು ಆಯ್ಕೆ ಮಾಡಿ.</li>
+        <li><strong>Markdown ಫೈಲ್‌ಗಳು</strong> (<code>.md</code>, <code>.markdown</code>) — <em>ತೆರೆಯಿರಿ</em> (ಮೂಲ ಸ್ಥಳದಿಂದ ಲೋಡ್ ಮಾಡುತ್ತದೆ) ಅಥವಾ <em>ಫೋಲ್ಡರ್‌ಗೆ ನಕಲಿಸಿ</em> (ಪ್ರಸ್ತುತ ದಾಖಲೆಯ ಅದೇ ಡೈರೆಕ್ಟರಿಗೆ ನಕಲಿಸಿ ಮತ್ತು ನಕಲನ್ನು ತೆರೆಯಿರಿ).</li>
+        <li><strong>PDF ಫೈಲ್‌ಗಳು</strong> — <em>ಆಮದು ಮಾಡಿ …</em> (ಉಳಿಸಿ ಸಂವಾದದೊಂದಿಗೆ ಪ್ರಮಾಣಿತ ಆಮದು) ಅಥವಾ <em>ಫೋಲ್ಡರ್‌ಗೆ ಆಮದು ಮಾಡಿ</em> (ಪ್ರಸ್ತುತ ದಾಖಲೆಯ ಡೈರೆಕ್ಟರಿಗೆ ಸ್ವಯಂ-ಆಮದು).</li>
+        <li><strong>ಯಾವುದೇ ಇತರ ಫೈಲ್</strong> — Markdown ಲಿಂಕ್ <code>[ಫೈಲ್ ಹೆಸರು](ಮಾರ್ಗ/ಫೈಲ್‌ಗೆ)</code> ಸೇರಿಸುತ್ತದೆ.</li>
+      </ul>
+      <div class="callout note">
+        <div class="callout-title">ಗಮನಿಸಿ</div>
+        <p>ಪ್ರಸ್ತುತ ದಾಖಲೆಯ ಫೋಲ್ಡರ್‌ಗೆ ನಕಲಿಸುವ ಅಥವಾ ಆಮದು ಮಾಡುವ ಕಾರ್ಯಾಚರಣೆಗಳಿಗಾಗಿ, MarkForge ಗುರಿ ಡೈರೆಕ್ಟರಿ ತಿಳಿಯಲು ಒಂದು ಫೈಲ್ ತೆರೆದು ಉಳಿಸಲಾಗಿರಬೇಕು.</p>
+      </div>
     </section>
 
     <!-- ═══ 7. MARKDOWN REFERENCE ═════════════════════════════════════════ -->

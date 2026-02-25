@@ -551,6 +551,7 @@
       <li><a href="#fileops">٦. عمليات الملفات</a>
         <ul>
           <li><a href="#recent-files">الملفات الأخيرة</a></li>
+          <li><a href="#drag-drop">سحب وإفلات</a></li>
         </ul>
       </li>
       <li><a href="#markdown-ref">٧. مرجع Markdown</a>
@@ -639,6 +640,7 @@
         <div class="feature-card"><strong>تصدير PDF</strong><span>PDF محسَّن للطباعة من أي مستند</span></div>
         <div class="feature-card"><strong>تصدير HTML</strong><span>HTML مكتفٍ بذاته مع CSS وصور مضمَّنة</span></div>
         <div class="feature-card"><strong>تصدير عبر Pandoc</strong><span>DOCX وEPUB وLaTeX عبر pandoc (اختياري)</span></div>
+        <div class="feature-card"><strong>سحب وإفلات</strong><span>إفلات الصور أو ملفات Markdown أو PDF مع خيارات النسخ والاستيراد</span></div>
         <div class="feature-card"><strong>متعدد اللغات</strong><span>واجهة مستخدم بـ 14 لغة: EN, DE, ES, FR, IT, NL, PT, AR, FA, VI, SV, UK, KN, HI</span></div>
       </div>
     </section>
@@ -885,6 +887,19 @@ python src/main.py</code></pre>
         <li>اختر <strong>مسح الملفات الأخيرة</strong> في أعلى القائمة الفرعية لمسح السجل بأكمله.</li>
         <li>يُحفظ السجل بين الجلسات.</li>
       </ul>
+
+      <h3 id="drag-drop">سحب وإفلات</h3>
+      <p>يمكنك سحب الملفات من مدير الملفات وإفلاتها على المحرر. يعرض MarkForge حواراً لاختيار طريقة التعامل مع كل نوع ملف:</p>
+      <ul>
+        <li><strong>ملفات الصور</strong> (<code>.png</code>، <code>.jpg</code>، <code>.gif</code> إلخ) — اختر إدراج <em>المسار الأصلي</em> أو <em>نسخ الملف إلى مجلد <code>assets/</code></em> وإدراج رابط نسبي.</li>
+        <li><strong>ملفات Markdown</strong> (<code>.md</code>، <code>.markdown</code>) — <em>فتح</em> من الموقع الأصلي أو <em>نسخ إلى المجلد</em> (نسخ إلى مجلد المستند الحالي وفتح النسخة).</li>
+        <li><strong>ملفات PDF</strong> — <em>استيراد …</em> (تدفق الاستيراد المعتاد مع مربع حوار الحفظ) أو <em>استيراد إلى المجلد</em> (يستورد تلقائياً إلى مجلد المستند الحالي).</li>
+        <li><strong>أي ملف آخر</strong> — يُدرج رابط Markdown <code>[اسم الملف](مسار/الملف)</code>.</li>
+      </ul>
+      <div class="callout note">
+        <div class="callout-title">ملاحظة</div>
+        <p>للعمليات التي تنسخ أو تستورد إلى مجلد المستند الحالي، يجب أن يكون الملف مفتوحاً ومحفوظاً حتى يعرف MarkForge الدليل الهدف.</p>
+      </div>
     </section>
 
     <!-- ═══ 7. MARKDOWN REFERENCE ═════════════════════════════════════════ -->

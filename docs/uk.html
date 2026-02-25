@@ -541,6 +541,7 @@
       <li><a href="#fileops">6. Операції з файлами</a>
         <ul>
           <li><a href="#recent-files">Останні файли</a></li>
+          <li><a href="#drag-drop">Перетягування</a></li>
         </ul>
       </li>
       <li><a href="#markdown-ref">7. Довідник Markdown</a>
@@ -629,6 +630,7 @@
         <div class="feature-card"><strong>Експорт PDF</strong><span>PDF, оптимізований для друку, з будь-якого документа</span></div>
         <div class="feature-card"><strong>Експорт HTML</strong><span>Автономний HTML з вбудованим CSS та зображеннями</span></div>
         <div class="feature-card"><strong>Експорт Pandoc</strong><span>DOCX, EPUB, LaTeX через pandoc (опціонально)</span></div>
+        <div class="feature-card"><strong>Перетягування</strong><span>Перетягуйте зображення, Markdown або PDF-файли з діалогами копіювання/імпорту</span></div>
         <div class="feature-card"><strong>Багатомовність</strong><span>Інтерфейс англійською та німецькою (Deutsch) мовами</span></div>
       </div>
     </section>
@@ -875,6 +877,19 @@ python src/main.py</code></pre>
         <li>Виберіть <strong>Очистити останні файли</strong> вгорі підменю, щоб очистити всю історію.</li>
         <li>Список зберігається між сеансами.</li>
       </ul>
+
+      <h3 id="drag-drop">Перетягування</h3>
+      <p>Ви можете перетягувати файли з файлового менеджера на редактор. MarkForge відображає діалог для вибору способу обробки кожного типу файлу:</p>
+      <ul>
+        <li><strong>Файли зображень</strong> (<code>.png</code>, <code>.jpg</code>, <code>.gif</code> тощо) — оберіть вставку за <em>оригінальним шляхом</em> або <em>скопіювати до папки <code>assets/</code></em> й вставити відносне посилання.</li>
+        <li><strong>Файли Markdown</strong> (<code>.md</code>, <code>.markdown</code>) — <em>Відкрити</em> файл з оригінального місця або <em>Копіювати до папки</em> (скопіювати в ту саму директорію, де знаходиться поточний документ, та відкрити копію).</li>
+        <li><strong>PDF-файли</strong> — <em>Імпортувати …</em> (стандартний потік імпорту з діалогом збереження) або <em>Імпортувати до папки</em> (автоматично імпортує в директорію поточного документа).</li>
+        <li><strong>Будь-який інший файл</strong> — вставляє посилання Markdown <code>[ім'я файлу](шлях/до/файлу)</code>.</li>
+      </ul>
+      <div class="callout note">
+        <div class="callout-title">Примітка</div>
+        <p>Для операцій копіювання або імпорту в папку поточного документа файл повинен бути відкритий і збережений, щоб MarkForge знав цільову директорію.</p>
+      </div>
     </section>
 
     <!-- ═══ 7. ДОВІДНИК MARKDOWN ═══════════════════════════════════════════ -->

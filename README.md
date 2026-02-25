@@ -21,7 +21,7 @@ A modern, feature-rich Markdown editor built with Python and PyQt6. Includes a l
 - **Recent Files** — File → Recent Files submenu tracks the last 10 opened files, persisted between sessions
 - **Spell check** — underlines misspelled words with a red wavy line; 14 languages (EN, DE, ES, FR, IT, NL, PT, AR, FA via pyspellchecker; VI, SV, UK, KN, HI via enchant/Hunspell); toggle and select language via View menu
 - **Image paste** — paste a screenshot or copied image from the clipboard (`Ctrl+V`) directly into the editor; the image is saved as `assets/image_NNN.png` and an `![]()` link is inserted automatically
-- **Drag-and-drop insertion** — drag image files from a file manager onto the editor to insert a relative `![]()` link; drag any other file to insert a `[name](path)` link
+- **Drag-and-drop insertion** — drag files onto the editor: images prompt to insert at the original path or copy to the `assets/` folder; Markdown files prompt to open or copy to the current folder; PDF files prompt to import with a save dialog or auto-import to the current folder; any other file inserts a `[name](path)` link
 - **File tree** — browse Markdown files and images in the project directory, including subdirectories
 - **Open Git Branch** — clone and browse an entire Git branch as a folder in the file tree; click any file to open it and push changes back (File → Open Git Branch…)
 - **Insert dialogs** — guided dialogs for links, images, tables, PlantUML diagrams, and Mermaid diagrams

@@ -541,6 +541,7 @@
       <li><a href="#fileops">6. Operaciones de archivo</a>
         <ul>
           <li><a href="#recent-files">Archivos recientes</a></li>
+          <li><a href="#drag-drop">Arrastrar &amp; Soltar</a></li>
         </ul>
       </li>
       <li><a href="#markdown-ref">7. Referencia de Markdown</a>
@@ -629,6 +630,7 @@
         <div class="feature-card"><strong>Exportar PDF</strong><span>PDF optimizado para impresión desde cualquier documento</span></div>
         <div class="feature-card"><strong>Exportar HTML</strong><span>HTML autocontenido con CSS e imágenes integrados</span></div>
         <div class="feature-card"><strong>Exportar con Pandoc</strong><span>DOCX, EPUB, LaTeX mediante pandoc (opcional)</span></div>
+        <div class="feature-card"><strong>Arrastrar &amp; Soltar</strong><span>Suelte imágenes, Markdown o PDF con opciones inteligentes de copia/importación</span></div>
         <div class="feature-card"><strong>Multilingüe</strong><span>Interfaz de usuario en 14 idiomas</span></div>
       </div>
     </section>
@@ -875,6 +877,19 @@ python src/main.py</code></pre>
         <li>Elija <strong>Borrar archivos recientes</strong> en la parte superior del submenú para borrar todo el historial.</li>
         <li>La lista se guarda entre sesiones.</li>
       </ul>
+
+      <h3 id="drag-drop">Arrastrar &amp; Soltar</h3>
+      <p>Puede arrastrar archivos desde su gestor de archivos al editor. MarkForge muestra un diálogo para elegir cómo manejar cada tipo de archivo:</p>
+      <ul>
+        <li><strong>Archivos de imagen</strong> (<code>.png</code>, <code>.jpg</code>, <code>.gif</code>, etc.) — elija insertar usando la <em>ruta original</em> o <em>copiar a la carpeta <code>assets/</code></em> e insertar un enlace relativo.</li>
+        <li><strong>Archivos Markdown</strong> (<code>.md</code>, <code>.markdown</code>) — <em>Abrir</em> el archivo desde su ubicación original o <em>Copiar a la carpeta</em> (copia al mismo directorio que el documento actual y abre la copia).</li>
+        <li><strong>Archivos PDF</strong> — <em>Importar …</em> (flujo de importación estándar con diálogo de guardado) o <em>Importar a la carpeta</em> (importa automáticamente al directorio del documento actual).</li>
+        <li><strong>Cualquier otro archivo</strong> — inserta un enlace Markdown <code>[nombre](ruta/al/archivo)</code>.</li>
+      </ul>
+      <div class="callout note">
+        <div class="callout-title">Nota</div>
+        <p>Para las operaciones que copian o importan a la carpeta del documento actual, debe haber un archivo abierto y guardado para que MarkForge conozca el directorio de destino.</p>
+      </div>
     </section>
 
     <!-- ═══ 7. REFERENCIA DE MARKDOWN ════════════════════════════════════ -->
