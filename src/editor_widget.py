@@ -91,6 +91,14 @@ class EditorWidget(QPlainTextEdit):
         self._update_extra_selections()
         self._gutter.update()
 
+    def set_spell_check(self, enabled: bool, lang: str) -> None:
+        from spell_checker import spell_check as _sc
+        sc = _sc()
+        if lang != sc.language:
+            sc.set_language(lang)
+        sc.set_enabled(enabled)
+        self._highlighter.rehighlight()
+
     def set_search_highlights(self, selections: list) -> None:
         self._search_selections = selections
         self._update_extra_selections()

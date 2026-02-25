@@ -301,6 +301,27 @@ class MainWindow(QMainWindow):
         self._act_wrap = self._mk_action(tr("Word wrap"), None, m, checkable=True)
         self._act_wrap.setChecked(True)
         m.addSeparator()
+        self._act_spellcheck = self._mk_action(
+            tr("Spell check"), None, m, checkable=True
+        )
+        self._act_spellcheck.setChecked(False)
+        from PyQt6.QtGui import QActionGroup
+        self._spell_lang_menu = m.addMenu(tr("Spell check language"))
+        lang_group = QActionGroup(self)
+        lang_group.setExclusive(True)
+        for code, name in [("en", "English"), ("de", "Deutsch")]:
+            act = self._spell_lang_menu.addAction(name)
+            act.setCheckable(True)
+            act.setData(code)
+            lang_group.addAction(act)
+        lang_group.actions()[0].setChecked(True)  # English default
+        lang_group.triggered.connect(
+            lambda a: self._editor.set_spell_check(
+                self._act_spellcheck.isChecked(), a.data()
+            )
+        )
+        self._spell_lang_group = lang_group
+        m.addSeparator()
         settings_act = self._mk_action(tr("Settings …"), None, m)
         settings_act.triggered.connect(self._open_settings)
 
@@ -375,6 +396,13 @@ class MainWindow(QMainWindow):
         self._act_outline.toggled.connect(self._outline.setVisible)
         self._act_preview.toggled.connect(self._preview.setVisible)
         self._act_wrap.toggled.connect(self._editor.set_word_wrap)
+        self._act_spellcheck.toggled.connect(
+            lambda on: self._editor.set_spell_check(
+                on,
+                self._spell_lang_group.checkedAction().data()
+                if self._spell_lang_group.checkedAction() else "en",
+            )
+        )
         self._file_tree.file_activated.connect(self._load)
         self._preview.open_file.connect(self._load)
         self._outline.jump_to_line.connect(self._jump_to_outline_line)
@@ -1062,6 +1090,14 @@ class MainWindow(QMainWindow):
             recent = [recent]
         self._recent_files = [p for p in recent if isinstance(p, str)]
         self._rebuild_recent_menu()
+        spell_on = self._settings.value("spell_check", False, type=bool)
+        spell_lang = self._settings.value("spell_lang", "en")
+        # Restore language selection
+        for act in self._spell_lang_group.actions():
+            if act.data() == spell_lang:
+                act.setChecked(True)
+                break
+        self._act_spellcheck.setChecked(spell_on)
         self._apply_themes()
 
     def _apply_themes(self) -> None:
@@ -1113,6 +1149,10 @@ class MainWindow(QMainWindow):
         self._settings.setValue("left_splitter", self._left_splitter.sizes())
         self._settings.setValue("outline_visible", self._act_outline.isChecked())
         self._settings.setValue("recent_files", self._recent_files)
+        self._settings.setValue("spell_check", self._act_spellcheck.isChecked())
+        checked_lang = self._spell_lang_group.checkedAction()
+        if checked_lang:
+            self._settings.setValue("spell_lang", checked_lang.data())
         event.accept()
 
     # ── Insert actions ────────────────────────────────────────────────────────

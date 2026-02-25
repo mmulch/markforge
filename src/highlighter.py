@@ -5,6 +5,7 @@ from __future__ import annotations
 from PyQt6.QtCore import QRegularExpression
 from PyQt6.QtGui import QColor, QFont, QSyntaxHighlighter, QTextCharFormat
 
+from spell_checker import spell_check as _spell_check
 from themes import EDITOR_THEMES
 
 
@@ -56,6 +57,13 @@ _PATTERNS: list[tuple[QRegularExpression, str]] = [
 _FENCE_START = QRegularExpression(r"^```\w*$")
 _FENCE_END   = QRegularExpression(r"^```\s*$")
 
+# ── Spell-check patterns ──────────────────────────────────────────────────────
+# Words: Latin + Latin-1 Supplement (covers German umlauts, accented chars, ß)
+_WORD_RE      = QRegularExpression(r"[A-Za-z\xC0-\xFF]+")
+# Regions to skip: inline code spans and bare URLs
+_CODE_SPAN_RE = QRegularExpression(r"`[^`]+`")
+_URL_RE       = QRegularExpression(r"https?://\S+")
+
 _STATE_CODE_BLOCK = 1
 
 
@@ -98,3 +106,41 @@ class MarkdownHighlighter(QSyntaxHighlighter):
             while it.hasNext():
                 m = it.next()
                 self.setFormat(m.capturedStart(), m.capturedLength(), fmt)
+
+        # ── Spell check ───────────────────────────────────────────────────────
+        sc = _spell_check()
+        if sc.enabled:
+            # Collect regions to skip (inline code, URLs)
+            skip: list[tuple[int, int]] = []
+            for pat in (_CODE_SPAN_RE, _URL_RE):
+                it2 = pat.globalMatch(text)
+                while it2.hasNext():
+                    m2 = it2.next()
+                    skip.append((m2.capturedStart(), m2.capturedEnd()))
+
+            it3 = _WORD_RE.globalMatch(text)
+            while it3.hasNext():
+                m3   = it3.next()
+                word  = m3.captured(0)
+                start = m3.capturedStart()
+
+                if len(word) < 2:
+                    continue
+                # Skip regions inside inline code or URLs
+                if any(s <= start < e for s, e in skip):
+                    continue
+                # Skip ALL-CAPS abbreviations (URL, API, HTML …)
+                if word.isupper():
+                    continue
+                # Skip words containing digits
+                if any(c.isdigit() for c in word):
+                    continue
+
+                if not sc.is_ok(word.lower()):
+                    # Merge with existing syntax colour, only add underline
+                    fmt = self.format(start)
+                    fmt.setUnderlineStyle(
+                        QTextCharFormat.UnderlineStyle.SpellCheckUnderline
+                    )
+                    fmt.setUnderlineColor(QColor("#e04040"))
+                    self.setFormat(start, len(word), fmt)

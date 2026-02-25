@@ -300,6 +300,9 @@ _DE: dict[str, str] = {
     "Clear Recent Files": "Liste leeren",
     "Recent Files":       "Zuletzt geöffnet",
     "File not found:\n{path}": "Datei nicht gefunden:\n{path}",
+    # ── Spell check ───────────────────────────────────────────────────────────
+    "Spell check":          "Rechtschreibprüfung",
+    "Spell check language": "Rechtschreibprüfung Sprache",
 }
 
 # ── Arabic (Egyptian / MSA) ───────────────────────────────────────────────────
