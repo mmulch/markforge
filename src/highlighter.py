@@ -58,11 +58,20 @@ _FENCE_START = QRegularExpression(r"^```\w*$")
 _FENCE_END   = QRegularExpression(r"^```\s*$")
 
 # ── Spell-check patterns ──────────────────────────────────────────────────────
-# Words: Latin + Latin-1 Supplement (covers German umlauts, accented chars, ß)
-_WORD_RE      = QRegularExpression(r"[A-Za-z\xC0-\xFF]+")
+# Latin + Latin-1 Supplement (covers accents, umlauts, ß …)
+_WORD_RE_LATIN    = QRegularExpression(r"[A-Za-z\xC0-\xFF]+")
+# Cyrillic (Russian etc.)
+_WORD_RE_CYRILLIC = QRegularExpression(r"[\u0400-\u04FF]+")
+# Arabic / Persian script
+_WORD_RE_ARABIC   = QRegularExpression(r"[\u0600-\u06FF]+")
+# Fallback alias used in the old code path (kept for clarity)
+_WORD_RE = _WORD_RE_LATIN
 # Regions to skip: inline code spans and bare URLs
 _CODE_SPAN_RE = QRegularExpression(r"`[^`]+`")
 _URL_RE       = QRegularExpression(r"https?://\S+")
+
+_CYRILLIC_LANGS = {"ru", "uk", "bg", "sr"}
+_ARABIC_LANGS   = {"ar", "fa"}
 
 _STATE_CODE_BLOCK = 1
 
@@ -110,6 +119,15 @@ class MarkdownHighlighter(QSyntaxHighlighter):
         # ── Spell check ───────────────────────────────────────────────────────
         sc = _spell_check()
         if sc.enabled:
+            # Choose word pattern based on the selected language's script
+            lang = sc.language
+            if lang in _CYRILLIC_LANGS:
+                word_re = _WORD_RE_CYRILLIC
+            elif lang in _ARABIC_LANGS:
+                word_re = _WORD_RE_ARABIC
+            else:
+                word_re = _WORD_RE_LATIN
+
             # Collect regions to skip (inline code, URLs)
             skip: list[tuple[int, int]] = []
             for pat in (_CODE_SPAN_RE, _URL_RE):
@@ -118,7 +136,7 @@ class MarkdownHighlighter(QSyntaxHighlighter):
                     m2 = it2.next()
                     skip.append((m2.capturedStart(), m2.capturedEnd()))
 
-            it3 = _WORD_RE.globalMatch(text)
+            it3 = word_re.globalMatch(text)
             while it3.hasNext():
                 m3   = it3.next()
                 word  = m3.captured(0)

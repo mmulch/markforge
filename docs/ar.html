@@ -544,10 +544,15 @@
       <li><a href="#editor">٤. المحرر</a>
         <ul>
           <li><a href="#find-replace">بحث &amp; استبدال</a></li>
+          <li><a href="#spell-check">التدقيق الإملائي</a></li>
         </ul>
       </li>
       <li><a href="#preview">٥. المعاينة الحية</a></li>
-      <li><a href="#fileops">٦. عمليات الملفات</a></li>
+      <li><a href="#fileops">٦. عمليات الملفات</a>
+        <ul>
+          <li><a href="#recent-files">الملفات الأخيرة</a></li>
+        </ul>
+      </li>
       <li><a href="#markdown-ref">٧. مرجع Markdown</a>
         <ul>
           <li><a href="#md-headings">العناوين</a></li>
@@ -692,7 +697,7 @@ python src/main.py</code></pre>
         <table>
           <thead><tr><th>اللوحة</th><th>الموضع</th><th>الوصف</th></tr></thead>
           <tbody>
-            <tr><td><strong>شجرة الملفات</strong></td><td>اليسار</td><td>تصفح ملفات <code>.md</code> والصور في المجلد الحالي. التبديل بـ <kbd>Ctrl</kbd>+<kbd>B</kbd>.</td></tr>
+            <tr><td><strong>المخطط التفصيلي + شجرة الملفات</strong></td><td>اليسار</td><td>يحتوي اللوح الأيسر على قسمين متراكبين: <strong>مخطط المستند</strong> (شجرة العناوين) في الأعلى، و<strong>شجرة الملفات</strong> (متصفح الملفات) في الأسفل. إظهار/إخفاء المخطط عبر <strong>عرض ← إظهار المخطط التفصيلي</strong>، وشجرة الملفات بـ <kbd>Ctrl</kbd>+<kbd>B</kbd>.</td></tr>
             <tr><td><strong>المحرر</strong></td><td>الوسط</td><td>محرر نصوص عادي مع تمييز صيغة Markdown وأرقام الأسطر.</td></tr>
             <tr><td><strong>المعاينة</strong></td><td>اليمين</td><td>عرض HTML حي للمستند الحالي. التبديل بـ <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>.</td></tr>
           </tbody>
@@ -700,6 +705,16 @@ python src/main.py</code></pre>
         </div>
 
         <p>اسحب أي مقبض فاصل لتغيير حجم اللوحات. يُحفظ حجم اللوحات بين الجلسات.</p>
+      </section>
+
+      <section id="outline">
+        <h3>مخطط المستند</h3>
+        <p>يعرض لوح <strong>مخطط المستند</strong> جميع العناوين (H1–H6) كشجرة للتنقل في الشريط الجانبي الأيسر.</p>
+        <ul>
+          <li>انقر على أي عنوان لنقل مؤشر المحرر إلى ذلك السطر.</li>
+          <li>يتحدث المخطط تلقائياً أثناء الكتابة.</li>
+          <li>إظهار/إخفاء عبر <strong>عرض ← إظهار المخطط التفصيلي</strong>. يُحفظ التفضيل بين الجلسات.</li>
+        </ul>
       </section>
 
       <section id="toolbar">
@@ -723,10 +738,10 @@ python src/main.py</code></pre>
         <table>
           <thead><tr><th>القائمة</th><th>المحتويات</th></tr></thead>
           <tbody>
-            <tr><td><strong>ملف</strong></td><td>جديد، فتح، فتح مجلد، استيراد PDF، فتح من Git، Git Squash، حفظ، حفظ باسم، تصدير كـ PDF، إنهاء</td></tr>
+            <tr><td><strong>ملف</strong></td><td>جديد، فتح، فتح مجلد، الملفات الأخيرة، استيراد PDF، فتح من Git، Git Squash، حفظ، حفظ باسم، تصدير كـ PDF، إنهاء</td></tr>
             <tr><td><strong>تحرير</strong></td><td>تراجع، إعادة، قص، نسخ، لصق</td></tr>
             <tr><td><strong>إدراج</strong></td><td>رابط، صورة، PlantUML، Mermaid، جدول</td></tr>
-            <tr><td><strong>عرض</strong></td><td>إظهار شجرة الملفات، إظهار المعاينة، التفاف الكلمات، الإعدادات</td></tr>
+            <tr><td><strong>عرض</strong></td><td>إظهار شجرة الملفات، إظهار المخطط التفصيلي، إظهار المعاينة، التفاف الكلمات، تدقيق إملائي، لغة التدقيق الإملائي، الإعدادات</td></tr>
             <tr><td><strong>مساعدة</strong></td><td>مرجع Markdown، حول</td></tr>
           </tbody>
         </table>
@@ -783,6 +798,17 @@ python src/main.py</code></pre>
         <li>اضغط <kbd>Escape</kbd> أو انقر على <strong>✕</strong> لإغلاق الشريط وإزالة جميع التمييزات.</li>
       </ul>
       <p>إذا كان هناك نص محدد في المحرر عند فتح الشريط، يُملأ حقل البحث تلقائياً بهذا النص (أسطر مفردة فقط).</p>
+
+      <h3 id="spell-check">التدقيق الإملائي</h3>
+      <p>يمكن لـ MarkForge وضع خط أحمر متموج تحت الكلمات المكتوبة بشكل خاطئ أثناء الكتابة. التدقيق الإملائي معطل افتراضياً.</p>
+      <ul>
+        <li>تشغيل/إيقاف عبر <strong>عرض ← تدقيق إملائي</strong> (مفتاح تبديل).</li>
+        <li>اختر لغة القاموس عبر <strong>عرض ← لغة التدقيق الإملائي</strong>. اللغات المتاحة: English, Deutsch, Español, Français, Italiano, Nederlands, Português, Русский, العربية, فارسی.</li>
+        <li>الكلمات داخل أجزاء الكود المضمنة (<code>`…`</code>) وعناوين URL لا تُوضع تحتها خطوط أبداً.</li>
+        <li>الاختصارات بالأحرف الكبيرة (HTML, API, URL…) يتم تخطيها.</li>
+        <li>يُحفظ تفضيل التدقيق الإملائي واللغة المختارة بين الجلسات.</li>
+        <li>يتطلب مكتبة <code>pyspellchecker</code>. في حال عدم التثبيت، يُتجاهل المفتاح بصمت.</li>
+      </ul>
     </section>
 
     <!-- ═══ 5. LIVE PREVIEW ════════════════════════════════════════════════ -->
@@ -840,6 +866,15 @@ python src/main.py</code></pre>
         <div class="callout-title">نصيحة</div>
         <p>بدِّل شجرة الملفات بـ <kbd>Ctrl</kbd>+<kbd>B</kbd> لتعظيم مساحة المحرر. يُحفظ تفضيلك بين الجلسات.</p>
       </div>
+
+      <h3 id="recent-files">الملفات الأخيرة</h3>
+      <p>يحتفظ MarkForge بقائمة آخر 10 ملفات تم فتحها. يمكن الوصول إليها عبر <strong>ملف ← الملفات الأخيرة</strong>.</p>
+      <ul>
+        <li>انقر على أي إدخال لإعادة فتح الملف فوراً.</li>
+        <li>إذا لم يعد الملف موجوداً على القرص، يُزال تلقائياً من القائمة.</li>
+        <li>اختر <strong>مسح الملفات الأخيرة</strong> في أعلى القائمة الفرعية لمسح السجل بأكمله.</li>
+        <li>يُحفظ السجل بين الجلسات.</li>
+      </ul>
     </section>
 
     <!-- ═══ 7. MARKDOWN REFERENCE ═════════════════════════════════════════ -->

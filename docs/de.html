@@ -533,10 +533,15 @@
       <li><a href="#editor">4. Der Editor</a>
         <ul>
           <li><a href="#suchen-ersetzen">Suchen &amp; Ersetzen</a></li>
+          <li><a href="#rechtschreibpruefung">Rechtschreibprüfung</a></li>
         </ul>
       </li>
       <li><a href="#vorschau">5. Live-Vorschau</a></li>
-      <li><a href="#dateioperationen">6. Dateioperationen</a></li>
+      <li><a href="#dateioperationen">6. Dateioperationen</a>
+        <ul>
+          <li><a href="#zuletzt-geoeffnet">Zuletzt geöffnet</a></li>
+        </ul>
+      </li>
       <li><a href="#markdown-referenz">7. Markdown-Referenz</a>
         <ul>
           <li><a href="#md-ueberschriften">Überschriften</a></li>
@@ -681,7 +686,7 @@ python src/main.py</code></pre>
         <table>
           <thead><tr><th>Bereich</th><th>Position</th><th>Beschreibung</th></tr></thead>
           <tbody>
-            <tr><td><strong>Dateibaum</strong></td><td>Links</td><td>Zeigt <code>.md</code>- und Bilddateien im aktuellen Ordner. Umschalten mit <kbd>Ctrl</kbd>+<kbd>B</kbd>.</td></tr>
+            <tr><td><strong>Gliederung + Dateibaum</strong></td><td>Links</td><td>Das linke Panel enthält zwei gestapelte Bereiche: die <strong>Dokumentgliederung</strong> (Überschriftenbaum) oben und den <strong>Dateibaum</strong> (Dateibrowser) unten. Gliederung ein-/ausblenden via <strong>Ansicht → Gliederung anzeigen</strong>, Dateibaum mit <kbd>Ctrl</kbd>+<kbd>B</kbd>.</td></tr>
             <tr><td><strong>Editor</strong></td><td>Mitte</td><td>Klartexteditor mit Markdown-Syntaxhervorhebung und Zeilennummern.</td></tr>
             <tr><td><strong>Vorschau</strong></td><td>Rechts</td><td>Live-HTML-Rendering des aktuellen Dokuments. Umschalten mit <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>.</td></tr>
           </tbody>
@@ -689,6 +694,16 @@ python src/main.py</code></pre>
         </div>
 
         <p>Ziehen Sie eine beliebige Trennleiste, um die Bereiche in der Größe anzupassen. Die Einstellungen werden sitzungsübergreifend gespeichert.</p>
+      </section>
+
+      <section id="gliederung">
+        <h3>Dokumentgliederung</h3>
+        <p>Die <strong>Dokumentgliederung</strong> im linken Panel listet alle Überschriften (H1–H6) des aktuellen Dokuments als navigierbaren Baum auf.</p>
+        <ul>
+          <li>Klicken Sie auf eine Überschrift, um den Editor-Cursor zu dieser Zeile zu springen.</li>
+          <li>Die Gliederung wird automatisch beim Tippen aktualisiert.</li>
+          <li>Sichtbarkeit ein-/ausblenden via <strong>Ansicht → Gliederung anzeigen</strong>. Die Einstellung wird sitzungsübergreifend gespeichert.</li>
+        </ul>
       </section>
 
       <section id="werkzeugleiste">
@@ -712,10 +727,10 @@ python src/main.py</code></pre>
         <table>
           <thead><tr><th>Menü</th><th>Einträge</th></tr></thead>
           <tbody>
-            <tr><td><strong>Datei</strong></td><td>Neu, Öffnen, Ordner öffnen, PDF importieren, Aus Git öffnen, Git Squash, Speichern, Speichern unter, Als PDF exportieren, Beenden</td></tr>
+            <tr><td><strong>Datei</strong></td><td>Neu, Öffnen, Ordner öffnen, Zuletzt geöffnet, PDF importieren, Aus Git öffnen, Git Squash, Speichern, Speichern unter, Als PDF exportieren, Beenden</td></tr>
             <tr><td><strong>Bearbeiten</strong></td><td>Rückgängig, Wiederholen, Ausschneiden, Kopieren, Einfügen</td></tr>
             <tr><td><strong>Einfügen</strong></td><td>Link, Bild, PlantUML, Mermaid, Tabelle</td></tr>
-            <tr><td><strong>Ansicht</strong></td><td>Dateibaum anzeigen, Vorschau anzeigen, Zeilenumbruch, Einstellungen</td></tr>
+            <tr><td><strong>Ansicht</strong></td><td>Dateibaum anzeigen, Gliederung anzeigen, Vorschau anzeigen, Zeilenumbruch, Rechtschreibprüfung, Rechtschreibprüfung Sprache, Einstellungen</td></tr>
             <tr><td><strong>Hilfe</strong></td><td>Markdown-Referenz, Über</td></tr>
           </tbody>
         </table>
@@ -772,6 +787,17 @@ python src/main.py</code></pre>
         <li>Drücken Sie <kbd>Escape</kbd> oder klicken Sie auf <strong>✕</strong>, um die Leiste zu schließen und alle Hervorhebungen zu entfernen.</li>
       </ul>
       <p>Wenn beim Öffnen der Leiste Text im Editor markiert ist, wird das Suchfeld automatisch damit befüllt (nur einzeilige Auswahlen).</p>
+
+      <h3 id="rechtschreibpruefung">Rechtschreibprüfung</h3>
+      <p>MarkForge kann falsch geschriebene Wörter mit einer roten Wellenlinie unterstreichen. Die Rechtschreibprüfung ist standardmäßig deaktiviert.</p>
+      <ul>
+        <li>Aktivieren via <strong>Ansicht → Rechtschreibprüfung</strong> (Umschalter).</li>
+        <li>Wörterbuchsprache wählen via <strong>Ansicht → Rechtschreibprüfung Sprache</strong>. Verfügbare Sprachen: English, Deutsch, Español, Français, Italiano, Nederlands, Português, Русский, العربية, فارسی.</li>
+        <li>Wörter in Inline-Code-Spans (<code>`…`</code>) und URLs werden nie unterstrichen.</li>
+        <li>GROSSBUCHSTABEN-Abkürzungen (HTML, API, URL…) werden übersprungen.</li>
+        <li>Die Einstellung und die gewählte Sprache werden sitzungsübergreifend gespeichert.</li>
+        <li>Erfordert die Bibliothek <code>pyspellchecker</code>. Falls nicht installiert, wird der Schalter stillschweigend ignoriert.</li>
+      </ul>
     </section>
 
     <!-- ═══ 5. LIVE-VORSCHAU ══════════════════════════════════════════════ -->
@@ -829,6 +855,15 @@ python src/main.py</code></pre>
         <div class="callout-title">Tipp</div>
         <p>Schalten Sie den Dateibaum mit <kbd>Ctrl</kbd>+<kbd>B</kbd> um, um dem Editor mehr Platz zu geben. Ihre Einstellung wird sitzungsübergreifend gespeichert.</p>
       </div>
+
+      <h3 id="zuletzt-geoeffnet">Zuletzt geöffnet</h3>
+      <p>MarkForge merkt sich die letzten 10 geöffneten Dateien. Zugriff über <strong>Datei → Zuletzt geöffnet</strong>.</p>
+      <ul>
+        <li>Klicken Sie auf einen Eintrag, um die Datei sofort wieder zu öffnen.</li>
+        <li>Existiert eine Datei nicht mehr auf der Festplatte, wird sie automatisch aus der Liste entfernt.</li>
+        <li>Wählen Sie <strong>Zuletzt geöffnete löschen</strong> am Anfang des Untermenüs, um den gesamten Verlauf zu löschen.</li>
+        <li>Die Liste wird sitzungsübergreifend gespeichert.</li>
+      </ul>
     </section>
 
     <!-- ═══ 7. MARKDOWN-REFERENZ ══════════════════════════════════════════ -->

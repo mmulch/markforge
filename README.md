@@ -17,6 +17,9 @@ A modern, feature-rich Markdown editor built with Python and PyQt6. Includes a l
 - **Syntax highlighting** — Markdown-aware highlighting with matching dark/light colour schemes
 - **Line numbers** — gutter with current-line highlight
 - **Find & Replace** — inline find/replace bar (`Ctrl+F` / `Ctrl+H`) with match highlighting, case-sensitive and whole-word options, and Replace All
+- **Document Outline** — collapsible heading tree in the left panel; click any heading to jump there; toggle via View → Show outline
+- **Recent Files** — File → Recent Files submenu tracks the last 10 opened files, persisted between sessions
+- **Spell check** — underlines misspelled words with a red wavy line; 10 languages (EN, DE, ES, FR, IT, NL, PT, RU, AR, FA); toggle and select language via View menu
 - **File tree** — browse Markdown files and images in the project directory
 - **Insert dialogs** — guided dialogs for links, images, tables, PlantUML diagrams, and Mermaid diagrams
 - **PlantUML support** — embed diagrams rendered via the PlantUML online service
@@ -73,6 +76,7 @@ Python dependencies (installed automatically by CMake):
 | pymupdf4llm | ≥ 0.3.4 | PDF-to-Markdown conversion |
 | dulwich | ≥ 0.20.50 | Pure-Python git client |
 | keyring | ≥ 24.0.0 | Secure OS-keyring credential storage |
+| pyspellchecker | ≥ 0.7 | Spell check (optional) |
 
 ---
 

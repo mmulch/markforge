@@ -534,10 +534,15 @@
       <li><a href="#editor">4. Redigeraren</a>
         <ul>
           <li><a href="#find-replace">Sök &amp; Ersätt</a></li>
+          <li><a href="#spell-check">Stavningskontroll</a></li>
         </ul>
       </li>
       <li><a href="#preview">5. Liveförhandsvisning</a></li>
-      <li><a href="#fileops">6. Filhantering</a></li>
+      <li><a href="#fileops">6. Filhantering</a>
+        <ul>
+          <li><a href="#recent-files">Senaste filer</a></li>
+        </ul>
+      </li>
       <li><a href="#markdown-ref">7. Markdown-referens</a>
         <ul>
           <li><a href="#md-headings">Rubriker</a></li>
@@ -682,7 +687,7 @@ python src/main.py</code></pre>
         <table>
           <thead><tr><th>Panel</th><th>Position</th><th>Beskrivning</th></tr></thead>
           <tbody>
-            <tr><td><strong>Filträd</strong></td><td>Vänster</td><td>Bläddra bland <code>.md</code>- och bildfiler i den aktuella mappen. Växla med <kbd>Ctrl</kbd>+<kbd>B</kbd>.</td></tr>
+            <tr><td><strong>Disposition + Filträd</strong></td><td>Vänster</td><td>Den vänstra panelen har två staplade avsnitt: <strong>Dokumentdispositionen</strong> (rubrikträd) ovan, och <strong>Filträdet</strong> (filbläddrare) nedan. Växla disposition via <strong>Visa → Visa disposition</strong>, filträd via <kbd>Ctrl</kbd>+<kbd>B</kbd>.</td></tr>
             <tr><td><strong>Redigeraren</strong></td><td>Mitten</td><td>Oformaterad textredigerare med Markdown-syntaxmarkering och radnummer.</td></tr>
             <tr><td><strong>Förhandsvisning</strong></td><td>Höger</td><td>Live HTML-rendering av det aktuella dokumentet. Växla med <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>.</td></tr>
           </tbody>
@@ -690,6 +695,16 @@ python src/main.py</code></pre>
         </div>
 
         <p>Dra ett avdelarhandtag för att ändra storlek på panelerna. Panelstorlekar sparas mellan sessioner.</p>
+      </section>
+
+      <section id="outline">
+        <h3>Dokumentdisposition</h3>
+        <p>Panelen <strong>Dokumentdisposition</strong> listar alla rubriker (H1–H6) som ett navigerbart träd i det vänstra sidofältet.</p>
+        <ul>
+          <li>Klicka på valfri rubrik för att flytta redigerarens markör till den raden.</li>
+          <li>Dispositionen uppdateras automatiskt när du skriver.</li>
+          <li>Växla synlighet via <strong>Visa → Visa disposition</strong>. Inställningen sparas mellan sessioner.</li>
+        </ul>
       </section>
 
       <section id="toolbar">
@@ -713,10 +728,10 @@ python src/main.py</code></pre>
         <table>
           <thead><tr><th>Meny</th><th>Innehåll</th></tr></thead>
           <tbody>
-            <tr><td><strong>Arkiv</strong></td><td>Ny, Öppna, Öppna mapp, Importera PDF, Öppna från Git, Git-sammanslagning, Spara, Spara som, Exportera som PDF, Avsluta</td></tr>
+            <tr><td><strong>Arkiv</strong></td><td>Ny, Öppna, Öppna mapp, Senaste filer, Importera PDF, Öppna från Git, Git-sammanslagning, Spara, Spara som, Exportera som PDF, Avsluta</td></tr>
             <tr><td><strong>Redigera</strong></td><td>Ångra, Gör om, Klipp ut, Kopiera, Klistra in</td></tr>
             <tr><td><strong>Infoga</strong></td><td>Länk, Bild, PlantUML, Mermaid, Tabell</td></tr>
-            <tr><td><strong>Visa</strong></td><td>Visa filträd, Visa förhandsvisning, Radbrytning, Inställningar</td></tr>
+            <tr><td><strong>Visa</strong></td><td>Visa filträd, Visa disposition, Visa förhandsvisning, Radbrytning, Stavningskontroll, Stavningskontrollspråk, Inställningar</td></tr>
             <tr><td><strong>Hjälp</strong></td><td>Markdown-referens, Om</td></tr>
           </tbody>
         </table>
@@ -773,6 +788,17 @@ python src/main.py</code></pre>
         <li>Tryck <kbd>Escape</kbd> eller klicka <strong>✕</strong> för att stänga fältet och ta bort alla markeringar.</li>
       </ul>
       <p>Om text är markerad i redigeraren när du öppnar fältet fylls sökfältet i förväg med urvalet (endast enradsurval).</p>
+
+      <h3 id="spell-check">Stavningskontroll</h3>
+      <p>MarkForge kan understryka felstavade ord med en röd vågig linje medan du skriver. Stavningskontroll är inaktiverat som standard.</p>
+      <ul>
+        <li>Aktivera via <strong>Visa → Stavningskontroll</strong> (växla).</li>
+        <li>Välj ordlistespråk via <strong>Visa → Stavningskontrollspråk</strong>. Tillgängliga språk: English, Deutsch, Español, Français, Italiano, Nederlands, Português, Русский, العربية, فارسی.</li>
+        <li>Ord inuti infogade kodavsnitt (<code>`…`</code>) och URL:er underlyks aldrig.</li>
+        <li>VERSALA förkortningar (HTML, API, URL…) hoppas över.</li>
+        <li>Stavningskontrollinställningen och det valda språket sparas mellan sessioner.</li>
+        <li>Kräver biblioteket <code>pyspellchecker</code>. Om det inte är installerat ignoreras växeln tyst.</li>
+      </ul>
     </section>
 
     <!-- ═══ 5. LIVEFÖRHANDSVISNING ════════════════════════════════════════════════ -->
@@ -830,6 +856,15 @@ python src/main.py</code></pre>
         <div class="callout-title">Tips</div>
         <p>Växla filträdet med <kbd>Ctrl</kbd>+<kbd>B</kbd> för att maximera redigerarutrymmet. Din inställning sparas mellan sessioner.</p>
       </div>
+
+      <h3 id="recent-files">Senaste filer</h3>
+      <p>MarkForge sparar en lista med de 10 senast öppnade filerna. Öppna via <strong>Arkiv → Senaste filer</strong>.</p>
+      <ul>
+        <li>Klicka på valfri post för att öppna filen omedelbart igen.</li>
+        <li>Om en fil inte längre finns på disk tas den automatiskt bort från listan.</li>
+        <li>Välj <strong>Rensa senaste filer</strong> högst upp i undermenyn för att rensa hela historiken.</li>
+        <li>Listan sparas mellan sessioner.</li>
+      </ul>
     </section>
 
     <!-- ═══ 7. MARKDOWN-REFERENS ═════════════════════════════════════════ -->

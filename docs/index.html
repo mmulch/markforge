@@ -534,10 +534,15 @@
       <li><a href="#editor">4. The Editor</a>
         <ul>
           <li><a href="#find-replace">Find &amp; Replace</a></li>
+          <li><a href="#spell-check">Spell Check</a></li>
         </ul>
       </li>
       <li><a href="#preview">5. Live Preview</a></li>
-      <li><a href="#fileops">6. File Operations</a></li>
+      <li><a href="#fileops">6. File Operations</a>
+        <ul>
+          <li><a href="#recent-files">Recent Files</a></li>
+        </ul>
+      </li>
       <li><a href="#markdown-ref">7. Markdown Reference</a>
         <ul>
           <li><a href="#md-headings">Headings</a></li>
@@ -682,7 +687,7 @@ python src/main.py</code></pre>
         <table>
           <thead><tr><th>Pane</th><th>Position</th><th>Description</th></tr></thead>
           <tbody>
-            <tr><td><strong>File Tree</strong></td><td>Left</td><td>Browse <code>.md</code> and image files in the current folder. Toggle with <kbd>Ctrl</kbd>+<kbd>B</kbd>.</td></tr>
+            <tr><td><strong>Outline + File Tree</strong></td><td>Left</td><td>The left panel has two stacked sections: the <strong>Document Outline</strong> (headings tree) above, and the <strong>File Tree</strong> (file browser) below. Toggle outline via <strong>View → Show outline</strong>, file tree via <kbd>Ctrl</kbd>+<kbd>B</kbd>.</td></tr>
             <tr><td><strong>Editor</strong></td><td>Centre</td><td>Plain-text editor with Markdown syntax highlighting and line numbers.</td></tr>
             <tr><td><strong>Preview</strong></td><td>Right</td><td>Live HTML rendering of the current document. Toggle with <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>.</td></tr>
           </tbody>
@@ -690,6 +695,16 @@ python src/main.py</code></pre>
         </div>
 
         <p>Drag any splitter handle to resize panes. Pane sizes are remembered between sessions.</p>
+      </section>
+
+      <section id="outline">
+        <h3>Document Outline</h3>
+        <p>The <strong>Document Outline</strong> panel sits at the top of the left sidebar and lists all headings (H1–H6) in the current document as a navigable tree.</p>
+        <ul>
+          <li>Click any heading to jump the editor cursor to that line.</li>
+          <li>The outline updates automatically as you type.</li>
+          <li>Toggle visibility via <strong>View → Show outline</strong>. The preference is saved between sessions.</li>
+        </ul>
       </section>
 
       <section id="toolbar">
@@ -713,10 +728,10 @@ python src/main.py</code></pre>
         <table>
           <thead><tr><th>Menu</th><th>Contents</th></tr></thead>
           <tbody>
-            <tr><td><strong>File</strong></td><td>New, Open, Open Folder, Import PDF, Open from Git, Git Squash, Save, Save As, Export as PDF, Quit</td></tr>
+            <tr><td><strong>File</strong></td><td>New, Open, Open Folder, Recent Files, Import PDF, Open from Git, Git Squash, Save, Save As, Export as PDF, Quit</td></tr>
             <tr><td><strong>Edit</strong></td><td>Undo, Redo, Cut, Copy, Paste</td></tr>
             <tr><td><strong>Insert</strong></td><td>Link, Image, PlantUML, Mermaid, Table</td></tr>
-            <tr><td><strong>View</strong></td><td>Show file tree, Show preview, Word wrap, Settings</td></tr>
+            <tr><td><strong>View</strong></td><td>Show file tree, Show outline, Show preview, Word wrap, Spell check, Spell check language, Settings</td></tr>
             <tr><td><strong>Help</strong></td><td>Markdown reference, About</td></tr>
           </tbody>
         </table>
@@ -773,6 +788,17 @@ python src/main.py</code></pre>
         <li>Press <kbd>Escape</kbd> or click <strong>✕</strong> to close the bar and clear all highlights.</li>
       </ul>
       <p>If text is selected in the editor when you open the bar, the search field is pre-filled with the selection (single-line selections only).</p>
+
+      <h3 id="spell-check">Spell Check</h3>
+      <p>MarkForge can underline misspelled words with a red wavy line as you type. Spell check is disabled by default.</p>
+      <ul>
+        <li>Enable via <strong>View → Spell check</strong> (toggle).</li>
+        <li>Select the dictionary language via <strong>View → Spell check language</strong>. Available languages: English, Deutsch, Español, Français, Italiano, Nederlands, Português, Русский, العربية, فارسی.</li>
+        <li>Words inside inline code spans (<code>`…`</code>) and URLs are never underlined.</li>
+        <li>ALL-CAPS abbreviations (HTML, API, URL…) are skipped.</li>
+        <li>The spell check preference and selected language are saved between sessions.</li>
+        <li>Requires the <code>pyspellchecker</code> library. If it is not installed, the toggle is silently ignored.</li>
+      </ul>
     </section>
 
     <!-- ═══ 5. LIVE PREVIEW ════════════════════════════════════════════════ -->
@@ -830,6 +856,15 @@ python src/main.py</code></pre>
         <div class="callout-title">Tip</div>
         <p>Toggle the file tree with <kbd>Ctrl</kbd>+<kbd>B</kbd> to maximise editor space. Your preference is saved between sessions.</p>
       </div>
+
+      <h3 id="recent-files">Recent Files</h3>
+      <p>MarkForge keeps a list of the last 10 files you have opened. Access them via <strong>File → Recent Files</strong>.</p>
+      <ul>
+        <li>Click any entry to reopen the file immediately.</li>
+        <li>If a file no longer exists on disk, it is removed from the list automatically.</li>
+        <li>Choose <strong>Clear Recent Files</strong> at the top of the submenu to clear the entire history.</li>
+        <li>The list is saved between sessions.</li>
+      </ul>
     </section>
 
     <!-- ═══ 7. MARKDOWN REFERENCE ═════════════════════════════════════════ -->

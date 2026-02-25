@@ -309,7 +309,18 @@ class MainWindow(QMainWindow):
         self._spell_lang_menu = m.addMenu(tr("Spell check language"))
         lang_group = QActionGroup(self)
         lang_group.setExclusive(True)
-        for code, name in [("en", "English"), ("de", "Deutsch")]:
+        for code, name in [
+            ("en", "English"),
+            ("de", "Deutsch"),
+            ("es", "Español"),
+            ("fr", "Français"),
+            ("it", "Italiano"),
+            ("nl", "Nederlands"),
+            ("pt", "Português"),
+            ("ru", "Русский"),
+            ("ar", "العربية"),
+            ("fa", "فارسی"),
+        ]:
             act = self._spell_lang_menu.addAction(name)
             act.setCheckable(True)
             act.setData(code)

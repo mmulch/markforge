@@ -534,10 +534,15 @@
       <li><a href="#editor">4. Trình soạn thảo</a>
         <ul>
           <li><a href="#find-replace">Tìm &amp; Thay thế</a></li>
+          <li><a href="#spell-check">Kiểm tra chính tả</a></li>
         </ul>
       </li>
       <li><a href="#preview">5. Xem trước trực tiếp</a></li>
-      <li><a href="#fileops">6. Thao tác với tệp</a></li>
+      <li><a href="#fileops">6. Thao tác với tệp</a>
+        <ul>
+          <li><a href="#recent-files">Tệp gần đây</a></li>
+        </ul>
+      </li>
       <li><a href="#markdown-ref">7. Tài liệu tham khảo Markdown</a>
         <ul>
           <li><a href="#md-headings">Tiêu đề</a></li>
@@ -682,7 +687,7 @@ python src/main.py</code></pre>
         <table>
           <thead><tr><th>Ngăn</th><th>Vị trí</th><th>Mô tả</th></tr></thead>
           <tbody>
-            <tr><td><strong>Cây tệp</strong></td><td>Trái</td><td>Duyệt các tệp <code>.md</code> và hình ảnh trong thư mục hiện tại. Bật/tắt bằng <kbd>Ctrl</kbd>+<kbd>B</kbd>.</td></tr>
+            <tr><td><strong>Dàn ý + Cây tệp</strong></td><td>Trái</td><td>Bảng trái có hai phần xếp chồng: <strong>Dàn ý tài liệu</strong> (cây tiêu đề) ở trên, và <strong>Cây tệp</strong> (trình duyệt tệp) ở dưới. Bật/tắt dàn ý qua <strong>Xem → Hiển thị dàn ý</strong>, cây tệp qua <kbd>Ctrl</kbd>+<kbd>B</kbd>.</td></tr>
             <tr><td><strong>Trình soạn thảo</strong></td><td>Giữa</td><td>Trình soạn thảo văn bản thuần có tô sáng cú pháp Markdown và số dòng.</td></tr>
             <tr><td><strong>Xem trước</strong></td><td>Phải</td><td>Hiển thị HTML trực tiếp của tài liệu hiện tại. Bật/tắt bằng <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>.</td></tr>
           </tbody>
@@ -690,6 +695,16 @@ python src/main.py</code></pre>
         </div>
 
         <p>Kéo bất kỳ thanh phân cách nào để thay đổi kích thước ngăn. Kích thước ngăn được ghi nhớ giữa các phiên làm việc.</p>
+      </section>
+
+      <section id="outline">
+        <h3>Dàn ý tài liệu</h3>
+        <p>Bảng <strong>Dàn ý tài liệu</strong> hiển thị tất cả các tiêu đề (H1–H6) dưới dạng cây có thể điều hướng trong thanh bên trái.</p>
+        <ul>
+          <li>Nhấp vào bất kỳ tiêu đề nào để đưa con trỏ trình soạn thảo đến dòng đó.</li>
+          <li>Dàn ý tự động cập nhật khi bạn gõ.</li>
+          <li>Bật/tắt hiển thị qua <strong>Xem → Hiển thị dàn ý</strong>. Tùy chọn được lưu giữa các phiên làm việc.</li>
+        </ul>
       </section>
 
       <section id="toolbar">
@@ -713,10 +728,10 @@ python src/main.py</code></pre>
         <table>
           <thead><tr><th>Menu</th><th>Nội dung</th></tr></thead>
           <tbody>
-            <tr><td><strong>Tệp</strong></td><td>Mới, Mở, Mở thư mục, Nhập PDF, Mở từ Git, Git Squash, Lưu, Lưu thành, Xuất dạng PDF, Thoát</td></tr>
+            <tr><td><strong>Tệp</strong></td><td>Mới, Mở, Mở thư mục, Tệp gần đây, Nhập PDF, Mở từ Git, Git Squash, Lưu, Lưu thành, Xuất dạng PDF, Thoát</td></tr>
             <tr><td><strong>Chỉnh sửa</strong></td><td>Hoàn tác, Làm lại, Cắt, Sao chép, Dán</td></tr>
             <tr><td><strong>Chèn</strong></td><td>Liên kết, Hình ảnh, PlantUML, Mermaid, Bảng</td></tr>
-            <tr><td><strong>Xem</strong></td><td>Hiển thị cây tệp, Hiển thị xem trước, Xuống dòng tự động, Cài đặt</td></tr>
+            <tr><td><strong>Xem</strong></td><td>Hiển thị cây tệp, Hiển thị dàn ý, Hiển thị xem trước, Xuống dòng tự động, Kiểm tra chính tả, Ngôn ngữ kiểm tra chính tả, Cài đặt</td></tr>
             <tr><td><strong>Trợ giúp</strong></td><td>Tài liệu tham khảo Markdown, Giới thiệu</td></tr>
           </tbody>
         </table>
@@ -773,6 +788,17 @@ python src/main.py</code></pre>
         <li>Nhấn <kbd>Escape</kbd> hoặc nhấp <strong>✕</strong> để đóng thanh và xóa tất cả tô sáng.</li>
       </ul>
       <p>Nếu có văn bản được chọn trong trình soạn thảo khi mở thanh, ô tìm kiếm sẽ được điền sẵn với nội dung đó (chỉ áp dụng cho lựa chọn một dòng).</p>
+
+      <h3 id="spell-check">Kiểm tra chính tả</h3>
+      <p>MarkForge có thể gạch chân các từ sai chính tả bằng đường gợn sóng màu đỏ khi bạn gõ. Kiểm tra chính tả bị tắt theo mặc định.</p>
+      <ul>
+        <li>Bật/tắt qua <strong>Xem → Kiểm tra chính tả</strong> (công tắc).</li>
+        <li>Chọn ngôn ngữ từ điển qua <strong>Xem → Ngôn ngữ kiểm tra chính tả</strong>. Ngôn ngữ có sẵn: English, Deutsch, Español, Français, Italiano, Nederlands, Português, Русский, العربية, فارسی.</li>
+        <li>Các từ bên trong đoạn mã nội tuyến (<code>`…`</code>) và URL không bao giờ bị gạch chân.</li>
+        <li>Các từ viết tắt VIẾT HOA (HTML, API, URL…) được bỏ qua.</li>
+        <li>Tùy chọn kiểm tra chính tả và ngôn ngữ được lưu giữa các phiên làm việc.</li>
+        <li>Yêu cầu thư viện <code>pyspellchecker</code>. Nếu chưa cài đặt, công tắc sẽ bị bỏ qua mà không có thông báo.</li>
+      </ul>
     </section>
 
     <!-- ═══ 5. XEM TRƯỚC TRỰC TIẾP ════════════════════════════════════════ -->
@@ -830,6 +856,15 @@ python src/main.py</code></pre>
         <div class="callout-title">Mẹo</div>
         <p>Bật/tắt cây tệp bằng <kbd>Ctrl</kbd>+<kbd>B</kbd> để tối đa hóa không gian trình soạn thảo. Tùy chọn của bạn được lưu giữa các phiên làm việc.</p>
       </div>
+
+      <h3 id="recent-files">Tệp gần đây</h3>
+      <p>MarkForge lưu danh sách 10 tệp được mở gần đây nhất. Truy cập qua <strong>Tệp → Tệp gần đây</strong>.</p>
+      <ul>
+        <li>Nhấp vào bất kỳ mục nào để mở lại tệp ngay lập tức.</li>
+        <li>Nếu tệp không còn tồn tại trên đĩa, nó sẽ tự động bị xóa khỏi danh sách.</li>
+        <li>Chọn <strong>Xóa tệp gần đây</strong> ở đầu menu con để xóa toàn bộ lịch sử.</li>
+        <li>Danh sách được lưu giữa các phiên làm việc.</li>
+      </ul>
     </section>
 
     <!-- ═══ 7. TÀI LIỆU THAM KHẢO MARKDOWN ════════════════════════════════ -->

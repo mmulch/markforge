@@ -534,10 +534,15 @@
       <li><a href="#editor">4. संपादक</a>
         <ul>
           <li><a href="#find-replace">खोजें &amp; बदलें</a></li>
+          <li><a href="#spell-check">वर्तनी जाँच</a></li>
         </ul>
       </li>
       <li><a href="#preview">5. लाइव पूर्वावलोकन</a></li>
-      <li><a href="#fileops">6. फ़ाइल संचालन</a></li>
+      <li><a href="#fileops">6. फ़ाइल संचालन</a>
+        <ul>
+          <li><a href="#recent-files">हाल की फ़ाइलें</a></li>
+        </ul>
+      </li>
       <li><a href="#markdown-ref">7. Markdown संदर्भ</a>
         <ul>
           <li><a href="#md-headings">शीर्षक</a></li>
@@ -682,7 +687,7 @@ python src/main.py</code></pre>
         <table>
           <thead><tr><th>पैनल</th><th>स्थिति</th><th>विवरण</th></tr></thead>
           <tbody>
-            <tr><td><strong>File Tree</strong></td><td>बाएँ</td><td>वर्तमान फ़ोल्डर में <code>.md</code> और चित्र फ़ाइलें ब्राउज़ करें। <kbd>Ctrl</kbd>+<kbd>B</kbd> से टॉगल करें।</td></tr>
+            <tr><td><strong>रूपरेखा + फ़ाइल ट्री</strong></td><td>बाएँ</td><td>बाएँ पैनल में दो स्टैक्ड खंड हैं: <strong>दस्तावेज़ रूपरेखा</strong> (शीर्षक ट्री) ऊपर, और <strong>फ़ाइल ट्री</strong> (फ़ाइल ब्राउज़र) नीचे। रूपरेखा <strong>दृश्य → रूपरेखा दिखाएँ</strong> से टॉगल करें, फ़ाइल ट्री <kbd>Ctrl</kbd>+<kbd>B</kbd> से।</td></tr>
             <tr><td><strong>संपादक</strong></td><td>बीच में</td><td>Markdown सिंटैक्स हाइलाइटिंग और लाइन नंबर के साथ सादा-पाठ संपादक।</td></tr>
             <tr><td><strong>पूर्वावलोकन</strong></td><td>दाएँ</td><td>वर्तमान दस्तावेज़ का लाइव HTML रेंडरिंग। <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> से टॉगल करें।</td></tr>
           </tbody>
@@ -690,6 +695,16 @@ python src/main.py</code></pre>
         </div>
 
         <p>पैनल का आकार बदलने के लिए किसी भी स्प्लिटर हैंडल को खींचें। पैनल आकार सत्रों के बीच याद रखे जाते हैं।</p>
+      </section>
+
+      <section id="outline">
+        <h3>दस्तावेज़ रूपरेखा</h3>
+        <p><strong>दस्तावेज़ रूपरेखा</strong> पैनल बाएँ साइडबार में सभी शीर्षकों (H1–H6) को नेविगेबल ट्री के रूप में दिखाता है।</p>
+        <ul>
+          <li>उस पंक्ति पर संपादक कर्सर ले जाने के लिए किसी भी शीर्षक पर क्लिक करें।</li>
+          <li>रूपरेखा टाइप करते समय स्वचालित रूप से अपडेट होती है।</li>
+          <li><strong>दृश्य → रूपरेखा दिखाएँ</strong> के माध्यम से दृश्यता टॉगल करें। प्राथमिकता सत्रों के बीच सहेजी जाती है।</li>
+        </ul>
       </section>
 
       <section id="toolbar">
@@ -713,10 +728,10 @@ python src/main.py</code></pre>
         <table>
           <thead><tr><th>मेनू</th><th>सामग्री</th></tr></thead>
           <tbody>
-            <tr><td><strong>File (फ़ाइल)</strong></td><td>New, Open, Open Folder, Import PDF, Open from Git, Git Squash, Save, Save As, Export as PDF, Quit</td></tr>
+            <tr><td><strong>File (फ़ाइल)</strong></td><td>New, Open, Open Folder, हाल की फ़ाइलें, Import PDF, Open from Git, Git Squash, Save, Save As, Export as PDF, Quit</td></tr>
             <tr><td><strong>Edit (संपादन)</strong></td><td>Undo, Redo, Cut, Copy, Paste</td></tr>
             <tr><td><strong>Insert (सम्मिलित करें)</strong></td><td>Link, Image, PlantUML, Mermaid, Table</td></tr>
-            <tr><td><strong>View (दृश्य)</strong></td><td>Show file tree, Show preview, Word wrap, Settings</td></tr>
+            <tr><td><strong>View (दृश्य)</strong></td><td>Show file tree, रूपरेखा दिखाएँ, Show preview, Word wrap, वर्तनी जाँच, वर्तनी जाँच भाषा, Settings</td></tr>
             <tr><td><strong>Help (सहायता)</strong></td><td>Markdown reference, About</td></tr>
           </tbody>
         </table>
@@ -773,6 +788,17 @@ python src/main.py</code></pre>
         <li>बार बंद करने और सभी हाइलाइट हटाने के लिए <kbd>Escape</kbd> दबाएँ या <strong>✕</strong> पर क्लिक करें।</li>
       </ul>
       <p>यदि बार खोलते समय संपादक में टेक्स्ट चुना हुआ है, तो खोज फ़ील्ड स्वतः उस टेक्स्ट से भर जाती है (केवल एकल-पंक्ति चयन के लिए)।</p>
+
+      <h3 id="spell-check">वर्तनी जाँच</h3>
+      <p>MarkForge गलत綴り वाले शब्दों के नीचे लाल लहरदार रेखा खींच सकता है। वर्तनी जाँच डिफ़ॉल्ट रूप से बंद है।</p>
+      <ul>
+        <li><strong>दृश्य → वर्तनी जाँच</strong> के माध्यम से सक्षम करें (टॉगल)।</li>
+        <li><strong>दृश्य → वर्तनी जाँच भाषा</strong> के माध्यम से शब्दकोश भाषा चुनें। उपलब्ध भाषाएँ: English, Deutsch, Español, Français, Italiano, Nederlands, Português, Русский, العربية, فارسی।</li>
+        <li>इनलाइन कोड स्पैन (<code>`…`</code>) और URL के अंदर के शब्दों पर कभी रेखांकन नहीं होता।</li>
+        <li>सभी-कैप संक्षिप्त नाम (HTML, API, URL…) छोड़ दिए जाते हैं।</li>
+        <li>वर्तनी जाँच प्राथमिकता और चयनित भाषा सत्रों के बीच सहेजी जाती है।</li>
+        <li><code>pyspellchecker</code> लाइब्रेरी की आवश्यकता है। यदि स्थापित नहीं है, तो टॉगल को चुपचाप अनदेखा किया जाता है।</li>
+      </ul>
     </section>
 
     <!-- ═══ 5. LIVE PREVIEW ════════════════════════════════════════════════ -->
@@ -830,6 +856,15 @@ python src/main.py</code></pre>
         <div class="callout-title">सुझाव</div>
         <p>संपादक स्थान अधिकतम करने के लिए <kbd>Ctrl</kbd>+<kbd>B</kbd> से फ़ाइल ट्री टॉगल करें। आपकी प्राथमिकता सत्रों के बीच सहेजी जाती है।</p>
       </div>
+
+      <h3 id="recent-files">हाल की फ़ाइलें</h3>
+      <p>MarkForge अंतिम 10 खुली फ़ाइलों की सूची रखता है। <strong>File → हाल की फ़ाइलें</strong> के माध्यम से पहुँचें।</p>
+      <ul>
+        <li>फ़ाइल तुरंत फिर से खोलने के लिए किसी भी प्रविष्टि पर क्लिक करें।</li>
+        <li>यदि फ़ाइल डिस्क पर अब मौजूद नहीं है, तो इसे सूची से स्वचालित रूप से हटा दिया जाता है।</li>
+        <li>पूरा इतिहास साफ़ करने के लिए सबमेनू के शीर्ष पर <strong>हाल की फ़ाइलें साफ़ करें</strong> चुनें।</li>
+        <li>सूची सत्रों के बीच सहेजी जाती है।</li>
+      </ul>
     </section>
 
     <!-- ═══ 7. MARKDOWN REFERENCE ═════════════════════════════════════════ -->
