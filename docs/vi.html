@@ -531,7 +531,11 @@
           <li><a href="#menubar">Thanh menu</a></li>
         </ul>
       </li>
-      <li><a href="#editor">4. Trình soạn thảo</a></li>
+      <li><a href="#editor">4. Trình soạn thảo</a>
+        <ul>
+          <li><a href="#find-replace">Tìm &amp; Thay thế</a></li>
+        </ul>
+      </li>
       <li><a href="#preview">5. Xem trước trực tiếp</a></li>
       <li><a href="#fileops">6. Thao tác với tệp</a></li>
       <li><a href="#markdown-ref">7. Tài liệu tham khảo Markdown</a>
@@ -756,6 +760,19 @@ python src/main.py</code></pre>
         <li><kbd>Ctrl</kbd>+<kbd>Y</kbd> — Làm lại</li>
         <li><kbd>Ctrl</kbd>+<kbd>X</kbd> / <kbd>Ctrl</kbd>+<kbd>C</kbd> / <kbd>Ctrl</kbd>+<kbd>V</kbd> — Cắt / Sao chép / Dán</li>
       </ul>
+
+      <h3 id="find-replace">Tìm &amp; Thay thế</h3>
+      <p>Nhấn <kbd>Ctrl</kbd>+<kbd>F</kbd> để mở thanh tìm kiếm, hoặc <kbd>Ctrl</kbd>+<kbd>H</kbd> để mở cùng với hàng thay thế. Thanh xuất hiện phía trên trình soạn thảo.</p>
+      <ul>
+        <li>Nhập vào ô tìm kiếm — tất cả kết quả khớp được tô sáng ngay lập tức trong trình soạn thảo.</li>
+        <li>Điều hướng giữa các kết quả bằng nút <strong>↑</strong> / <strong>↓</strong>, hoặc nhấn <kbd>Enter</kbd> (tiếp theo) / <kbd>Shift</kbd>+<kbd>Enter</kbd> (trước đó) trong ô tìm kiếm.</li>
+        <li>Bộ đếm kết quả hiển thị vị trí hiện tại (ví dụ <em>3 / 12</em>).</li>
+        <li><strong>Aa</strong> — bật/tắt tìm kiếm phân biệt chữ hoa/thường.</li>
+        <li><strong>[W]</strong> — bật/tắt khớp toàn bộ từ.</li>
+        <li>Dùng <strong>Thay thế</strong> để thay thế kết quả hiện tại, hoặc <strong>Thay thế tất cả</strong> để thay thế mọi lần xuất hiện cùng lúc.</li>
+        <li>Nhấn <kbd>Escape</kbd> hoặc nhấp <strong>✕</strong> để đóng thanh và xóa tất cả tô sáng.</li>
+      </ul>
+      <p>Nếu có văn bản được chọn trong trình soạn thảo khi mở thanh, ô tìm kiếm sẽ được điền sẵn với nội dung đó (chỉ áp dụng cho lựa chọn một dòng).</p>
     </section>
 
     <!-- ═══ 5. XEM TRƯỚC TRỰC TIẾP ════════════════════════════════════════ -->
@@ -1269,6 +1286,11 @@ $</code></pre>
       <div class="shortcut-row"><span class="label">Cắt</span><span><kbd>Ctrl</kbd>+<kbd>X</kbd></span></div>
       <div class="shortcut-row"><span class="label">Sao chép</span><span><kbd>Ctrl</kbd>+<kbd>C</kbd></span></div>
       <div class="shortcut-row"><span class="label">Dán</span><span><kbd>Ctrl</kbd>+<kbd>V</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Tìm kiếm</span><span><kbd>Ctrl</kbd>+<kbd>F</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Tìm &amp; Thay thế</span><span><kbd>Ctrl</kbd>+<kbd>H</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Tìm tiếp theo</span><span><kbd>Enter</kbd> <em>(trong thanh tìm kiếm)</em></span></div>
+      <div class="shortcut-row"><span class="label">Tìm trước đó</span><span><kbd>Shift</kbd>+<kbd>Enter</kbd> <em>(trong thanh tìm kiếm)</em></span></div>
+      <div class="shortcut-row"><span class="label">Đóng thanh tìm kiếm</span><span><kbd>Escape</kbd></span></div>
 
       <hr class="section-divider">
       <p style="color:var(--text-muted);font-size:0.85em;">MarkForge — Copyright &copy; Marcel Mulch. Phát hành theo Giấy phép Công cộng GNU phiên bản 3.0.</p>

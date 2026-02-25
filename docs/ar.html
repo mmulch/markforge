@@ -541,7 +541,11 @@
           <li><a href="#menubar">شريط القوائم</a></li>
         </ul>
       </li>
-      <li><a href="#editor">٤. المحرر</a></li>
+      <li><a href="#editor">٤. المحرر</a>
+        <ul>
+          <li><a href="#find-replace">بحث &amp; استبدال</a></li>
+        </ul>
+      </li>
       <li><a href="#preview">٥. المعاينة الحية</a></li>
       <li><a href="#fileops">٦. عمليات الملفات</a></li>
       <li><a href="#markdown-ref">٧. مرجع Markdown</a>
@@ -766,6 +770,19 @@ python src/main.py</code></pre>
         <li><kbd>Ctrl</kbd>+<kbd>Y</kbd> — إعادة</li>
         <li><kbd>Ctrl</kbd>+<kbd>X</kbd> / <kbd>Ctrl</kbd>+<kbd>C</kbd> / <kbd>Ctrl</kbd>+<kbd>V</kbd> — قص / نسخ / لصق</li>
       </ul>
+
+      <h3 id="find-replace">بحث واستبدال</h3>
+      <p>اضغط <kbd>Ctrl</kbd>+<kbd>F</kbd> لفتح شريط البحث، أو <kbd>Ctrl</kbd>+<kbd>H</kbd> لفتحه مع صف الاستبدال. يظهر الشريط فوق المحرر.</p>
+      <ul>
+        <li>اكتب في حقل البحث — تُسلَّط الضوء على جميع التطابقات فوراً في المحرر.</li>
+        <li>انتقل بين التطابقات باستخدام زرَّي <strong>↑</strong> / <strong>↓</strong>، أو اضغط <kbd>Enter</kbd> (التالي) / <kbd>Shift</kbd>+<kbd>Enter</kbd> (السابق) في حقل البحث.</li>
+        <li>يُظهر عداد التطابقات الموضع الحالي (مثلاً <em>٣ / ١٢</em>).</li>
+        <li><strong>Aa</strong> — تفعيل مطابقة حالة الأحرف.</li>
+        <li><strong>[W]</strong> — مطابقة الكلمات الكاملة فقط.</li>
+        <li>استخدم <strong>استبدال</strong> لاستبدال التطابق الحالي، أو <strong>استبدال الكل</strong> لاستبدال جميع التكرارات دفعةً واحدة.</li>
+        <li>اضغط <kbd>Escape</kbd> أو انقر على <strong>✕</strong> لإغلاق الشريط وإزالة جميع التمييزات.</li>
+      </ul>
+      <p>إذا كان هناك نص محدد في المحرر عند فتح الشريط، يُملأ حقل البحث تلقائياً بهذا النص (أسطر مفردة فقط).</p>
     </section>
 
     <!-- ═══ 5. LIVE PREVIEW ════════════════════════════════════════════════ -->
@@ -1279,6 +1296,11 @@ $</code></pre>
       <div class="shortcut-row"><span class="label">قص</span><span><kbd>Ctrl</kbd>+<kbd>X</kbd></span></div>
       <div class="shortcut-row"><span class="label">نسخ</span><span><kbd>Ctrl</kbd>+<kbd>C</kbd></span></div>
       <div class="shortcut-row"><span class="label">لصق</span><span><kbd>Ctrl</kbd>+<kbd>V</kbd></span></div>
+      <div class="shortcut-row"><span class="label">بحث</span><span><kbd>Ctrl</kbd>+<kbd>F</kbd></span></div>
+      <div class="shortcut-row"><span class="label">بحث &amp; استبدال</span><span><kbd>Ctrl</kbd>+<kbd>H</kbd></span></div>
+      <div class="shortcut-row"><span class="label">البحث عن التالي</span><span><kbd>Enter</kbd> <em>(في شريط البحث)</em></span></div>
+      <div class="shortcut-row"><span class="label">البحث عن السابق</span><span><kbd>Shift</kbd>+<kbd>Enter</kbd> <em>(في شريط البحث)</em></span></div>
+      <div class="shortcut-row"><span class="label">إغلاق شريط البحث</span><span><kbd>Escape</kbd></span></div>
 
       <hr class="section-divider">
       <p style="color:var(--text-muted);font-size:0.85em;">MarkForge — حقوق النشر &copy; Marcel Mulch. مُصدَر بموجب رخصة GNU العمومية الإصدار 3.0.</p>

@@ -531,7 +531,11 @@
           <li><a href="#menubar">ಮೆನು ಪಟ್ಟಿ</a></li>
         </ul>
       </li>
-      <li><a href="#editor">4. ಸಂಪಾದಕ</a></li>
+      <li><a href="#editor">4. ಸಂಪಾದಕ</a>
+        <ul>
+          <li><a href="#find-replace">ಹುಡುಕು &amp; ಬದಲಾಯಿಸು</a></li>
+        </ul>
+      </li>
       <li><a href="#preview">5. ನೇರ ಮುನ್ನೋಟ</a></li>
       <li><a href="#fileops">6. ಫೈಲ್ ಕಾರ್ಯಾಚರಣೆಗಳು</a></li>
       <li><a href="#markdown-ref">7. Markdown ಉಲ್ಲೇಖ</a>
@@ -756,6 +760,19 @@ python src/main.py</code></pre>
         <li><kbd>Ctrl</kbd>+<kbd>Y</kbd> — Redo</li>
         <li><kbd>Ctrl</kbd>+<kbd>X</kbd> / <kbd>Ctrl</kbd>+<kbd>C</kbd> / <kbd>Ctrl</kbd>+<kbd>V</kbd> — ಕಟ್ / ಕಾಪಿ / ಪೇಸ್ಟ್</li>
       </ul>
+
+      <h3 id="find-replace">ಹುಡುಕು &amp; ಬದಲಾಯಿಸು</h3>
+      <p>ಹುಡುಕು ಪಟ್ಟಿ ತೆರೆಯಲು <kbd>Ctrl</kbd>+<kbd>F</kbd> ಒತ್ತಿರಿ, ಅಥವಾ ಬದಲಾಯಿಸು ಸಾಲಿನೊಂದಿಗೆ ತೆರೆಯಲು <kbd>Ctrl</kbd>+<kbd>H</kbd> ಒತ್ತಿರಿ. ಪಟ್ಟಿಯು ಸಂಪಾದಕದ ಮೇಲೆ ಕಾಣಿಸುತ್ತದೆ.</p>
+      <ul>
+        <li>ಹುಡುಕು ಕ್ಷೇತ್ರದಲ್ಲಿ ಟೈಪ್ ಮಾಡಿ — ಎಲ್ಲಾ ಹೊಂದಾಣಿಕೆಗಳು ಸಂಪಾದಕದಲ್ಲಿ ತಕ್ಷಣ ಹೈಲೈಟ್ ಆಗುತ್ತವೆ.</li>
+        <li><strong>↑</strong> / <strong>↓</strong> ಬಟನ್‌ಗಳನ್ನು ಬಳಸಿ ಹೊಂದಾಣಿಕೆಗಳ ನಡುವೆ ನ್ಯಾವಿಗೇಟ್ ಮಾಡಿ, ಅಥವಾ ಹುಡುಕು ಕ್ಷೇತ್ರದಲ್ಲಿ <kbd>Enter</kbd> (ಮುಂದಿನದು) / <kbd>Shift</kbd>+<kbd>Enter</kbd> (ಹಿಂದಿನದು) ಒತ್ತಿರಿ.</li>
+        <li>ಹೊಂದಾಣಿಕೆ ಕೌಂಟರ್ ಪ್ರಸ್ತುತ ಸ್ಥಾನ ತೋರಿಸುತ್ತದೆ (ಉದಾ. <em>3 / 12</em>).</li>
+        <li><strong>Aa</strong> — ಕೇಸ್-ಸೆನ್ಸಿಟಿವ್ ಹುಡುಕಾಟ ಆನ್/ಆಫ್.</li>
+        <li><strong>[W]</strong> — ಸಂಪೂರ್ಣ ಪದ ಹೊಂದಾಣಿಕೆ ಆನ್/ಆಫ್.</li>
+        <li>ಪ್ರಸ್ತುತ ಹೊಂದಾಣಿಕೆ ಬದಲಾಯಿಸಲು <strong>ಬದಲಾಯಿಸು</strong> ಬಳಸಿ, ಅಥವಾ ಎಲ್ಲಾ ಉದಾಹರಣೆಗಳನ್ನು ಒಂದೇ ಬಾರಿ ಬದಲಾಯಿಸಲು <strong>ಎಲ್ಲ ಬದಲಾಯಿಸಿ</strong> ಬಳಸಿ.</li>
+        <li>ಪಟ್ಟಿ ಮುಚ್ಚಿ ಎಲ್ಲ ಹೈಲೈಟ್‌ಗಳನ್ನು ತೆಗೆಯಲು <kbd>Escape</kbd> ಒತ್ತಿರಿ ಅಥವಾ <strong>✕</strong> ಕ್ಲಿಕ್ ಮಾಡಿ.</li>
+      </ul>
+      <p>ಪಟ್ಟಿ ತೆರೆಯುವ ಸಮಯದಲ್ಲಿ ಸಂಪಾದಕದಲ್ಲಿ ಪಠ್ಯ ಆಯ್ಕೆ ಮಾಡಿದ್ದರೆ, ಹುಡುಕು ಕ್ಷೇತ್ರ ಸ್ವಯಂಚಾಲಿತವಾಗಿ ಆ ಪಠ್ಯದಿಂದ ತುಂಬಿಸಲ್ಪಡುತ್ತದೆ (ಏಕ-ಸಾಲು ಆಯ್ಕೆಗಳಿಗೆ ಮಾತ್ರ).</p>
     </section>
 
     <!-- ═══ 5. LIVE PREVIEW ════════════════════════════════════════════════ -->
@@ -1269,6 +1286,11 @@ $</code></pre>
       <div class="shortcut-row"><span class="label">ಕಟ್</span><span><kbd>Ctrl</kbd>+<kbd>X</kbd></span></div>
       <div class="shortcut-row"><span class="label">ಕಾಪಿ</span><span><kbd>Ctrl</kbd>+<kbd>C</kbd></span></div>
       <div class="shortcut-row"><span class="label">ಪೇಸ್ಟ್</span><span><kbd>Ctrl</kbd>+<kbd>V</kbd></span></div>
+      <div class="shortcut-row"><span class="label">ಹುಡುಕು</span><span><kbd>Ctrl</kbd>+<kbd>F</kbd></span></div>
+      <div class="shortcut-row"><span class="label">ಹುಡುಕು &amp; ಬದಲಾಯಿಸು</span><span><kbd>Ctrl</kbd>+<kbd>H</kbd></span></div>
+      <div class="shortcut-row"><span class="label">ಮುಂದಿನದು ಹುಡುಕು</span><span><kbd>Enter</kbd> <em>(ಹುಡುಕು ಪಟ್ಟಿಯಲ್ಲಿ)</em></span></div>
+      <div class="shortcut-row"><span class="label">ಹಿಂದಿನದು ಹುಡುಕು</span><span><kbd>Shift</kbd>+<kbd>Enter</kbd> <em>(ಹುಡುಕು ಪಟ್ಟಿಯಲ್ಲಿ)</em></span></div>
+      <div class="shortcut-row"><span class="label">ಹುಡುಕು ಪಟ್ಟಿ ಮುಚ್ಚು</span><span><kbd>Escape</kbd></span></div>
 
       <hr class="section-divider">
       <p style="color:var(--text-muted);font-size:0.85em;">MarkForge — Copyright &copy; Marcel Mulch. GNU General Public License v3.0 ಅಡಿಯಲ್ಲಿ ಬಿಡುಗಡೆ ಮಾಡಲಾಗಿದೆ.</p>

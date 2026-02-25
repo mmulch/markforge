@@ -277,6 +277,21 @@ _DE: dict[str, str] = {
     "Proxy password:": "Proxy-Passwort:",
     "Leave empty to use system proxy settings.":
         "Leer lassen, um die Systemproxy-Einstellungen zu verwenden.",
+    # ── Find & Replace ────────────────────────────────────────────────────────
+    "&Find …":             "&Suchen …",
+    "Find && &Replace …":  "Suchen && &Ersetzen …",
+    "Find…":               "Suchen…",
+    "Replace…":            "Ersetzen…",
+    "Replace":             "Ersetzen",
+    "Replace All":         "Alle ersetzen",
+    "Match case":          "Groß-/Kleinschreibung",
+    "Whole words":         "Ganze Wörter",
+    "No results":          "Keine Treffer",
+    "{cur} / {total}":     "{cur} / {total}",
+    "{n} replaced":        "{n} ersetzt",
+    "Find previous (Shift+Enter)": "Vorheriges suchen (Umschalt+Eingabe)",
+    "Find next (Enter)":           "Nächstes suchen (Eingabe)",
+    "Close (Escape)":              "Schließen (Escape)",
 }
 
 # ── Arabic (Egyptian / MSA) ───────────────────────────────────────────────────

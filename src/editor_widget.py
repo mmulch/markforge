@@ -40,6 +40,7 @@ class EditorWidget(QPlainTextEdit):
         self._theme_name = "VS Code Dark"
         self._gutter = _LineNumberArea(self)
         self._highlighter = MarkdownHighlighter(self.document())
+        self._search_selections: list = []
 
         self._apply_theme()
 
@@ -62,9 +63,11 @@ class EditorWidget(QPlainTextEdit):
         theme = EDITOR_THEMES.get(self._theme_name, EDITOR_THEMES["VS Code Dark"])
         bg = QColor(theme["bg"])
         fg = QColor(theme["fg"])
-        self._GUTTER_BG = QColor(theme["gutter_bg"])
-        self._GUTTER_FG = QColor(theme["gutter_fg"])
-        self._LINE_HL   = QColor(theme["line_hl"])
+        self._GUTTER_BG    = QColor(theme["gutter_bg"])
+        self._GUTTER_FG    = QColor(theme["gutter_fg"])
+        self._LINE_HL      = QColor(theme["line_hl"])
+        self._FIND_MATCH   = QColor(theme["find_match"])
+        self._FIND_CURRENT = QColor(theme["find_current"])
 
         pal = self.palette()
         pal.setColor(QPalette.ColorRole.Base, bg)
@@ -85,8 +88,12 @@ class EditorWidget(QPlainTextEdit):
         old = self.blockSignals(True)
         self._highlighter.set_theme(theme_name)
         self.blockSignals(old)
-        self._highlight_current_line()
+        self._update_extra_selections()
         self._gutter.update()
+
+    def set_search_highlights(self, selections: list) -> None:
+        self._search_selections = selections
+        self._update_extra_selections()
 
     # ── Line numbers ──────────────────────────────────────────────────────────
 
@@ -143,9 +150,11 @@ class EditorWidget(QPlainTextEdit):
 
     # ── Current line highlight ────────────────────────────────────────────────
 
-    def _highlight_current_line(self) -> None:
+    def _update_extra_selections(self) -> None:
         if self.isReadOnly():
             return
+        sels = []
+        # 1. current-line full-width highlight (renders first / underneath)
         sel = QTextEdit.ExtraSelection()
         fmt = QTextCharFormat()
         fmt.setBackground(self._LINE_HL)
@@ -153,4 +162,10 @@ class EditorWidget(QPlainTextEdit):
         sel.format = fmt
         sel.cursor = self.textCursor()
         sel.cursor.clearSelection()
-        self.setExtraSelections([sel])
+        sels.append(sel)
+        # 2. search match highlights (render on top)
+        sels.extend(self._search_selections)
+        self.setExtraSelections(sels)
+
+    def _highlight_current_line(self) -> None:
+        self._update_extra_selections()

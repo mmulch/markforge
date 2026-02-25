@@ -531,7 +531,11 @@
           <li><a href="#menubar">मेनू बार</a></li>
         </ul>
       </li>
-      <li><a href="#editor">4. संपादक</a></li>
+      <li><a href="#editor">4. संपादक</a>
+        <ul>
+          <li><a href="#find-replace">खोजें &amp; बदलें</a></li>
+        </ul>
+      </li>
       <li><a href="#preview">5. लाइव पूर्वावलोकन</a></li>
       <li><a href="#fileops">6. फ़ाइल संचालन</a></li>
       <li><a href="#markdown-ref">7. Markdown संदर्भ</a>
@@ -756,6 +760,19 @@ python src/main.py</code></pre>
         <li><kbd>Ctrl</kbd>+<kbd>Y</kbd> — Redo (फिर से करें)</li>
         <li><kbd>Ctrl</kbd>+<kbd>X</kbd> / <kbd>Ctrl</kbd>+<kbd>C</kbd> / <kbd>Ctrl</kbd>+<kbd>V</kbd> — Cut / Copy / Paste</li>
       </ul>
+
+      <h3 id="find-replace">खोजें &amp; बदलें</h3>
+      <p>खोज बार खोलने के लिए <kbd>Ctrl</kbd>+<kbd>F</kbd> दबाएँ, या बदलें पंक्ति के साथ खोलने के लिए <kbd>Ctrl</kbd>+<kbd>H</kbd> दबाएँ। बार संपादक के ऊपर प्रकट होती है।</p>
+      <ul>
+        <li>खोज फ़ील्ड में टाइप करें — सभी मिलान संपादक में तुरंत हाइलाइट हो जाते हैं।</li>
+        <li><strong>↑</strong> / <strong>↓</strong> बटन से मिलानों के बीच नेविगेट करें, या खोज फ़ील्ड में <kbd>Enter</kbd> (अगला) / <kbd>Shift</kbd>+<kbd>Enter</kbd> (पिछला) दबाएँ।</li>
+        <li>मिलान काउंटर वर्तमान स्थिति दिखाता है (जैसे <em>3 / 12</em>)।</li>
+        <li><strong>Aa</strong> — केस-संवेदनशील खोज चालू/बंद।</li>
+        <li><strong>[W]</strong> — पूरे शब्द का मिलान चालू/बंद।</li>
+        <li>वर्तमान मिलान बदलने के लिए <strong>बदलें</strong> उपयोग करें, या एक साथ सभी मिलान बदलने के लिए <strong>सभी बदलें</strong> उपयोग करें।</li>
+        <li>बार बंद करने और सभी हाइलाइट हटाने के लिए <kbd>Escape</kbd> दबाएँ या <strong>✕</strong> पर क्लिक करें।</li>
+      </ul>
+      <p>यदि बार खोलते समय संपादक में टेक्स्ट चुना हुआ है, तो खोज फ़ील्ड स्वतः उस टेक्स्ट से भर जाती है (केवल एकल-पंक्ति चयन के लिए)।</p>
     </section>
 
     <!-- ═══ 5. LIVE PREVIEW ════════════════════════════════════════════════ -->
@@ -1269,6 +1286,11 @@ $</code></pre>
       <div class="shortcut-row"><span class="label">Cut (काटें)</span><span><kbd>Ctrl</kbd>+<kbd>X</kbd></span></div>
       <div class="shortcut-row"><span class="label">Copy (कॉपी करें)</span><span><kbd>Ctrl</kbd>+<kbd>C</kbd></span></div>
       <div class="shortcut-row"><span class="label">Paste (पेस्ट करें)</span><span><kbd>Ctrl</kbd>+<kbd>V</kbd></span></div>
+      <div class="shortcut-row"><span class="label">खोजें</span><span><kbd>Ctrl</kbd>+<kbd>F</kbd></span></div>
+      <div class="shortcut-row"><span class="label">खोजें &amp; बदलें</span><span><kbd>Ctrl</kbd>+<kbd>H</kbd></span></div>
+      <div class="shortcut-row"><span class="label">अगला खोजें</span><span><kbd>Enter</kbd> <em>(खोज बार में)</em></span></div>
+      <div class="shortcut-row"><span class="label">पिछला खोजें</span><span><kbd>Shift</kbd>+<kbd>Enter</kbd> <em>(खोज बार में)</em></span></div>
+      <div class="shortcut-row"><span class="label">खोज बार बंद करें</span><span><kbd>Escape</kbd></span></div>
 
       <hr class="section-divider">
       <p style="color:var(--text-muted);font-size:0.85em;">MarkForge — Copyright &copy; Marcel Mulch. Released under the GNU General Public License v3.0.</p>

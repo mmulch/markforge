@@ -530,7 +530,11 @@
           <li><a href="#menueleiste">Menüleiste</a></li>
         </ul>
       </li>
-      <li><a href="#editor">4. Der Editor</a></li>
+      <li><a href="#editor">4. Der Editor</a>
+        <ul>
+          <li><a href="#suchen-ersetzen">Suchen &amp; Ersetzen</a></li>
+        </ul>
+      </li>
       <li><a href="#vorschau">5. Live-Vorschau</a></li>
       <li><a href="#dateioperationen">6. Dateioperationen</a></li>
       <li><a href="#markdown-referenz">7. Markdown-Referenz</a>
@@ -755,6 +759,19 @@ python src/main.py</code></pre>
         <li><kbd>Ctrl</kbd>+<kbd>Y</kbd> — Wiederholen</li>
         <li><kbd>Ctrl</kbd>+<kbd>X</kbd> / <kbd>Ctrl</kbd>+<kbd>C</kbd> / <kbd>Ctrl</kbd>+<kbd>V</kbd> — Ausschneiden / Kopieren / Einfügen</li>
       </ul>
+
+      <h3 id="suchen-ersetzen">Suchen &amp; Ersetzen</h3>
+      <p>Drücken Sie <kbd>Ctrl</kbd>+<kbd>F</kbd>, um die Suchleiste zu öffnen, oder <kbd>Ctrl</kbd>+<kbd>H</kbd>, um sie mit der Ersetzen-Zeile anzuzeigen. Die Leiste erscheint oberhalb des Editors.</p>
+      <ul>
+        <li>Tippen Sie im Suchfeld — alle Treffer werden sofort im Editor hervorgehoben.</li>
+        <li>Navigieren Sie mit den Schaltflächen <strong>↑</strong> / <strong>↓</strong> oder drücken Sie im Suchfeld <kbd>Enter</kbd> (nächstes) / <kbd>Shift</kbd>+<kbd>Enter</kbd> (vorheriges).</li>
+        <li>Der Trefferzähler zeigt die aktuelle Position an (z. B. <em>3 / 12</em>).</li>
+        <li><strong>Aa</strong> — Groß-/Kleinschreibung beachten.</li>
+        <li><strong>[W]</strong> — Nur ganze Wörter suchen.</li>
+        <li>Mit <strong>Ersetzen</strong> wird der aktuelle Treffer ersetzt; <strong>Alle ersetzen</strong> ersetzt alle Vorkommen auf einmal.</li>
+        <li>Drücken Sie <kbd>Escape</kbd> oder klicken Sie auf <strong>✕</strong>, um die Leiste zu schließen und alle Hervorhebungen zu entfernen.</li>
+      </ul>
+      <p>Wenn beim Öffnen der Leiste Text im Editor markiert ist, wird das Suchfeld automatisch damit befüllt (nur einzeilige Auswahlen).</p>
     </section>
 
     <!-- ═══ 5. LIVE-VORSCHAU ══════════════════════════════════════════════ -->
@@ -1268,6 +1285,11 @@ $</code></pre>
       <div class="shortcut-row"><span class="label">Ausschneiden</span><span><kbd>Ctrl</kbd>+<kbd>X</kbd></span></div>
       <div class="shortcut-row"><span class="label">Kopieren</span><span><kbd>Ctrl</kbd>+<kbd>C</kbd></span></div>
       <div class="shortcut-row"><span class="label">Einfügen</span><span><kbd>Ctrl</kbd>+<kbd>V</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Suchen</span><span><kbd>Ctrl</kbd>+<kbd>F</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Suchen &amp; Ersetzen</span><span><kbd>Ctrl</kbd>+<kbd>H</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Nächstes suchen</span><span><kbd>Enter</kbd> <em>(in der Suchleiste)</em></span></div>
+      <div class="shortcut-row"><span class="label">Vorheriges suchen</span><span><kbd>Shift</kbd>+<kbd>Enter</kbd> <em>(in der Suchleiste)</em></span></div>
+      <div class="shortcut-row"><span class="label">Suchleiste schließen</span><span><kbd>Escape</kbd></span></div>
 
       <hr class="section-divider">
       <p style="color:var(--text-muted);font-size:0.85em;">MarkForge — Copyright &copy; Marcel Mulch. Veröffentlicht unter der GNU General Public License v3.0.</p>

@@ -16,6 +16,7 @@ A modern, feature-rich Markdown editor built with Python and PyQt6. Includes a l
 - **Editor themes** — switch the editor between dark and light independently of the preview
 - **Syntax highlighting** — Markdown-aware highlighting with matching dark/light colour schemes
 - **Line numbers** — gutter with current-line highlight
+- **Find & Replace** — inline find/replace bar (`Ctrl+F` / `Ctrl+H`) with match highlighting, case-sensitive and whole-word options, and Replace All
 - **File tree** — browse Markdown files and images in the project directory
 - **Insert dialogs** — guided dialogs for links, images, tables, PlantUML diagrams, and Mermaid diagrams
 - **PlantUML support** — embed diagrams rendered via the PlantUML online service
@@ -48,6 +49,8 @@ A modern, feature-rich Markdown editor built with Python and PyQt6. Includes a l
 | Insert PlantUML | `Ctrl+Shift+U` |
 | Insert Mermaid | `Ctrl+Shift+M` |
 | Insert table | `Ctrl+Shift+T` |
+| Find | `Ctrl+F` |
+| Find & Replace | `Ctrl+H` |
 
 ---
 
@@ -231,6 +234,7 @@ markforge/
 │   ├── editor_widget.py    # Text editor with line numbers
 │   ├── preview_widget.py   # Live HTML preview (WebEngine)
 │   ├── highlighter.py      # Markdown syntax highlighter
+│   ├── find_replace_bar.py # Find & Replace bar widget
 │   ├── file_tree_widget.py # Project file browser
 │   ├── git_manager.py      # Pure-Python git logic (dulwich)
 │   ├── git_dialogs.py      # Git open / commit & push dialogs

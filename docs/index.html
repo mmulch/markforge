@@ -531,7 +531,11 @@
           <li><a href="#menubar">Menu Bar</a></li>
         </ul>
       </li>
-      <li><a href="#editor">4. The Editor</a></li>
+      <li><a href="#editor">4. The Editor</a>
+        <ul>
+          <li><a href="#find-replace">Find &amp; Replace</a></li>
+        </ul>
+      </li>
       <li><a href="#preview">5. Live Preview</a></li>
       <li><a href="#fileops">6. File Operations</a></li>
       <li><a href="#markdown-ref">7. Markdown Reference</a>
@@ -756,6 +760,19 @@ python src/main.py</code></pre>
         <li><kbd>Ctrl</kbd>+<kbd>Y</kbd> — Redo</li>
         <li><kbd>Ctrl</kbd>+<kbd>X</kbd> / <kbd>Ctrl</kbd>+<kbd>C</kbd> / <kbd>Ctrl</kbd>+<kbd>V</kbd> — Cut / Copy / Paste</li>
       </ul>
+
+      <h3 id="find-replace">Find &amp; Replace</h3>
+      <p>Press <kbd>Ctrl</kbd>+<kbd>F</kbd> to open the find bar, or <kbd>Ctrl</kbd>+<kbd>H</kbd> to open it with the replace row visible. The bar appears above the editor.</p>
+      <ul>
+        <li>Type in the search field — all matches are highlighted instantly in the editor.</li>
+        <li>Navigate between matches with the <strong>↑</strong> / <strong>↓</strong> buttons, or press <kbd>Enter</kbd> (next) / <kbd>Shift</kbd>+<kbd>Enter</kbd> (previous) in the search field.</li>
+        <li>The match counter shows the current position (e.g. <em>3 / 12</em>).</li>
+        <li><strong>Aa</strong> — toggle case-sensitive search.</li>
+        <li><strong>[W]</strong> — toggle whole-word matching.</li>
+        <li>Use <strong>Replace</strong> to replace the current match, or <strong>Replace All</strong> to replace every occurrence at once.</li>
+        <li>Press <kbd>Escape</kbd> or click <strong>✕</strong> to close the bar and clear all highlights.</li>
+      </ul>
+      <p>If text is selected in the editor when you open the bar, the search field is pre-filled with the selection (single-line selections only).</p>
     </section>
 
     <!-- ═══ 5. LIVE PREVIEW ════════════════════════════════════════════════ -->
@@ -1269,6 +1286,11 @@ $</code></pre>
       <div class="shortcut-row"><span class="label">Cut</span><span><kbd>Ctrl</kbd>+<kbd>X</kbd></span></div>
       <div class="shortcut-row"><span class="label">Copy</span><span><kbd>Ctrl</kbd>+<kbd>C</kbd></span></div>
       <div class="shortcut-row"><span class="label">Paste</span><span><kbd>Ctrl</kbd>+<kbd>V</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Find</span><span><kbd>Ctrl</kbd>+<kbd>F</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Find &amp; Replace</span><span><kbd>Ctrl</kbd>+<kbd>H</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Find next</span><span><kbd>Enter</kbd> <em>(in find bar)</em></span></div>
+      <div class="shortcut-row"><span class="label">Find previous</span><span><kbd>Shift</kbd>+<kbd>Enter</kbd> <em>(in find bar)</em></span></div>
+      <div class="shortcut-row"><span class="label">Close find bar</span><span><kbd>Escape</kbd></span></div>
 
       <hr class="section-divider">
       <p style="color:var(--text-muted);font-size:0.85em;">MarkForge — Copyright &copy; Marcel Mulch. Released under the GNU General Public License v3.0.</p>

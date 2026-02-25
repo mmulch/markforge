@@ -19,10 +19,13 @@ from PyQt6.QtWidgets import (
     QProgressDialog,
     QSplitter,
     QToolBar,
+    QVBoxLayout,
+    QWidget,
 )
 
 from editor_widget import EditorWidget
 from file_tree_widget import FileTreeWidget
+from find_replace_bar import FindReplaceBar
 from git_dialogs import GitCommitDialog, GitOpenDialog, GitSquashDialog
 from git_manager import GitFileInfo, CommitSpec  # noqa: F401
 from i18n import tr
@@ -202,7 +205,16 @@ class MainWindow(QMainWindow):
         self._outer_splitter.setStretchFactor(0, 0)
         self._outer_splitter.setStretchFactor(1, 1)
 
-        self.setCentralWidget(self._outer_splitter)
+        self._find_bar = FindReplaceBar(self._editor, self)
+        self._find_bar.hide()
+
+        container = QWidget()
+        vbox = QVBoxLayout(container)
+        vbox.setContentsMargins(0, 0, 0, 0)
+        vbox.setSpacing(0)
+        vbox.addWidget(self._find_bar)
+        vbox.addWidget(self._outer_splitter)
+        self.setCentralWidget(container)
 
     def _build_menu(self) -> None:
         mb = self.menuBar()
@@ -237,6 +249,11 @@ class MainWindow(QMainWindow):
         cut.triggered.connect(self._editor.cut)
         copy.triggered.connect(self._editor.copy)
         paste.triggered.connect(self._editor.paste)
+        m.addSeparator()
+        self._act_find    = self._mk_action(tr("&Find …"),             "Ctrl+F", m)
+        self._act_replace = self._mk_action(tr("Find && &Replace …"),  "Ctrl+H", m)
+        self._act_find.triggered.connect(lambda: self._find_bar.show_find())
+        self._act_replace.triggered.connect(lambda: self._find_bar.show_replace())
 
         # ── Insert ─────────────────────────────────────────────────────────
         m = mb.addMenu(tr("&Insert"))
@@ -388,8 +405,11 @@ class MainWindow(QMainWindow):
             self._act_save, self._act_save_as, self._act_export_pdf,
             self._act_insert_link, self._act_insert_image,
             self._act_insert_plantuml, self._act_insert_mermaid, self._act_insert_table,
+            self._act_find, self._act_replace,
         ):
             act.setEnabled(active)
+        if not active:
+            self._find_bar.close_bar()
 
     def _update_title(self) -> None:
         name = (

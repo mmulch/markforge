@@ -531,7 +531,11 @@
           <li><a href="#menubar">Рядок меню</a></li>
         </ul>
       </li>
-      <li><a href="#editor">4. Редактор</a></li>
+      <li><a href="#editor">4. Редактор</a>
+        <ul>
+          <li><a href="#find-replace">Знайти &amp; Замінити</a></li>
+        </ul>
+      </li>
       <li><a href="#preview">5. Попередній перегляд у реальному часі</a></li>
       <li><a href="#fileops">6. Операції з файлами</a></li>
       <li><a href="#markdown-ref">7. Довідник Markdown</a>
@@ -756,6 +760,19 @@ python src/main.py</code></pre>
         <li><kbd>Ctrl</kbd>+<kbd>Y</kbd> — Повторити</li>
         <li><kbd>Ctrl</kbd>+<kbd>X</kbd> / <kbd>Ctrl</kbd>+<kbd>C</kbd> / <kbd>Ctrl</kbd>+<kbd>V</kbd> — Вирізати / Копіювати / Вставити</li>
       </ul>
+
+      <h3 id="find-replace">Знайти &amp; Замінити</h3>
+      <p>Натисніть <kbd>Ctrl</kbd>+<kbd>F</kbd>, щоб відкрити панель пошуку, або <kbd>Ctrl</kbd>+<kbd>H</kbd> — щоб відкрити її з рядком заміни. Панель з'являється над редактором.</p>
+      <ul>
+        <li>Введіть текст у поле пошуку — усі збіги миттєво підсвічуються в редакторі.</li>
+        <li>Переміщайтеся між збігами за допомогою кнопок <strong>↑</strong> / <strong>↓</strong>, або натисніть <kbd>Enter</kbd> (наступний) / <kbd>Shift</kbd>+<kbd>Enter</kbd> (попередній) у полі пошуку.</li>
+        <li>Лічильник збігів показує поточну позицію (наприклад <em>3 / 12</em>).</li>
+        <li><strong>Aa</strong> — увімкнути пошук з урахуванням регістру.</li>
+        <li><strong>[W]</strong> — пошук лише цілих слів.</li>
+        <li>Натисніть <strong>Замінити</strong>, щоб замінити поточний збіг, або <strong>Замінити все</strong> — щоб замінити всі входження одразу.</li>
+        <li>Натисніть <kbd>Escape</kbd> або клацніть <strong>✕</strong>, щоб закрити панель і прибрати всі підсвічення.</li>
+      </ul>
+      <p>Якщо під час відкриття панелі в редакторі є виділений текст, поле пошуку автоматично заповнюється цим текстом (лише одно-рядкові виділення).</p>
     </section>
 
     <!-- ═══ 5. ПОПЕРЕДНІЙ ПЕРЕГЛЯД У РЕАЛЬНОМУ ЧАСІ ══════════════════════ -->
@@ -1269,6 +1286,11 @@ $</code></pre>
       <div class="shortcut-row"><span class="label">Вирізати</span><span><kbd>Ctrl</kbd>+<kbd>X</kbd></span></div>
       <div class="shortcut-row"><span class="label">Копіювати</span><span><kbd>Ctrl</kbd>+<kbd>C</kbd></span></div>
       <div class="shortcut-row"><span class="label">Вставити</span><span><kbd>Ctrl</kbd>+<kbd>V</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Знайти</span><span><kbd>Ctrl</kbd>+<kbd>F</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Знайти &amp; Замінити</span><span><kbd>Ctrl</kbd>+<kbd>H</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Знайти наступний</span><span><kbd>Enter</kbd> <em>(у панелі пошуку)</em></span></div>
+      <div class="shortcut-row"><span class="label">Знайти попередній</span><span><kbd>Shift</kbd>+<kbd>Enter</kbd> <em>(у панелі пошуку)</em></span></div>
+      <div class="shortcut-row"><span class="label">Закрити панель пошуку</span><span><kbd>Escape</kbd></span></div>
 
       <hr class="section-divider">
       <p style="color:var(--text-muted);font-size:0.85em;">MarkForge — Copyright &copy; Marcel Mulch. Released under the GNU General Public License v3.0.</p>

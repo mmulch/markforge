@@ -531,7 +531,11 @@
           <li><a href="#menubar">Menyrad</a></li>
         </ul>
       </li>
-      <li><a href="#editor">4. Redigeraren</a></li>
+      <li><a href="#editor">4. Redigeraren</a>
+        <ul>
+          <li><a href="#find-replace">Sök &amp; Ersätt</a></li>
+        </ul>
+      </li>
       <li><a href="#preview">5. Liveförhandsvisning</a></li>
       <li><a href="#fileops">6. Filhantering</a></li>
       <li><a href="#markdown-ref">7. Markdown-referens</a>
@@ -756,6 +760,19 @@ python src/main.py</code></pre>
         <li><kbd>Ctrl</kbd>+<kbd>Y</kbd> — Gör om</li>
         <li><kbd>Ctrl</kbd>+<kbd>X</kbd> / <kbd>Ctrl</kbd>+<kbd>C</kbd> / <kbd>Ctrl</kbd>+<kbd>V</kbd> — Klipp ut / Kopiera / Klistra in</li>
       </ul>
+
+      <h3 id="find-replace">Sök &amp; Ersätt</h3>
+      <p>Tryck <kbd>Ctrl</kbd>+<kbd>F</kbd> för att öppna sökfältet, eller <kbd>Ctrl</kbd>+<kbd>H</kbd> för att öppna det med ersättningsraden synlig. Fältet visas ovanför redigeraren.</p>
+      <ul>
+        <li>Skriv i sökfältet — alla träffar markeras omedelbart i redigeraren.</li>
+        <li>Navigera mellan träffar med knapparna <strong>↑</strong> / <strong>↓</strong>, eller tryck <kbd>Enter</kbd> (nästa) / <kbd>Shift</kbd>+<kbd>Enter</kbd> (föregående) i sökfältet.</li>
+        <li>Träffräknaren visar aktuell position (t.ex. <em>3 / 12</em>).</li>
+        <li><strong>Aa</strong> — aktivera skiftlägeskänslig sökning.</li>
+        <li><strong>[W]</strong> — aktivera helordsmatchning.</li>
+        <li>Använd <strong>Ersätt</strong> för att ersätta aktuell träff, eller <strong>Ersätt alla</strong> för att ersätta alla förekomster på en gång.</li>
+        <li>Tryck <kbd>Escape</kbd> eller klicka <strong>✕</strong> för att stänga fältet och ta bort alla markeringar.</li>
+      </ul>
+      <p>Om text är markerad i redigeraren när du öppnar fältet fylls sökfältet i förväg med urvalet (endast enradsurval).</p>
     </section>
 
     <!-- ═══ 5. LIVEFÖRHANDSVISNING ════════════════════════════════════════════════ -->
@@ -1269,6 +1286,11 @@ $</code></pre>
       <div class="shortcut-row"><span class="label">Klipp ut</span><span><kbd>Ctrl</kbd>+<kbd>X</kbd></span></div>
       <div class="shortcut-row"><span class="label">Kopiera</span><span><kbd>Ctrl</kbd>+<kbd>C</kbd></span></div>
       <div class="shortcut-row"><span class="label">Klistra in</span><span><kbd>Ctrl</kbd>+<kbd>V</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Sök</span><span><kbd>Ctrl</kbd>+<kbd>F</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Sök &amp; Ersätt</span><span><kbd>Ctrl</kbd>+<kbd>H</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Sök nästa</span><span><kbd>Enter</kbd> <em>(i sökfältet)</em></span></div>
+      <div class="shortcut-row"><span class="label">Sök föregående</span><span><kbd>Shift</kbd>+<kbd>Enter</kbd> <em>(i sökfältet)</em></span></div>
+      <div class="shortcut-row"><span class="label">Stäng sökfältet</span><span><kbd>Escape</kbd></span></div>
 
       <hr class="section-divider">
       <p style="color:var(--text-muted);font-size:0.85em;">MarkForge — Copyright &copy; Marcel Mulch. Utgiven under GNU General Public License v3.0.</p>

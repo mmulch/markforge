@@ -17,6 +17,7 @@ EDITOR_THEMES: dict[str, dict] = {
     "VS Code Dark": {
         "bg": "#1e1e1e", "fg": "#d4d4d4",
         "gutter_bg": "#252526", "gutter_fg": "#858585", "line_hl": "#2a2a2a",
+        "find_match": "#4d3800", "find_current": "#8b6000",
         "syntax": {
             "h1":     ("#569CD6", True,  False, None),
             "h2":     ("#4EC9B0", True,  False, None),
@@ -36,6 +37,7 @@ EDITOR_THEMES: dict[str, dict] = {
     "VS Code Light": {
         "bg": "#ffffff", "fg": "#1e1e1e",
         "gutter_bg": "#f0f0f0", "gutter_fg": "#888888", "line_hl": "#e8f2ff",
+        "find_match": "#fff3b0", "find_current": "#ffcc40",
         "syntax": {
             "h1":     ("#0000CC", True,  False, None),
             "h2":     ("#007070", True,  False, None),
@@ -55,6 +57,7 @@ EDITOR_THEMES: dict[str, dict] = {
     "Monokai": {
         "bg": "#272822", "fg": "#f8f8f2",
         "gutter_bg": "#3e3d32", "gutter_fg": "#75715e", "line_hl": "#3e3d32",
+        "find_match": "#4a3800", "find_current": "#886000",
         "syntax": {
             "h1":     ("#f92672", True,  False, None),
             "h2":     ("#a6e22e", True,  False, None),
@@ -74,6 +77,7 @@ EDITOR_THEMES: dict[str, dict] = {
     "Solarized Dark": {
         "bg": "#002b36", "fg": "#839496",
         "gutter_bg": "#073642", "gutter_fg": "#586e75", "line_hl": "#073642",
+        "find_match": "#3d3200", "find_current": "#7a5800",
         "syntax": {
             "h1":     ("#268bd2", True,  False, None),
             "h2":     ("#2aa198", True,  False, None),
@@ -93,6 +97,7 @@ EDITOR_THEMES: dict[str, dict] = {
     "Solarized Light": {
         "bg": "#fdf6e3", "fg": "#657b83",
         "gutter_bg": "#eee8d5", "gutter_fg": "#93a1a1", "line_hl": "#eee8d5",
+        "find_match": "#fff3b0", "find_current": "#ffcc40",
         "syntax": {
             "h1":     ("#268bd2", True,  False, None),
             "h2":     ("#2aa198", True,  False, None),
@@ -112,6 +117,7 @@ EDITOR_THEMES: dict[str, dict] = {
     "Nord": {
         "bg": "#2e3440", "fg": "#d8dee9",
         "gutter_bg": "#3b4252", "gutter_fg": "#4c566a", "line_hl": "#3b4252",
+        "find_match": "#3b3600", "find_current": "#6b5e00",
         "syntax": {
             "h1":     ("#88c0d0", True,  False, None),
             "h2":     ("#81a1c1", True,  False, None),
