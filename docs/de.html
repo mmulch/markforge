@@ -606,7 +606,7 @@
   <article>
 
     <!-- ─── TITEL ─────────────────────────────────────────────────────────── -->
-    <h1>MarkForge Benutzerhandbuch <span class="version-badge">v1.7.1</span></h1>
+    <h1>MarkForge Benutzerhandbuch <span class="version-badge">v1.7.2</span></h1>
 
     <!-- ═══ 1. EINLEITUNG ════════════════════════════════════════════════ -->
     <section id="einleitung">
@@ -719,9 +719,10 @@ python src/main.py</code></pre>
 
       <section id="statusleiste">
         <h3>Statusleiste</h3>
-        <p>Die Statusleiste am unteren Rand des Fensters zeigt stets zwei Informationen:</p>
+                <p>Die Statusleiste am unteren Rand des Fensters zeigt stets:</p>
         <ul>
-          <li><strong>Wörteranzahl</strong> — die Gesamtzahl der Wörter im Dokument (wird beim Tippen aktualisiert).</li>
+          <li><strong>Wörteranzahl &amp; Lesezeit</strong> — Wörteranzahl und geschätzte Lesezeit (z.B. <em>342 Wörter · 2 Min. Lesezeit</em>), wird beim Tippen aktualisiert.</li>
+          <li><strong>Wortziel-Fortschritt</strong> — wenn ein Wortziel über <em>Ansicht → Wortziel festlegen</em> gesetzt wurde, erscheint ein kompakter Fortschrittsbalken neben der Wörteranzahl.</li>
           <li><strong>Cursorposition</strong> — aktuelle Zeile und Spalte, z.&nbsp;B. <em>Zeile 12, Spalte 5</em>.</li>
         </ul>
       </section>
@@ -1297,6 +1298,7 @@ $</code></pre>
           <tr><td><strong>Proxy-Benutzername</strong></td><td>Textfeld</td><td>Optionale Proxy-Authentifizierung</td></tr>
           <tr><td><strong>Proxy-Passwort</strong></td><td>Textfeld</td><td>Optionale Proxy-Authentifizierung — im OS-Schlüsselbund gespeichert</td></tr>
           <tr><td><strong>Automatisches Speichern</strong></td><td>Intervall (Sekunden), bei Fokusverlust speichern</td><td>Standardmäßig deaktiviert; nicht für Git-verwaltete Dateien</td></tr>
+          <tr><td><strong>Wortziel</strong></td><td>Ziel-Wortanzahl</td><td>0 = deaktiviert; über Ansicht → Wortziel festlegen; zeigt Fortschrittsbalken in der Statusleiste</td></tr>
         </tbody>
       </table>
       </div>

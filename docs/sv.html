@@ -607,7 +607,7 @@
   <article>
 
     <!-- ─── TITLE ─────────────────────────────────────────────────────────── -->
-    <h1>MarkForge Användarmanual <span class="version-badge">v1.7.1</span></h1>
+    <h1>MarkForge Användarmanual <span class="version-badge">v1.7.2</span></h1>
 
     <!-- ═══ 1. INTRODUKTION ═══════════════════════════════════════════════ -->
     <section id="introduction">
@@ -720,10 +720,11 @@ python src/main.py</code></pre>
 
       <section id="statusbar">
         <h3>Statusfält</h3>
-        <p>Statusfältet längst ned i fönstret visar alltid två typer av information:</p>
+                <p>Statusfältet längst ned i fönstret visar alltid:</p>
         <ul>
-          <li><strong>Ordantal</strong> — det totala antalet ord i dokumentet (uppdateras live medan du skriver).</li>
-          <li><strong>Markörsposition</strong> — aktuell rad och kolumnnummer, t.ex. <em>Rad 12, Kol 5</em>.</li>
+          <li><strong>Ordantal &amp; lästid</strong> — ordantal och uppskattad lästid (t.ex. <em>342 ord · 2 min läsning</em>), uppdateras live.</li>
+          <li><strong>Ordmålsframsteg</strong> — om ett ordmål ställts in via <em>Visa → Ange ordmål</em> visas en kompakt förloppsindikator.</li>
+          <li><strong>Markörposition</strong> — aktuell rad och kolumn, t.ex. <em>Rad 12, Kolumn 5</em>.</li>
         </ul>
       </section>
 
@@ -1298,6 +1299,7 @@ $</code></pre>
           <tr><td><strong>Proxyanvändarnamn</strong></td><td>Textfält</td><td>Valfri proxyautentisering</td></tr>
           <tr><td><strong>Proxylösenord</strong></td><td>Textfält</td><td>Valfri proxyautentisering — lagras i OS-nyckelringen</td></tr>
           <tr><td><strong>Autospara</strong></td><td>Intervall (sekunder), spara vid fokusbortfall</td><td>Av som standard; gäller inte Git-hanterade filer</td></tr>
+          <tr><td><strong>Ordmål</strong></td><td>Målordantal</td><td>0 = inaktiverat; ange via Visa → Ange ordmål; visar förloppsindikator i statusfältet</td></tr>
         </tbody>
       </table>
       </div>

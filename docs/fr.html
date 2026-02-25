@@ -607,7 +607,7 @@
   <article>
 
     <!-- ─── TITLE ─────────────────────────────────────────────────────────── -->
-    <h1>Manuel utilisateur MarkForge <span class="version-badge">v1.7.1</span></h1>
+    <h1>Manuel utilisateur MarkForge <span class="version-badge">v1.7.2</span></h1>
 
     <!-- ═══ 1. INTRODUCTION ══════════════════════════════════════════════ -->
     <section id="introduction">
@@ -720,10 +720,11 @@ python src/main.py</code></pre>
 
       <section id="statusbar">
         <h3>Barre d'état</h3>
-        <p>La barre d'état en bas de la fenêtre affiche toujours deux informations :</p>
+                <p>La barre d'état en bas de la fenêtre affiche toujours :</p>
         <ul>
-          <li><strong>Nombre de mots</strong> — le nombre total de mots dans le document (mis à jour en direct pendant la saisie).</li>
-          <li><strong>Position du curseur</strong> — le numéro de ligne et de colonne actuel, par exemple <em>Ligne 12, Col 5</em>.</li>
+          <li><strong>Nombre de mots &amp; temps de lecture</strong> — nombre de mots et temps de lecture estimé (ex. <em>342 mots · 2 min de lecture</em>), mis à jour en direct.</li>
+          <li><strong>Progression de l'objectif de mots</strong> — si un objectif est défini via <em>Afficher → Définir l'objectif de mots</em>, une barre de progression compacte apparaît.</li>
+          <li><strong>Position du curseur</strong> — ligne et colonne actuelles, ex. <em>Ligne 12, Col 5</em>.</li>
         </ul>
       </section>
 
@@ -1298,6 +1299,7 @@ $</code></pre>
           <tr><td><strong>Nom d'utilisateur du proxy</strong></td><td>Champ de texte</td><td>Authentification proxy facultative</td></tr>
           <tr><td><strong>Mot de passe du proxy</strong></td><td>Champ de texte</td><td>Authentification proxy facultative — stocké dans le trousseau du SO</td></tr>
           <tr><td><strong>Sauvegarde automatique</strong></td><td>Intervalle (secondes), enregistrer à la perte de focus</td><td>Désactivé par défaut ; non appliqué aux fichiers Git</td></tr>
+          <tr><td><strong>Objectif de mots</strong></td><td>Nombre de mots cible</td><td>0 = désactivé ; définir via Afficher → Définir l'objectif de mots ; affiche une barre de progression dans la barre d'état</td></tr>
         </tbody>
       </table>
       </div>

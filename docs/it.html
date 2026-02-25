@@ -607,7 +607,7 @@
   <article>
 
     <!-- ─── TITLE ─────────────────────────────────────────────────────────── -->
-    <h1>Manuale utente MarkForge <span class="version-badge">v1.7.1</span></h1>
+    <h1>Manuale utente MarkForge <span class="version-badge">v1.7.2</span></h1>
 
     <!-- ═══ 1. INTRODUZIONE ══════════════════════════════════════════════ -->
     <section id="introduction">
@@ -720,10 +720,11 @@ python src/main.py</code></pre>
 
       <section id="statusbar">
         <h3>Barra di stato</h3>
-        <p>La barra di stato nella parte inferiore della finestra mostra sempre due informazioni:</p>
+                <p>La barra di stato nella parte inferiore della finestra mostra sempre:</p>
         <ul>
-          <li><strong>Conteggio parole</strong> — il numero totale di parole nel documento (aggiornato in tempo reale mentre scrivi).</li>
-          <li><strong>Posizione del cursore</strong> — il numero di riga e colonna corrente, ad esempio <em>Riga 12, Col 5</em>.</li>
+          <li><strong>Conteggio parole &amp; tempo di lettura</strong> — conteggio parole e tempo di lettura stimato (es. <em>342 parole · 2 min di lettura</em>), aggiornato in tempo reale.</li>
+          <li><strong>Avanzamento obiettivo parole</strong> — se impostato un obiettivo tramite <em>Visualizza → Imposta obiettivo parole</em>, appare una barra di avanzamento compatta.</li>
+          <li><strong>Posizione cursore</strong> — riga e colonna correnti, es. <em>Riga 12, Col 5</em>.</li>
         </ul>
       </section>
 
@@ -1298,6 +1299,7 @@ $</code></pre>
           <tr><td><strong>Nome utente del proxy</strong></td><td>Campo di testo</td><td>Autenticazione proxy facoltativa</td></tr>
           <tr><td><strong>Password del proxy</strong></td><td>Campo di testo</td><td>Autenticazione proxy facoltativa — archiviata nel portachiavi del SO</td></tr>
           <tr><td><strong>Salvataggio automatico</strong></td><td>Intervallo (secondi), salva alla perdita del focus</td><td>Disattivato per impostazione predefinita; non applicato ai file Git</td></tr>
+          <tr><td><strong>Obiettivo parole</strong></td><td>Conteggio parole obiettivo</td><td>0 = disabilitato; impostare tramite Visualizza → Imposta obiettivo parole; mostra barra di avanzamento nella barra di stato</td></tr>
         </tbody>
       </table>
       </div>

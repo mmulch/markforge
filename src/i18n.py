@@ -340,6 +340,15 @@ _DE: dict[str, str] = {
     "Save on focus loss":        "Speichern bei Fokusverlust",
     "Auto-saved.":               "Automatisch gespeichert.",
     "Save the file first to paste images.": "Datei zuerst speichern, um Bilder einzufügen.",
+    # ── Word count / reading time ─────────────────────────────────────────────
+    "{n} words · {read}":          "{n} Wörter · {read}",
+    "{n} / {goal} words · {read}": "{n} / {goal} Wörter · {read}",
+    "{m} min read":                "{m} Min. Lesezeit",
+    "< 1 min read":                "< 1 Min. Lesezeit",
+    "Set Word Goal …":             "Wortziel festlegen …",
+    "Word Goal":                   "Wortziel",
+    "Target word count (0 to disable):": "Ziel-Wortanzahl (0 zum Deaktivieren):",
+
 
 }
 
@@ -639,6 +648,15 @@ _AR: dict[str, str] = {
     "Save on focus loss": "الحفظ عند فقدان التركيز",
     "Auto-saved.": "تم الحفظ تلقائياً.",
     "Save the file first to paste images.": "احفظ الملف أولاً لإدراج الصور",
+    # ── Word count / reading time ─────────────────────────────────────────────
+    "{n} words · {read}":          "{n} كلمات · {read}",
+    "{n} / {goal} words · {read}": "{n} / {goal} كلمات · {read}",
+    "{m} min read":                "وقت القراءة {m} دقيقة",
+    "< 1 min read":                "وقت القراءة < دقيقة",
+    "Set Word Goal …":             "تعيين هدف الكلمات …",
+    "Word Goal":                   "هدف الكلمات",
+    "Target word count (0 to disable):": "عدد الكلمات المستهدف (0 للتعطيل):",
+
 
 }
 
@@ -939,6 +957,15 @@ _VI: dict[str, str] = {
     "Save on focus loss": "Lưu khi mất tiêu điểm",
     "Auto-saved.": "Đã tự động lưu.",
     "Save the file first to paste images.": "Lưu tệp trước để dán hình ảnh",
+    # ── Word count / reading time ─────────────────────────────────────────────
+    "{n} words · {read}":          "{n} từ · {read}",
+    "{n} / {goal} words · {read}": "{n} / {goal} từ · {read}",
+    "{m} min read":                "đọc {m} phút",
+    "< 1 min read":                "đọc < 1 phút",
+    "Set Word Goal …":             "Đặt mục tiêu từ …",
+    "Word Goal":                   "Mục tiêu từ",
+    "Target word count (0 to disable):": "Số từ mục tiêu (0 để tắt):",
+
 
 }
 
@@ -1239,6 +1266,15 @@ _SV: dict[str, str] = {
     "Save on focus loss": "Spara vid fokusbortfall",
     "Auto-saved.": "Autosparades.",
     "Save the file first to paste images.": "Spara filen först för att klistra in bilder",
+    # ── Word count / reading time ─────────────────────────────────────────────
+    "{n} words · {read}":          "{n} ord · {read}",
+    "{n} / {goal} words · {read}": "{n} / {goal} ord · {read}",
+    "{m} min read":                "{m} min läsning",
+    "< 1 min read":                "< 1 min läsning",
+    "Set Word Goal …":             "Sätt ordmål …",
+    "Word Goal":                   "Ordmål",
+    "Target word count (0 to disable):": "Målantal ord (0 för att inaktivera):",
+
 
 }
 
@@ -1539,6 +1575,15 @@ _UK: dict[str, str] = {
     "Save on focus loss": "Зберігати при втраті фокусу",
     "Auto-saved.": "Автоматично збережено.",
     "Save the file first to paste images.": "Спочатку збережіть файл, щоб вставити зображення",
+    # ── Word count / reading time ─────────────────────────────────────────────
+    "{n} words · {read}":          "{n} слів · {read}",
+    "{n} / {goal} words · {read}": "{n} / {goal} слів · {read}",
+    "{m} min read":                "{m} хв читання",
+    "< 1 min read":                "< 1 хв читання",
+    "Set Word Goal …":             "Встановити мету слів …",
+    "Word Goal":                   "Мета слів",
+    "Target word count (0 to disable):": "Цільова кількість слів (0 для вимкнення):",
+
 
 }
 
@@ -1839,6 +1884,15 @@ _KN: dict[str, str] = {
     "Save on focus loss": "ಫೋಕಸ್ ಕಳೆದಾಗ ಉಳಿಸಿ",
     "Auto-saved.": "ಸ್ವಯಂ-ಉಳಿಸಲಾಗಿದೆ.",
     "Save the file first to paste images.": "ಚಿತ್ರಗಳನ್ನು ಅಂಟಿಸಲು ಮೊದಲು ಫೈಲ್ ಉಳಿಸಿ",
+    # ── Word count / reading time ─────────────────────────────────────────────
+    "{n} words · {read}":          "{n} ಪದಗಳು · {read}",
+    "{n} / {goal} words · {read}": "{n} / {goal} ಪದಗಳು · {read}",
+    "{m} min read":                "{m} ನಿಮಿಷ ಓದು",
+    "< 1 min read":                "< 1 ನಿಮಿಷ ಓದು",
+    "Set Word Goal …":             "ಪದ ಗುರಿ ಹೊಂದಿಸಿ …",
+    "Word Goal":                   "ಪದ ಗುರಿ",
+    "Target word count (0 to disable):": "ಗುರಿ ಪದ ಸಂಖ್ಯೆ (0 ನಿಷ್ಕ್ರಿಯಗೊಳಿಸಲು):",
+
 
 }
 
@@ -2139,6 +2193,15 @@ _HI: dict[str, str] = {
     "Save on focus loss": "फ़ोकस खोने पर सहेजें",
     "Auto-saved.": "ऑटो-सहेजा गया.",
     "Save the file first to paste images.": "चित्र चिपकाने के लिए पहले फ़ाइल सहेजें",
+    # ── Word count / reading time ─────────────────────────────────────────────
+    "{n} words · {read}":          "{n} शब्द · {read}",
+    "{n} / {goal} words · {read}": "{n} / {goal} शब्द · {read}",
+    "{m} min read":                "{m} मिनट पढ़ाई",
+    "< 1 min read":                "< 1 मिनट पढ़ाई",
+    "Set Word Goal …":             "शब्द लक्ष्य सेट करें …",
+    "Word Goal":                   "शब्द लक्ष्य",
+    "Target word count (0 to disable):": "लक्ष्य शब्द संख्या (0 अक्षम करने के लिए):",
+
 
 }
 
@@ -2413,6 +2476,15 @@ _ES: dict[str, str] = {
     "Save on focus loss": "Guardar al perder el foco",
     "Auto-saved.": "Guardado automáticamente.",
     "Save the file first to paste images.": "Guarda el archivo primero para pegar imágenes",
+    # ── Word count / reading time ─────────────────────────────────────────────
+    "{n} words · {read}":          "{n} palabras · {read}",
+    "{n} / {goal} words · {read}": "{n} / {goal} palabras · {read}",
+    "{m} min read":                "{m} min de lectura",
+    "< 1 min read":                "< 1 min de lectura",
+    "Set Word Goal …":             "Establecer meta de palabras …",
+    "Word Goal":                   "Meta de palabras",
+    "Target word count (0 to disable):": "Recuento de palabras objetivo (0 para desactivar):",
+
 
 }
 
@@ -2688,6 +2760,15 @@ _FR: dict[str, str] = {
     "Save on focus loss": "Enregistrer à la perte de focus",
     "Auto-saved.": "Sauvegardé automatiquement.",
     "Save the file first to paste images.": "Enregistrez d'abord le fichier pour coller des images",
+    # ── Word count / reading time ─────────────────────────────────────────────
+    "{n} words · {read}":          "{n} mots · {read}",
+    "{n} / {goal} words · {read}": "{n} / {goal} mots · {read}",
+    "{m} min read":                "{m} min de lecture",
+    "< 1 min read":                "< 1 min de lecture",
+    "Set Word Goal …":             "Définir un objectif de mots …",
+    "Word Goal":                   "Objectif de mots",
+    "Target word count (0 to disable):": "Nombre de mots cible (0 pour désactiver) :",
+
 
 }
 
@@ -2963,6 +3044,15 @@ _IT: dict[str, str] = {
     "Save on focus loss": "Salva alla perdita del focus",
     "Auto-saved.": "Salvato automaticamente.",
     "Save the file first to paste images.": "Salva prima il file per incollare immagini",
+    # ── Word count / reading time ─────────────────────────────────────────────
+    "{n} words · {read}":          "{n} parole · {read}",
+    "{n} / {goal} words · {read}": "{n} / {goal} parole · {read}",
+    "{m} min read":                "{m} min di lettura",
+    "< 1 min read":                "< 1 min di lettura",
+    "Set Word Goal …":             "Imposta obiettivo parole …",
+    "Word Goal":                   "Obiettivo parole",
+    "Target word count (0 to disable):": "Numero di parole obiettivo (0 per disattivare):",
+
 
 }
 
@@ -3238,6 +3328,15 @@ _NL: dict[str, str] = {
     "Save on focus loss": "Opslaan bij focusverlies",
     "Auto-saved.": "Automatisch opgeslagen.",
     "Save the file first to paste images.": "Sla het bestand eerst op om afbeeldingen te plakken",
+    # ── Word count / reading time ─────────────────────────────────────────────
+    "{n} words · {read}":          "{n} woorden · {read}",
+    "{n} / {goal} words · {read}": "{n} / {goal} woorden · {read}",
+    "{m} min read":                "{m} min lezen",
+    "< 1 min read":                "< 1 min lezen",
+    "Set Word Goal …":             "Woorddoel instellen …",
+    "Word Goal":                   "Woorddoel",
+    "Target word count (0 to disable):": "Doelaantal woorden (0 om uit te schakelen):",
+
 
 }
 
@@ -3513,6 +3612,15 @@ _PT: dict[str, str] = {
     "Save on focus loss": "Salvar ao perder o foco",
     "Auto-saved.": "Salvo automaticamente.",
     "Save the file first to paste images.": "Salve o arquivo primeiro para colar imagens",
+    # ── Word count / reading time ─────────────────────────────────────────────
+    "{n} words · {read}":          "{n} palavras · {read}",
+    "{n} / {goal} words · {read}": "{n} / {goal} palavras · {read}",
+    "{m} min read":                "{m} min de leitura",
+    "< 1 min read":                "< 1 min de leitura",
+    "Set Word Goal …":             "Definir meta de palavras …",
+    "Word Goal":                   "Meta de palavras",
+    "Target word count (0 to disable):": "Contagem de palavras alvo (0 para desativar):",
+
 
 }
 
@@ -3788,6 +3896,15 @@ _FA: dict[str, str] = {
     "Save on focus loss": "ذخیره هنگام از دست دادن فوکوس",
     "Auto-saved.": "ذخیره خودکار انجام شد.",
     "Save the file first to paste images.": "ابتدا فایل را ذخیره کنید تا تصاویر را جای‌گذاری کنید",
+    # ── Word count / reading time ─────────────────────────────────────────────
+    "{n} words · {read}":          "{n} کلمه · {read}",
+    "{n} / {goal} words · {read}": "{n} / {goal} کلمه · {read}",
+    "{m} min read":                "{m} دقیقه مطالعه",
+    "< 1 min read":                "< ۱ دقیقه مطالعه",
+    "Set Word Goal …":             "تنظیم هدف کلمه …",
+    "Word Goal":                   "هدف کلمه",
+    "Target word count (0 to disable):": "تعداد کلمه هدف (۰ برای غیرفعال‌سازی):",
+
 }
 
 _TRANSLATIONS: dict[str, dict[str, str]] = {

@@ -31,7 +31,7 @@ A modern, feature-rich Markdown editor built with Python and PyQt6. Includes a l
 - **PDF import** — import any PDF and convert it to Markdown automatically (headings, paragraphs, tables preserved)
 - **PDF export** — export the current document as a PDF
 - **Git integration** — open individual files or entire branches directly from GitHub, GitHub Enterprise, Bitbucket Cloud, or Bitbucket Server; edit and push back without leaving the editor; amend the previous commit or squash multiple commits in one step (see [Git Integration](#git-integration))
-- **Word count & cursor position** — always visible in the status bar
+- **Word count & reading time** — word count and estimated reading time always visible in the status bar; set an optional target word count (View → Set Word Goal) to show a compact progress bar toward your goal
 - **Online user manual** — comprehensive documentation in 14 languages: EN, DE, AR, VI, SV, UK, KN, HI, ES, FR, IT, NL, PT, FA (see [User Manual](docs/index.html))
 - **Multilingual** — UI available in 14 languages: English, Deutsch, Español, Français, Italiano, Nederlands, Português, عربي, فارسی, Tiếng Việt, Svenska, Українська, ಕನ್ನಡ, हिंदी
 - **Auto-save** — automatically saves local files on a configurable interval (default off) and/or on window focus loss; never triggers a git commit; configurable in View → Settings

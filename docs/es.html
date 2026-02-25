@@ -607,7 +607,7 @@
   <article>
 
     <!-- ─── TITLE ─────────────────────────────────────────────────────────── -->
-    <h1>Manual de usuario de MarkForge <span class="version-badge">v1.7.1</span></h1>
+    <h1>Manual de usuario de MarkForge <span class="version-badge">v1.7.2</span></h1>
 
     <!-- ═══ 1. INTRODUCCIÓN ══════════════════════════════════════════════ -->
     <section id="introduction">
@@ -720,10 +720,11 @@ python src/main.py</code></pre>
 
       <section id="statusbar">
         <h3>Barra de estado</h3>
-        <p>La barra de estado en la parte inferior de la ventana siempre muestra dos datos:</p>
+                <p>La barra de estado en la parte inferior de la ventana siempre muestra:</p>
         <ul>
-          <li><strong>Recuento de palabras</strong> — el número total de palabras en el documento (se actualiza en vivo mientras escribe).</li>
-          <li><strong>Posición del cursor</strong> — el número de línea y columna actual, por ejemplo <em>Línea 12, Col 5</em>.</li>
+          <li><strong>Recuento de palabras &amp; tiempo de lectura</strong> — recuento de palabras y tiempo de lectura estimado (p.ej. <em>342 palabras · 2 min de lectura</em>), actualizado en tiempo real.</li>
+          <li><strong>Progreso del objetivo de palabras</strong> — si se establece un objetivo mediante <em>Ver → Establecer objetivo de palabras</em>, aparece una barra de progreso compacta.</li>
+          <li><strong>Posición del cursor</strong> — línea y columna actuales, p.ej. <em>Línea 12, Col 5</em>.</li>
         </ul>
       </section>
 
@@ -1298,6 +1299,7 @@ $</code></pre>
           <tr><td><strong>Nombre de usuario del proxy</strong></td><td>Campo de texto</td><td>Autenticación de proxy opcional</td></tr>
           <tr><td><strong>Contraseña del proxy</strong></td><td>Campo de texto</td><td>Autenticación de proxy opcional — almacenada en el llavero del SO</td></tr>
           <tr><td><strong>Guardado automático</strong></td><td>Intervalo (segundos), guardar al perder el foco</td><td>Desactivado por defecto; no se aplica a archivos Git</td></tr>
+          <tr><td><strong>Objetivo de palabras</strong></td><td>Recuento de palabras objetivo</td><td>0 = desactivado; establecer mediante Ver → Establecer objetivo de palabras; muestra barra de progreso en la barra de estado</td></tr>
         </tbody>
       </table>
       </div>

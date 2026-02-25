@@ -606,7 +606,7 @@
   <article>
 
     <!-- ─── TÍTULO ─────────────────────────────────────────────────────────── -->
-    <h1>Manual do Utilizador MarkForge <span class="version-badge">v1.7.1</span></h1>
+    <h1>Manual do Utilizador MarkForge <span class="version-badge">v1.7.2</span></h1>
 
     <!-- ═══ 1. INTRODUÇÃO ════════════════════════════════════════════════ -->
     <section id="introducao">
@@ -719,10 +719,11 @@ python src/main.py</code></pre>
 
       <section id="barra-estado">
         <h3>Barra de Estado</h3>
-        <p>A barra de estado na parte inferior da janela mostra sempre duas informações:</p>
+                <p>A barra de status na parte inferior da janela sempre exibe:</p>
         <ul>
-          <li><strong>Contagem de palavras</strong> — o número total de palavras no documento (atualiza em direto enquanto escreve).</li>
-          <li><strong>Posição do cursor</strong> — a linha e coluna atual, por exemplo <em>Linha 12, Col 5</em>.</li>
+          <li><strong>Contagem de palavras &amp; tempo de leitura</strong> — contagem de palavras e tempo de leitura estimado (ex. <em>342 palavras · 2 min de leitura</em>), atualizado em tempo real.</li>
+          <li><strong>Progresso da meta de palavras</strong> — se uma meta for definida via <em>Exibir → Definir meta de palavras</em>, uma barra de progresso compacta aparece.</li>
+          <li><strong>Posição do cursor</strong> — linha e coluna atuais, ex. <em>Linha 12, Col 5</em>.</li>
         </ul>
       </section>
 
@@ -1296,6 +1297,7 @@ $</code></pre>
           <tr><td><strong>Nome de utilizador do proxy</strong></td><td>Campo de texto</td><td>Autenticação de proxy opcional</td></tr>
           <tr><td><strong>Palavra-passe do proxy</strong></td><td>Campo de texto</td><td>Autenticação de proxy opcional — armazenada no porta-chaves do SO</td></tr>
           <tr><td><strong>Salvamento automático</strong></td><td>Intervalo (segundos), salvar ao perder o foco</td><td>Desativado por padrão; não aplicado a arquivos Git</td></tr>
+          <tr><td><strong>Meta de palavras</strong></td><td>Contagem de palavras alvo</td><td>0 = desativado; definir via Exibir → Definir meta de palavras; mostra barra de progresso na barra de status</td></tr>
         </tbody>
       </table>
       </div>

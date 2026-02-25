@@ -16,6 +16,7 @@ from PyQt6.QtWidgets import (
     QLabel,
     QMainWindow,
     QMessageBox,
+    QProgressBar,
     QProgressDialog,
     QSplitter,
     QToolBar,
@@ -207,6 +208,7 @@ class MainWindow(QMainWindow):
         self._git_pending_commit_msg: str = ""
 
         self._recent_files: list[str] = []
+        self._word_goal: int = 0
 
         self._autosave_timer = QTimer(self)
         self._autosave_timer.timeout.connect(self._autosave)
@@ -351,6 +353,9 @@ class MainWindow(QMainWindow):
         )
         # Populated dynamically by _rebuild_spell_lang_menu() once settings load
         m.addSeparator()
+        self._act_word_goal = self._mk_action(tr("Set Word Goal …"), None, m)
+        self._act_word_goal.triggered.connect(self._set_word_goal)
+        m.addSeparator()
         settings_act = self._mk_action(tr("Settings …"), None, m)
         settings_act.triggered.connect(self._open_settings)
 
@@ -382,8 +387,15 @@ class MainWindow(QMainWindow):
     def _build_statusbar(self) -> None:
         self._lbl_words = QLabel(tr("{n} words", n=0))
         self._lbl_pos   = QLabel(tr("Line {line}, Col {col}", line=1, col=1))
+        self._bar_goal  = QProgressBar()
+        self._bar_goal.setFixedWidth(100)
+        self._bar_goal.setFixedHeight(14)
+        self._bar_goal.setTextVisible(False)
+        self._bar_goal.setRange(0, 100)
+        self._bar_goal.hide()
         sb = self.statusBar()
         sb.addPermanentWidget(self._lbl_words)
+        sb.addPermanentWidget(self._bar_goal)
         sb.addPermanentWidget(self._lbl_pos)
 
     # ── Helpers ───────────────────────────────────────────────────────────────
@@ -493,7 +505,18 @@ class MainWindow(QMainWindow):
     def _update_words(self) -> None:
         txt = self._editor.toPlainText().strip()
         n   = len(txt.split()) if txt else 0
-        self._lbl_words.setText(tr("{n} words", n=n))
+        mins = max(1, round(n / 200)) if n >= 100 else None
+        read = tr("{m} min read", m=mins) if mins else tr("< 1 min read")
+        if self._word_goal > 0:
+            self._lbl_words.setText(
+                tr("{n} / {goal} words · {read}", n=n, goal=self._word_goal, read=read)
+            )
+            pct = min(100, round(n * 100 / self._word_goal))
+            self._bar_goal.setValue(pct)
+            self._bar_goal.show()
+        else:
+            self._lbl_words.setText(tr("{n} words · {read}", n=n, read=read))
+            self._bar_goal.hide()
 
     def _set_editor_active(self, active: bool) -> None:
         """Enable/disable the editor and all actions that require an open document."""
@@ -1270,6 +1293,8 @@ class MainWindow(QMainWindow):
         self._act_spellcheck.setChecked(spell_on)
         self._apply_themes()
         self._apply_autosave_settings()
+        self._word_goal = int(self._settings.value("word_goal", 0))
+        self._update_words()
 
     def _apply_themes(self) -> None:
         editor_theme  = self._settings.value("editor_theme",  "VS Code Dark")
@@ -1293,6 +1318,18 @@ class MainWindow(QMainWindow):
         if self._git_file_info is not None:
             return
         self._write(self._file)
+
+    def _set_word_goal(self) -> None:
+        val, ok = QInputDialog.getInt(
+            self,
+            tr("Word Goal"),
+            tr("Target word count (0 to disable):"),
+            self._word_goal, 0, 1_000_000, 100,
+        )
+        if ok:
+            self._word_goal = val
+            self._settings.setValue("word_goal", val)
+            self._update_words()
 
     def changeEvent(self, event) -> None:  # type: ignore[override]
         super().changeEvent(event)

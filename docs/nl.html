@@ -606,7 +606,7 @@
   <article>
 
     <!-- ─── TITEL ─────────────────────────────────────────────────────────── -->
-    <h1>MarkForge Gebruikershandleiding <span class="version-badge">v1.7.1</span></h1>
+    <h1>MarkForge Gebruikershandleiding <span class="version-badge">v1.7.2</span></h1>
 
     <!-- ═══ 1. INLEIDING ══════════════════════════════════════════════════ -->
     <section id="inleiding">
@@ -719,10 +719,11 @@ python src/main.py</code></pre>
 
       <section id="statusbalk">
         <h3>Statusbalk</h3>
-        <p>De statusbalk onderaan het venster toont altijd twee stukjes informatie:</p>
+                <p>De statusbalk onderaan het venster toont altijd:</p>
         <ul>
-          <li><strong>Woordtelling</strong> — het totale aantal woorden in het document (wordt live bijgewerkt tijdens het typen).</li>
-          <li><strong>Cursorpositie</strong> — het huidige regel- en kolomnummer, bijv. <em>Regel 12, Kol 5</em>.</li>
+          <li><strong>Woordtelling &amp; leestijd</strong> — woordtelling en geschatte leestijd (bijv. <em>342 woorden · 2 min lezen</em>), live bijgewerkt.</li>
+          <li><strong>Voortgang woorddoel</strong> — als een woorddoel is ingesteld via <em>Weergave → Woorddoel instellen</em>, verschijnt een compacte voortgangsbalk.</li>
+          <li><strong>Cursorpositie</strong> — huidige regel en kolom, bijv. <em>Regel 12, Kolom 5</em>.</li>
         </ul>
       </section>
 
@@ -1296,6 +1297,7 @@ $</code></pre>
           <tr><td><strong>Proxy-gebruikersnaam</strong></td><td>Tekstveld</td><td>Optionele proxy-authenticatie</td></tr>
           <tr><td><strong>Proxywachtwoord</strong></td><td>Tekstveld</td><td>Optionele proxy-authenticatie — opgeslagen in OS-sleutelhanger</td></tr>
           <tr><td><strong>Automatisch opslaan</strong></td><td>Interval (seconden), opslaan bij focusverlies</td><td>Standaard uitgeschakeld; niet van toepassing op Git-bestanden</td></tr>
+          <tr><td><strong>Woorddoel</strong></td><td>Doelwoordtelling</td><td>0 = uitgeschakeld; instellen via Weergave → Woorddoel instellen; toont voortgangsbalk in statusbalk</td></tr>
         </tbody>
       </table>
       </div>

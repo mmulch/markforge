@@ -607,7 +607,7 @@
   <article>
 
     <!-- ─── TITLE ─────────────────────────────────────────────────────────── -->
-    <h1>Hướng dẫn sử dụng MarkForge <span class="version-badge">v1.7.1</span></h1>
+    <h1>Hướng dẫn sử dụng MarkForge <span class="version-badge">v1.7.2</span></h1>
 
     <!-- ═══ 1. GIỚI THIỆU ════════════════════════════════════════════════ -->
     <section id="introduction">
@@ -720,10 +720,11 @@ python src/main.py</code></pre>
 
       <section id="statusbar">
         <h3>Thanh trạng thái</h3>
-        <p>Thanh trạng thái ở cuối cửa sổ luôn hiển thị hai thông tin:</p>
+                <p>Thanh trạng thái ở dưới cùng cửa sổ luôn hiển thị:</p>
         <ul>
-          <li><strong>Số từ</strong> — tổng số từ trong tài liệu (cập nhật trực tiếp khi bạn gõ).</li>
-          <li><strong>Vị trí con trỏ</strong> — số dòng và cột hiện tại, ví dụ <em>Dòng 12, Cột 5</em>.</li>
+          <li><strong>Số từ &amp; thời gian đọc</strong> — số từ và thời gian đọc ước tính (ví dụ: <em>342 từ · 2 phút đọc</em>), cập nhật khi bạn gõ.</li>
+          <li><strong>Tiến độ mục tiêu từ</strong> — nếu đặt số từ mục tiêu qua <em>Xem → Đặt Mục Tiêu Từ</em>, thanh tiến độ nhỏ gọn sẽ xuất hiện.</li>
+          <li><strong>Vị trí con trỏ</strong> — số dòng và cột hiện tại, ví dụ: <em>Dòng 12, Cột 5</em>.</li>
         </ul>
       </section>
 
@@ -1298,6 +1299,7 @@ $</code></pre>
           <tr><td><strong>Tên người dùng proxy</strong></td><td>Trường văn bản</td><td>Xác thực proxy tùy chọn</td></tr>
           <tr><td><strong>Mật khẩu proxy</strong></td><td>Trường văn bản</td><td>Xác thực proxy tùy chọn — lưu trong OS keyring</td></tr>
           <tr><td><strong>Tự động lưu</strong></td><td>Khoảng thời gian (giây), lưu khi mất tiêu điểm</td><td>Tắt theo mặc định; không áp dụng cho tệp Git</td></tr>
+          <tr><td><strong>Mục tiêu từ</strong></td><td>Số từ mục tiêu</td><td>0 = tắt; đặt qua Xem → Đặt Mục Tiêu Từ; hiển thị thanh tiến độ trong thanh trạng thái</td></tr>
         </tbody>
       </table>
       </div>

@@ -607,7 +607,7 @@
   <article>
 
     <!-- ─── TITLE ─────────────────────────────────────────────────────────── -->
-    <h1>MarkForge User Manual <span class="version-badge">v1.7.1</span></h1>
+    <h1>MarkForge User Manual <span class="version-badge">v1.7.2</span></h1>
 
     <!-- ═══ 1. INTRODUCTION ═══════════════════════════════════════════════ -->
     <section id="introduction">
@@ -720,9 +720,10 @@ python src/main.py</code></pre>
 
       <section id="statusbar">
         <h3>Status Bar</h3>
-        <p>The status bar at the bottom of the window always shows two pieces of information:</p>
+                <p>The status bar at the bottom of the window always shows:</p>
         <ul>
-          <li><strong>Word count</strong> — the total number of words in the document (updates live as you type).</li>
+          <li><strong>Word count &amp; reading time</strong> — word count and estimated reading time (e.g. <em>342 words · 2 min read</em>), updated live as you type.</li>
+          <li><strong>Word goal progress</strong> — if a target word count is set via <em>View → Set Word Goal</em>, a compact progress bar appears next to the word count.</li>
           <li><strong>Cursor position</strong> — the current line and column number, e.g. <em>Line 12, Col 5</em>.</li>
         </ul>
       </section>
@@ -737,7 +738,7 @@ python src/main.py</code></pre>
             <tr><td><strong>File</strong></td><td>New, Open, Open Folder, Recent Files, Import PDF, Open File from Git, Open Git Branch, Git Squash, Save, Save As, Export as PDF, Quit</td></tr>
             <tr><td><strong>Edit</strong></td><td>Undo, Redo, Cut, Copy, Paste</td></tr>
             <tr><td><strong>Insert</strong></td><td>Link, Image, PlantUML, Mermaid, Table</td></tr>
-            <tr><td><strong>View</strong></td><td>Show file tree, Show outline, Show preview, Word wrap, Spell check, Spell check language, Settings</td></tr>
+            <tr><td><strong>View</strong></td><td>Show file tree, Show outline, Show preview, Word wrap, Spell check, Spell check language, Set Word Goal, Settings</td></tr>
             <tr><td><strong>Help</strong></td><td>Markdown reference, About</td></tr>
           </tbody>
         </table>
@@ -1298,6 +1299,7 @@ $</code></pre>
           <tr><td><strong>Proxy username</strong></td><td>Text field</td><td>Optional proxy auth</td></tr>
           <tr><td><strong>Proxy password</strong></td><td>Text field</td><td>Optional proxy auth — stored in OS keyring</td></tr>
           <tr><td><strong>Auto-Save</strong></td><td>Interval (seconds), save on focus loss</td><td>Off by default; not applied to Git-managed files</td></tr>
+          <tr><td><strong>Word Goal</strong></td><td>Target word count</td><td>0 = disabled; set via View → Set Word Goal; shows progress bar in status bar</td></tr>
         </tbody>
       </table>
       </div>
