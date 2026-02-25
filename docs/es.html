@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MarkForge – Manual de usuario</title>
+<style>
+  /* ── Reset & base ──────────────────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:           #0d1117;
+    --sidebar-bg:   #161b22;
+    --border:       #30363d;
+    --text:         #e6edf3;
+    --text-muted:   #8b949e;
+    --link:         #58a6ff;
+    --accent:       #238636;
+    --accent-hover: #2ea043;
+    --code-bg:      #161b22;
+    --note-bg:      #0d2030;
+    --note-border:  #58a6ff;
+    --tip-bg:       #0d2613;
+    --tip-border:   #238636;
+    --warn-bg:      #2d1b00;
+    --warn-border:  #d29922;
+    --sidebar-w:    260px;
+    --font-mono:    'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* ── Sidebar ───────────────────────────────────────────────────────────── */
+  #sidebar {
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    width: var(--sidebar-w);
+    background: var(--sidebar-bg);
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+  }
+
+  #sidebar-header {
+    padding: 20px 16px 12px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  #sidebar-header .logo {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.3px;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  #sidebar-header .subtitle {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  #toc {
+    padding: 12px 0 20px;
+    flex: 1;
+  }
+
+  #toc h3 {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    padding: 0 16px 6px;
+  }
+
+  #toc ul { list-style: none; }
+
+  #toc > ul > li > a {
+    display: block;
+    padding: 5px 16px;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-decoration: none;
+    border-left: 2px solid transparent;
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+  }
+
+  #toc > ul > li > a:hover {
+    color: var(--text);
+    background: rgba(255,255,255,0.04);
+    border-left-color: var(--link);
+  }
+
+  #toc ul ul { padding-left: 14px; }
+
+  #toc ul ul li a {
+    display: block;
+    padding: 3px 16px 3px 14px;
+    font-size: 12.5px;
+    color: var(--text-muted);
+    text-decoration: none;
+    border-left: 2px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+
+  #toc ul ul li a:hover {
+    color: var(--link);
+    border-left-color: var(--link);
+  }
+
+  /* ── Main content ──────────────────────────────────────────────────────── */
+  #content {
+    margin-left: var(--sidebar-w);
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* ── Top bar ───────────────────────────────────────────────────────────── */
+  #topbar {
+    position: sticky;
+    top: 0;
+    background: rgba(13,17,23,0.92);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    z-index: 50;
+  }
+
+  .lang-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: var(--sidebar-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+  }
+
+  .lang-btn:hover {
+    color: var(--text);
+    border-color: var(--link);
+    background: rgba(88,166,255,0.08);
+  }
+
+  .lang-btn.active {
+    color: var(--text);
+    border-color: var(--link);
+    background: rgba(88,166,255,0.12);
+    font-weight: 700;
+  }
+
+  .lang-switcher {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    align-items: center;
+  }
+
+  /* ── Article ───────────────────────────────────────────────────────────── */
+  article {
+    max-width: 860px;
+    padding: 40px 40px 80px;
+  }
+
+  /* ── Headings ──────────────────────────────────────────────────────────── */
+  h1 {
+    font-size: 2.2em;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 16px;
+  }
+
+  h1 .version-badge {
+    font-size: 0.45em;
+    font-weight: 500;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 12px;
+    padding: 2px 10px;
+    vertical-align: middle;
+    margin-left: 10px;
+  }
+
+  h2 {
+    font-size: 1.5em;
+    font-weight: 700;
+    margin-top: 52px;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+
+  h3 {
+    font-size: 1.15em;
+    font-weight: 600;
+    margin-top: 32px;
+    margin-bottom: 10px;
+    color: var(--text);
+  }
+
+  h4 {
+    font-size: 1em;
+    font-weight: 600;
+    margin-top: 24px;
+    margin-bottom: 8px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 0.82em;
+  }
+
+  /* ── Paragraphs & lists ────────────────────────────────────────────────── */
+  p { margin-bottom: 14px; }
+
+  ul, ol {
+    margin: 0 0 14px 24px;
+  }
+
+  li { margin-bottom: 5px; }
+  li ul, li ol { margin-top: 5px; margin-bottom: 6px; }
+
+  /* ── Links ─────────────────────────────────────────────────────────────── */
+  a { color: var(--link); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* ── Code ──────────────────────────────────────────────────────────────── */
+  code {
+    font-family: var(--font-mono);
+    font-size: 0.875em;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.1em 0.4em;
+    color: #e6c07b;
+  }
+
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    overflow-x: auto;
+    margin: 16px 0;
+    font-family: var(--font-mono);
+    font-size: 0.875em;
+    line-height: 1.6;
+    color: #abb2bf;
+  }
+
+  pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    color: inherit;
+    font-size: inherit;
+  }
+
+  /* ── kbd ───────────────────────────────────────────────────────────────── */
+  kbd {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 0.78em;
+    font-weight: 600;
+    color: var(--text);
+    background: #21262d;
+    border: 1px solid #444c56;
+    border-bottom-width: 2px;
+    border-radius: 5px;
+    padding: 2px 7px;
+    white-space: nowrap;
+    box-shadow: inset 0 -1px 0 #444c56;
+  }
+
+  /* ── Tables ────────────────────────────────────────────────────────────── */
+  .table-wrap { overflow-x: auto; margin: 16px 0; }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 0.9em;
+  }
+
+  th {
+    background: #161b22;
+    color: var(--text);
+    font-weight: 600;
+    text-align: left;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+  }
+
+  td {
+    padding: 9px 14px;
+    border: 1px solid var(--border);
+    vertical-align: top;
+  }
+
+  tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+
+  /* ── Callouts ──────────────────────────────────────────────────────────── */
+  .callout {
+    border-left: 4px solid;
+    border-radius: 0 8px 8px 0;
+    padding: 14px 18px;
+    margin: 20px 0;
+    font-size: 0.95em;
+  }
+
+  .callout-title {
+    font-weight: 700;
+    font-size: 0.82em;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+  }
+
+  .callout p:last-child { margin-bottom: 0; }
+
+  .note  { background: var(--note-bg);  border-color: var(--note-border); }
+  .note  .callout-title { color: var(--note-border); }
+
+  .tip   { background: var(--tip-bg);   border-color: var(--tip-border); }
+  .tip   .callout-title { color: var(--tip-border); }
+
+  .warn  { background: var(--warn-bg);  border-color: var(--warn-border); }
+  .warn  .callout-title { color: var(--warn-border); }
+
+  /* ── Sections ──────────────────────────────────────────────────────────── */
+  section { scroll-margin-top: 64px; }
+
+  /* ── Step list ─────────────────────────────────────────────────────────── */
+  .steps { list-style: none; margin: 0 0 14px; counter-reset: step; }
+  .steps li {
+    counter-increment: step;
+    padding: 8px 0 8px 40px;
+    position: relative;
+    border-bottom: 1px solid rgba(48,54,61,0.5);
+  }
+  .steps li:last-child { border-bottom: none; }
+  .steps li::before {
+    content: counter(step);
+    position: absolute;
+    left: 0; top: 8px;
+    width: 26px; height: 26px;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ── Feature grid ──────────────────────────────────────────────────────── */
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+    margin: 16px 0;
+  }
+
+  .feature-card {
+    background: var(--sidebar-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+
+  .feature-card strong {
+    display: block;
+    color: var(--link);
+    font-size: 0.9em;
+    margin-bottom: 4px;
+  }
+
+  .feature-card span {
+    font-size: 0.82em;
+    color: var(--text-muted);
+  }
+
+  /* ── Shortcut row ──────────────────────────────────────────────────────── */
+  .shortcut-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(48,54,61,0.5);
+  }
+  .shortcut-row:last-child { border-bottom: none; }
+  .shortcut-row .label { font-size: 0.9em; }
+
+  /* ── Markdown example block ────────────────────────────────────────────── */
+  .md-example {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 12px 0;
+    font-size: 0.875em;
+  }
+  .md-example-col { padding: 12px 16px; }
+  .md-example-col:first-child {
+    background: #1c2028;
+    border-right: 1px solid var(--border);
+    font-family: var(--font-mono);
+    color: #abb2bf;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .md-example-col:last-child {
+    background: var(--code-bg);
+    color: var(--text);
+  }
+  .md-example-label {
+    font-size: 0.75em;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+  .md-example-col:last-child h1,
+  .md-example-col:last-child h2,
+  .md-example-col:last-child h3 {
+    margin: 0 0 6px;
+    border: none;
+    padding: 0;
+    font-size: 1.1em;
+    color: var(--text);
+  }
+
+  /* ── Responsive ────────────────────────────────────────────────────────── */
+  @media (max-width: 768px) {
+    #sidebar { transform: translateX(-100%); transition: transform 0.25s; }
+    #sidebar.open { transform: translateX(0); }
+    #content { margin-left: 0; }
+    article { padding: 20px 18px 60px; }
+    #topbar { padding: 10px 18px; }
+    .md-example { grid-template-columns: 1fr; }
+    .md-example-col:first-child { border-right: none; border-bottom: 1px solid var(--border); }
+    #menu-toggle { display: flex; }
+  }
+
+  #menu-toggle {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 36px; height: 36px;
+    background: var(--sidebar-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    margin-right: auto;
+    color: var(--text-muted);
+    font-size: 18px;
+  }
+
+  /* ── Intro hero ────────────────────────────────────────────────────────── */
+  .hero {
+    background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px 28px;
+    margin-bottom: 24px;
+  }
+  .hero p { margin-bottom: 0; color: var(--text-muted); font-size: 1.05em; }
+
+  hr.section-divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 40px 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════ SIDEBAR ══════════════════════════════════════════ -->
+<nav id="sidebar">
+  <div id="sidebar-header">
+    <span class="logo">MarkForge</span>
+    <span class="subtitle">Manual de usuario</span>
+  </div>
+  <div id="toc">
+    <h3>Contenido</h3>
+    <ul>
+      <li><a href="#introduction">1. Introducción</a></li>
+      <li><a href="#installation">2. Instalación</a>
+        <ul>
+          <li><a href="#install-linux">Linux (Debian/Ubuntu)</a></li>
+          <li><a href="#install-windows">Windows</a></li>
+          <li><a href="#install-source">Desde el código fuente</a></li>
+        </ul>
+      </li>
+      <li><a href="#interface">3. Descripción de la interfaz</a>
+        <ul>
+          <li><a href="#layout">Diseño</a></li>
+          <li><a href="#toolbar">Barra de herramientas</a></li>
+          <li><a href="#statusbar">Barra de estado</a></li>
+          <li><a href="#menubar">Barra de menú</a></li>
+        </ul>
+      </li>
+      <li><a href="#editor">4. El editor</a>
+        <ul>
+          <li><a href="#find-replace">Buscar &amp; Reemplazar</a></li>
+          <li><a href="#spell-check">Corrección ortográfica</a></li>
+        </ul>
+      </li>
+      <li><a href="#preview">5. Vista previa en vivo</a></li>
+      <li><a href="#fileops">6. Operaciones de archivo</a>
+        <ul>
+          <li><a href="#recent-files">Archivos recientes</a></li>
+        </ul>
+      </li>
+      <li><a href="#markdown-ref">7. Referencia de Markdown</a>
+        <ul>
+          <li><a href="#md-headings">Encabezados</a></li>
+          <li><a href="#md-emphasis">Énfasis</a></li>
+          <li><a href="#md-lists">Listas</a></li>
+          <li><a href="#md-links">Enlaces &amp; Imágenes</a></li>
+          <li><a href="#md-tables">Tablas</a></li>
+          <li><a href="#md-code">Bloques de código</a></li>
+          <li><a href="#md-other">Otros elementos</a></li>
+        </ul>
+      </li>
+      <li><a href="#math">8. Fórmulas matemáticas</a></li>
+      <li><a href="#inserts">9. Diálogos de inserción</a>
+        <ul>
+          <li><a href="#insert-link">Enlace</a></li>
+          <li><a href="#insert-image">Imagen</a></li>
+          <li><a href="#insert-table">Tabla</a></li>
+          <li><a href="#insert-plantuml">PlantUML</a></li>
+          <li><a href="#insert-mermaid">Mermaid</a></li>
+        </ul>
+      </li>
+      <li><a href="#pdf">10. Funciones PDF</a></li>
+      <li><a href="#git">11. Integración con Git</a>
+        <ul>
+          <li><a href="#git-platforms">Plataformas</a></li>
+          <li><a href="#git-open">Abrir un archivo</a></li>
+          <li><a href="#git-save">Guardar (Commit &amp; Push)</a></li>
+          <li><a href="#git-squash">Squash de commits</a></li>
+          <li><a href="#git-auth">Autenticación</a></li>
+          <li><a href="#git-proxy">Proxy</a></li>
+          <li><a href="#git-close">Cerrar</a></li>
+        </ul>
+      </li>
+      <li><a href="#settings">12. Configuración</a></li>
+      <li><a href="#shortcuts">13. Atajos de teclado</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ══════════════════════ MAIN ═══════════════════════════════════════════ -->
+<div id="content">
+  <div id="topbar">
+    <button id="menu-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')" aria-label="Toggle menu">&#9776;</button>
+    <div class="lang-switcher">
+      <a href="index.html" class="lang-btn">EN</a>
+      <a href="de.html" class="lang-btn">DE</a>
+      <a href="ar.html" class="lang-btn">AR</a>
+      <a href="vi.html" class="lang-btn">VI</a>
+      <a href="sv.html" class="lang-btn">SV</a>
+      <a href="uk.html" class="lang-btn">UK</a>
+      <a href="kn.html" class="lang-btn">KN</a>
+      <a href="hi.html" class="lang-btn">HI</a>
+      <a href="es.html" class="lang-btn active">ES</a>
+      <a href="fr.html" class="lang-btn">FR</a>
+      <a href="it.html" class="lang-btn">IT</a>
+      <a href="nl.html" class="lang-btn">NL</a>
+      <a href="pt.html" class="lang-btn">PT</a>
+      <a href="fa.html" class="lang-btn">FA</a>
+    </div>
+  </div>
+
+  <article>
+
+    <!-- ─── TITLE ─────────────────────────────────────────────────────────── -->
+    <h1>Manual de usuario de MarkForge <span class="version-badge">v1.6.1</span></h1>
+
+    <!-- ═══ 1. INTRODUCCIÓN ══════════════════════════════════════════════ -->
+    <section id="introduction">
+      <h2>1. Introducción</h2>
+
+      <div class="hero">
+        <p>MarkForge es un editor Markdown moderno y repleto de funciones, construido con Python y PyQt6. Combina una experiencia de escritura sin distracciones con una vista previa en tiempo real lado a lado, integración completa de flujo de trabajo con Git, soporte de diagramas, renderizado matemático e importación/exportación de PDF, todo en una limpia aplicación de escritorio de doble panel.</p>
+      </div>
+
+      <p>Ya sea que esté escribiendo documentación técnica, READMEs de proyectos o publicando contenido directamente en un repositorio de GitHub, MarkForge maneja el ciclo de vida completo de edición y publicación sin necesidad de abrir una terminal.</p>
+
+      <div class="feature-grid">
+        <div class="feature-card"><strong>Vista previa en vivo</strong><span>HTML renderizado con estilo GitHub lado a lado mientras escribe</span></div>
+        <div class="feature-card"><strong>Resaltado de sintaxis</strong><span>Esquema de colores para Markdown, temas oscuro y claro</span></div>
+        <div class="feature-card"><strong>Integración con Git</strong><span>Abra, edite, haga commit y push a GitHub o Bitbucket</span></div>
+        <div class="feature-card"><strong>Diagramas</strong><span>PlantUML (12 plantillas) y Mermaid (9 plantillas)</span></div>
+        <div class="feature-card"><strong>Fórmulas matemáticas</strong><span>Notación LaTeX renderizada con MathJax</span></div>
+        <div class="feature-card"><strong>Importar PDF</strong><span>Convierte cualquier PDF a Markdown automáticamente</span></div>
+        <div class="feature-card"><strong>Exportar PDF</strong><span>PDF optimizado para impresión desde cualquier documento</span></div>
+        <div class="feature-card"><strong>Multilingüe</strong><span>Interfaz de usuario en 14 idiomas</span></div>
+      </div>
+    </section>
+
+    <!-- ═══ 2. INSTALACIÓN ════════════════════════════════════════════════ -->
+    <section id="installation">
+      <h2>2. Instalación</h2>
+
+      <section id="install-linux">
+        <h3>Linux (Debian / Ubuntu)</h3>
+        <p>Descargue el paquete <code>.deb</code> desde la página de <strong>Releases</strong> en GitHub y luego instálelo con:</p>
+        <pre><code>sudo apt install ./markforge_*.deb</code></pre>
+        <p>El paquete instala automáticamente todas las dependencias del sistema necesarias (<code>python3-pyqt6</code>, <code>python3-pyqt6.qtwebengine</code>, <code>python3-markdown</code>, <code>python3-pygments</code>). No se requiere un entorno virtual.</p>
+      </section>
+
+      <section id="install-windows">
+        <h3>Windows</h3>
+        <p>Descargue <strong>MarkForge-Setup.exe</strong> desde la página de <strong>Releases</strong> y ejecute el instalador. El asistente de instalación le guía a través del proceso y crea accesos directos en el menú de inicio automáticamente.</p>
+
+        <div class="callout note">
+          <div class="callout-title">Nota</div>
+          <p>El instalador de Windows incluye el entorno de ejecución de Python y todas las dependencias. No se requiere una instalación separada de Python.</p>
+        </div>
+      </section>
+
+      <section id="install-source">
+        <h3>Desde el código fuente</h3>
+        <p>Requisitos: Python 3.8 o posterior, CMake 3.16 o posterior.</p>
+
+        <p><strong>Usando CMake (recomendado):</strong></p>
+        <pre><code># 1. Clone the repository
+git clone https://github.com/mmulch/markforge.git
+cd markforge
+
+# 2. Configure the build (creates a local virtual environment)
+cmake -B build
+
+# 3. Install Python dependencies into the local venv
+cmake --build build --target install_deps
+
+# 4. Run the application
+cmake --build build --target run</code></pre>
+
+        <p><strong>Inicio directo con Python (sin CMake):</strong></p>
+        <pre><code>pip install -r requirements.txt
+python src/main.py</code></pre>
+
+        <div class="callout tip">
+          <div class="callout-title">Consejo</div>
+          <p>Para operaciones Git basadas en SSH, instale también <code>paramiko</code>: <code>pip install paramiko</code></p>
+        </div>
+      </section>
+    </section>
+
+    <!-- ═══ 3. DESCRIPCIÓN DE LA INTERFAZ ════════════════════════════════ -->
+    <section id="interface">
+      <h2>3. Descripción de la interfaz</h2>
+
+      <section id="layout">
+        <h3>Diseño</h3>
+        <p>La ventana de MarkForge está dividida en tres paneles redimensionables separados por divisores arrastrables:</p>
+
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>Panel</th><th>Posición</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Esquema + Árbol de archivos</strong></td><td>Izquierda</td><td>El panel izquierdo tiene dos secciones apiladas: el <strong>Esquema del documento</strong> (árbol de encabezados) arriba, y el <strong>Árbol de archivos</strong> (explorador de archivos) abajo. Active/desactive el esquema mediante <strong>Ver → Mostrar esquema</strong>, el árbol de archivos con <kbd>Ctrl</kbd>+<kbd>B</kbd>.</td></tr>
+            <tr><td><strong>Editor</strong></td><td>Centro</td><td>Editor de texto sin formato con resaltado de sintaxis Markdown y números de línea.</td></tr>
+            <tr><td><strong>Vista previa</strong></td><td>Derecha</td><td>Renderizado HTML en vivo del documento actual. Active/desactive con <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>.</td></tr>
+          </tbody>
+        </table>
+        </div>
+
+        <p>Arrastre cualquier divisor para cambiar el tamaño de los paneles. Los tamaños de los paneles se recuerdan entre sesiones.</p>
+      </section>
+
+      <section id="outline">
+        <h3>Esquema del documento</h3>
+        <p>El panel de <strong>Esquema del documento</strong> se encuentra en la parte superior de la barra lateral izquierda y lista todos los encabezados (H1–H6) del documento actual como un árbol navegable.</p>
+        <ul>
+          <li>Haga clic en cualquier encabezado para mover el cursor del editor a esa línea.</li>
+          <li>El esquema se actualiza automáticamente mientras escribe.</li>
+          <li>Active/desactive la visibilidad mediante <strong>Ver → Mostrar esquema</strong>. La preferencia se guarda entre sesiones.</li>
+        </ul>
+      </section>
+
+      <section id="toolbar">
+        <h3>Barra de herramientas</h3>
+        <p>La barra de herramientas debajo de la barra de menú proporciona acceso con un clic a las acciones más comunes: Nuevo, Abrir, Guardar, Insertar enlace, Insertar imagen, Insertar tabla, Insertar PlantUML, Insertar Mermaid, Alternar vista previa y Configuración. Todas las acciones de la barra de herramientas duplican los elementos del menú y los atajos de teclado.</p>
+      </section>
+
+      <section id="statusbar">
+        <h3>Barra de estado</h3>
+        <p>La barra de estado en la parte inferior de la ventana siempre muestra dos datos:</p>
+        <ul>
+          <li><strong>Recuento de palabras</strong> — el número total de palabras en el documento (se actualiza en vivo mientras escribe).</li>
+          <li><strong>Posición del cursor</strong> — el número de línea y columna actual, por ejemplo <em>Línea 12, Col 5</em>.</li>
+        </ul>
+      </section>
+
+      <section id="menubar">
+        <h3>Barra de menú</h3>
+        <p>La barra de menú contiene cinco menús de nivel superior:</p>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>Menú</th><th>Contenido</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Archivo</strong></td><td>Nuevo, Abrir, Abrir carpeta, Archivos recientes, Importar PDF, Abrir desde Git, Git Squash, Guardar, Guardar como, Exportar como PDF, Salir</td></tr>
+            <tr><td><strong>Editar</strong></td><td>Deshacer, Rehacer, Cortar, Copiar, Pegar</td></tr>
+            <tr><td><strong>Insertar</strong></td><td>Enlace, Imagen, PlantUML, Mermaid, Tabla</td></tr>
+            <tr><td><strong>Ver</strong></td><td>Mostrar árbol de archivos, Mostrar esquema, Mostrar vista previa, Ajuste de línea, Corrección ortográfica, Idioma de corrección, Configuración</td></tr>
+            <tr><td><strong>Ayuda</strong></td><td>Referencia de Markdown, Acerca de</td></tr>
+          </tbody>
+        </table>
+        </div>
+      </section>
+
+      <h3>Título de la ventana</h3>
+      <p>El título de la ventana muestra el nombre del archivo actualmente abierto. Cuando realiza cambios sin guardar, se agrega un asterisco (<strong>*</strong>) al nombre del archivo, por ejemplo <em>README.md *</em>. Cuando no hay ningún archivo abierto, el título muestra <em>Untitled</em>.</p>
+    </section>
+
+    <!-- ═══ 4. EL EDITOR ═════════════════════════════════════════════════ -->
+    <section id="editor">
+      <h2>4. El editor</h2>
+
+      <p>El panel central aloja un editor de texto sin formato con todas las funciones, optimizado para la creación de Markdown.</p>
+
+      <h3>Resaltado de sintaxis</h3>
+      <p>MarkForge aplica resaltado de sintaxis con reconocimiento de Markdown al documento mientras escribe. Los encabezados, marcadores de énfasis, enlaces, fragmentos de código, bloques de código delimitados y otras construcciones de Markdown se colorean de forma diferenciada. El resaltado se adapta automáticamente al cambiar entre los temas de editor Claro y Oscuro.</p>
+
+      <h3>Números de línea</h3>
+      <p>Un margen en el lado izquierdo del editor muestra los números de línea. La línea actual se resalta con un color de fondo sutil para ayudarle a rastrear su posición en documentos largos.</p>
+
+      <h3>Ajuste de línea</h3>
+      <p>El ajuste de línea está habilitado de forma predeterminada. Las líneas largas se ajustan para encajar en el ancho visible del editor. Active/desactive el ajuste de línea en cualquier momento mediante <strong>Ver → Ajuste de línea</strong>. La preferencia se guarda entre sesiones.</p>
+
+      <h3>Temas del editor</h3>
+      <p>Hay dos temas de editor integrados disponibles:</p>
+      <ul>
+        <li><strong>Oscuro</strong> (predeterminado) — fondo oscuro con colores de sintaxis de alto contraste.</li>
+        <li><strong>Claro</strong> — fondo blanco adecuado para entornos brillantes.</li>
+      </ul>
+      <p>Cambie los temas en <strong>Ver → Configuración → Tema del editor</strong>. El cambio surte efecto inmediatamente sin reiniciar.</p>
+
+      <h3>Texto de marcador de posición</h3>
+      <p>Cuando no hay ningún archivo abierto, el editor está desactivado y muestra el mensaje: <em>"Open or create a Markdown file to start editing."</em> El editor se activa en cuanto crea un nuevo archivo o abre uno existente.</p>
+
+      <h3>Operaciones de edición</h3>
+      <p>Todas las operaciones estándar de edición de texto están disponibles:</p>
+      <ul>
+        <li><kbd>Ctrl</kbd>+<kbd>Z</kbd> — Deshacer</li>
+        <li><kbd>Ctrl</kbd>+<kbd>Y</kbd> — Rehacer</li>
+        <li><kbd>Ctrl</kbd>+<kbd>X</kbd> / <kbd>Ctrl</kbd>+<kbd>C</kbd> / <kbd>Ctrl</kbd>+<kbd>V</kbd> — Cortar / Copiar / Pegar</li>
+      </ul>
+
+      <h3 id="find-replace">Buscar &amp; Reemplazar</h3>
+      <p>Presione <kbd>Ctrl</kbd>+<kbd>F</kbd> para abrir la barra de búsqueda, o <kbd>Ctrl</kbd>+<kbd>H</kbd> para abrirla con la fila de reemplazo visible. La barra aparece encima del editor.</p>
+      <ul>
+        <li>Escriba en el campo de búsqueda — todas las coincidencias se resaltan instantáneamente en el editor.</li>
+        <li>Navegue entre las coincidencias con los botones <strong>↑</strong> / <strong>↓</strong>, o presione <kbd>Enter</kbd> (siguiente) / <kbd>Shift</kbd>+<kbd>Enter</kbd> (anterior) en el campo de búsqueda.</li>
+        <li>El contador de coincidencias muestra la posición actual (por ejemplo, <em>3 / 12</em>).</li>
+        <li><strong>Aa</strong> — alternar búsqueda sensible a mayúsculas/minúsculas.</li>
+        <li><strong>[W]</strong> — alternar coincidencia de palabras completas.</li>
+        <li>Use <strong>Reemplazar</strong> para reemplazar la coincidencia actual, o <strong>Reemplazar todo</strong> para reemplazar todas las ocurrencias a la vez.</li>
+        <li>Presione <kbd>Escape</kbd> o haga clic en <strong>✕</strong> para cerrar la barra y borrar todos los resaltados.</li>
+      </ul>
+      <p>Si hay texto seleccionado en el editor cuando abre la barra, el campo de búsqueda se rellena previamente con la selección (solo selecciones de una línea).</p>
+
+      <h3 id="spell-check">Corrección ortográfica</h3>
+      <p>MarkForge puede subrayar las palabras mal escritas con una línea ondulada roja mientras escribe. La corrección ortográfica está desactivada de forma predeterminada.</p>
+      <ul>
+        <li>Actívela mediante <strong>Ver → Corrección ortográfica</strong> (interruptor).</li>
+        <li>Seleccione el idioma del diccionario mediante <strong>Ver → Idioma de corrección ortográfica</strong>. Idiomas disponibles: English, Deutsch, Español, Français, Italiano, Nederlands, Português, العربية, فارسی (vía pyspellchecker) y Tiếng Việt*, Svenska*, Українська*, ಕನ್ನಡ*, हिंदी* (vía enchant/Hunspell).</li>
+        <li>Las palabras dentro de fragmentos de código en línea (<code>`…`</code>) y las URL nunca se subrayan.</li>
+        <li>Las abreviaturas EN MAYÚSCULAS (HTML, API, URL…) se omiten.</li>
+        <li>La preferencia de corrección ortográfica y el idioma seleccionado se guardan entre sesiones.</li>
+        <li>Requiere la biblioteca <code>pyspellchecker</code>. Si no está instalada, el interruptor se ignora silenciosamente.</li>
+        <li>Los idiomas marcados con * requieren la biblioteca <code>pyenchant</code> y los diccionarios del sistema Hunspell (por ejemplo, <code>hunspell-vi</code> en Debian/Ubuntu).</li>
+      </ul>
+    </section>
+
+    <!-- ═══ 5. VISTA PREVIA EN VIVO ══════════════════════════════════════ -->
+    <section id="preview">
+      <h2>5. Vista previa en vivo</h2>
+
+      <p>El panel derecho muestra una versión HTML completamente renderizada de su documento Markdown, actualizada automáticamente mientras escribe.</p>
+
+      <h3>Renderizado</h3>
+      <p>La vista previa utiliza una hoja de estilos inspirada en GitHub para una salida limpia y legible. Admite todas las extensiones de Markdown, incluidas tablas, listas de tareas, notas al pie, resaltado de código, matemáticas y diagramas. La canalización de renderizado procesa su texto a través de la biblioteca Python <code>markdown</code> con las extensiones <code>extra</code>, <code>codehilite</code>, <code>toc</code> y <code>sane_lists</code>.</p>
+
+      <h3>Preservación de la posición de desplazamiento</h3>
+      <p>Cuando edita el documento, la vista previa se actualiza después de un breve retardo de debounce de 300 ms. Antes de actualizar el HTML, MarkForge lee la posición de desplazamiento actual de la vista web y la restaura después del renderizado, de modo que la vista previa no salte al inicio mientras trabaja en medio de un documento.</p>
+
+      <h3>Temas de vista previa</h3>
+      <p>Hay dos temas de vista previa disponibles:</p>
+      <ul>
+        <li><strong>Oscuro</strong> (predeterminado) — fondo oscuro que coincide con el tema general de la aplicación.</li>
+        <li><strong>Claro</strong> — fondo blanco para una experiencia de lectura similar a la impresión.</li>
+      </ul>
+      <p>Cambie mediante <strong>Ver → Configuración → Tema de vista previa</strong>. El cambio surte efecto inmediatamente.</p>
+
+      <h3>Alternar la vista previa</h3>
+      <p>Presione <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> o use <strong>Ver → Mostrar vista previa</strong> para ocultar o mostrar el panel de vista previa. Ocultar la vista previa da al editor más espacio en la pantalla.</p>
+
+      <div class="callout note">
+        <div class="callout-title">Nota</div>
+        <p>Las fórmulas matemáticas (MathJax) y los diagramas Mermaid requieren una conexión a internet en el primer uso, ya que las bibliotecas se cargan desde una CDN. Los diagramas PlantUML siempre se obtienen de <code>plantuml.com</code> y requieren acceso a internet.</p>
+      </div>
+    </section>
+
+    <!-- ═══ 6. OPERACIONES DE ARCHIVO ════════════════════════════════════ -->
+    <section id="fileops">
+      <h2>6. Operaciones de archivo</h2>
+
+      <h3>Nuevo archivo</h3>
+      <p>Presione <kbd>Ctrl</kbd>+<kbd>N</kbd> o elija <strong>Archivo → Nuevo</strong>. Si el documento actual tiene cambios sin guardar, MarkForge le pedirá que guarde antes de continuar. Se abre un nuevo documento vacío y se activa el editor.</p>
+
+      <h3>Abrir archivo</h3>
+      <p>Presione <kbd>Ctrl</kbd>+<kbd>O</kbd> o elija <strong>Archivo → Abrir…</strong> para abrir un diálogo de explorador de archivos. Se pueden seleccionar archivos Markdown (<code>.md</code>, <code>.markdown</code>), archivos de texto (<code>.txt</code>) y todos los demás archivos. El árbol de archivos se actualizará para mostrar la carpeta que contiene el archivo abierto.</p>
+
+      <h3>Abrir carpeta</h3>
+      <p>Elija <strong>Archivo → Abrir carpeta…</strong> (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>O</kbd>) para seleccionar un directorio. El árbol de archivos mostrará entonces todos los archivos <code>.md</code> e imágenes en ese directorio. Haga clic en cualquier archivo del árbol para abrirlo en el editor.</p>
+
+      <h3>Guardar</h3>
+      <p>Presione <kbd>Ctrl</kbd>+<kbd>S</kbd> o elija <strong>Archivo → Guardar</strong>. Si el archivo se abrió desde un repositorio Git, aparecerá un diálogo de commit &amp; push de Git en su lugar (consulte <a href="#git-save">Guardar a través de Git</a>). Para archivos locales, el archivo se escribe inmediatamente en el disco y el asterisco en la barra de título desaparece.</p>
+
+      <h3>Guardar como</h3>
+      <p>Presione <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>S</kbd> o elija <strong>Archivo → Guardar como…</strong> para guardar el documento actual en una nueva ubicación o con un nuevo nombre.</p>
+
+      <h3>Árbol de archivos</h3>
+      <p>El panel izquierdo muestra una lista plana de archivos <code>.md</code> e imágenes en el directorio raíz actual. Los subdirectorios que no contienen archivos directamente relevantes están ocultos para reducir el desorden. Haga clic en un archivo para abrirlo. El encabezado del árbol muestra <strong>[GIT] reponame</strong> en verde cuando hay un archivo administrado por Git abierto.</p>
+
+      <div class="callout tip">
+        <div class="callout-title">Consejo</div>
+        <p>Active/desactive el árbol de archivos con <kbd>Ctrl</kbd>+<kbd>B</kbd> para maximizar el espacio del editor. Su preferencia se guarda entre sesiones.</p>
+      </div>
+
+      <h3 id="recent-files">Archivos recientes</h3>
+      <p>MarkForge mantiene una lista de los últimos 10 archivos que ha abierto. Acceda a ellos mediante <strong>Archivo → Archivos recientes</strong>.</p>
+      <ul>
+        <li>Haga clic en cualquier entrada para reabrir el archivo inmediatamente.</li>
+        <li>Si un archivo ya no existe en el disco, se elimina de la lista automáticamente.</li>
+        <li>Elija <strong>Borrar archivos recientes</strong> en la parte superior del submenú para borrar todo el historial.</li>
+        <li>La lista se guarda entre sesiones.</li>
+      </ul>
+    </section>
+
+    <!-- ═══ 7. REFERENCIA DE MARKDOWN ════════════════════════════════════ -->
+    <section id="markdown-ref">
+      <h2>7. Referencia de Markdown</h2>
+      <p>MarkForge admite el Markdown CommonMark estándar más las siguientes extensiones: <code>extra</code> (tablas, notas al pie, abreviaturas), <code>codehilite</code> (bloques de código resaltados con sintaxis), <code>toc</code> (tabla de contenidos), <code>sane_lists</code> y tachado.</p>
+
+      <section id="md-headings">
+        <h3>Encabezados</h3>
+        <div class="md-example">
+          <div class="md-example-col"><div class="md-example-label">Markdown</div># Heading 1
+## Heading 2
+### Heading 3
+#### Heading 4
+##### Heading 5
+###### Heading 6</div>
+          <div class="md-example-col"><div class="md-example-label">Resultado</div><h1>Heading 1</h1><h2>Heading 2</h2><h3>Heading 3</h3></div>
+        </div>
+      </section>
+
+      <section id="md-emphasis">
+        <h3>Énfasis &amp; Formato en línea</h3>
+        <div class="md-example">
+          <div class="md-example-col"><div class="md-example-label">Markdown</div>**bold text**
+*italic text*
+~~strikethrough~~
+`inline code`
+**_bold italic_**</div>
+          <div class="md-example-col"><div class="md-example-label">Resultado</div><strong>bold text</strong><br><em>italic text</em><br><del>strikethrough</del><br><code>inline code</code><br><strong><em>bold italic</em></strong></div>
+        </div>
+      </section>
+
+      <section id="md-lists">
+        <h3>Listas</h3>
+        <p><strong>Lista desordenada:</strong></p>
+        <div class="md-example">
+          <div class="md-example-col"><div class="md-example-label">Markdown</div>- First item
+- Second item
+  - Nested item
+- Third item</div>
+          <div class="md-example-col"><div class="md-example-label">Resultado</div><ul><li>First item</li><li>Second item<ul><li>Nested item</li></ul></li><li>Third item</li></ul></div>
+        </div>
+        <p><strong>Lista ordenada:</strong></p>
+        <div class="md-example">
+          <div class="md-example-col"><div class="md-example-label">Markdown</div>1. First item
+2. Second item
+3. Third item</div>
+          <div class="md-example-col"><div class="md-example-label">Resultado</div><ol><li>First item</li><li>Second item</li><li>Third item</li></ol></div>
+        </div>
+        <p><strong>Lista de tareas (casillas de verificación):</strong></p>
+        <div class="md-example">
+          <div class="md-example-col"><div class="md-example-label">Markdown</div>- [x] Done task
+- [ ] Pending task
+- [ ] Another task</div>
+          <div class="md-example-col"><div class="md-example-label">Resultado</div><ul style="list-style:none;padding-left:0"><li>&#9989; Done task</li><li>&#9744; Pending task</li><li>&#9744; Another task</li></ul></div>
+        </div>
+      </section>
+
+      <section id="md-links">
+        <h3>Enlaces &amp; Imágenes</h3>
+        <div class="md-example">
+          <div class="md-example-col"><div class="md-example-label">Markdown</div>[Link text](https://example.com)
+[Tooltip link](https://example.com "My tooltip")
+
+![Alt text](image.png)
+![Alt text](https://example.com/img.png)</div>
+          <div class="md-example-col"><div class="md-example-label">Resultado</div><a href="#">Link text</a><br><a href="#" title="My tooltip">Tooltip link</a><br><br><em>[image: Alt text]</em></div>
+        </div>
+      </section>
+
+      <section id="md-tables">
+        <h3>Tablas (GFM)</h3>
+        <div class="md-example">
+          <div class="md-example-col"><div class="md-example-label">Markdown</div>| Left | Center | Right |
+|:-----|:------:|------:|
+| A    |   B    |     C |
+| D    |   E    |     F |</div>
+          <div class="md-example-col"><div class="md-example-label">Resultado</div>
+            <table style="font-size:0.85em">
+              <thead><tr><th style="text-align:left">Left</th><th style="text-align:center">Center</th><th style="text-align:right">Right</th></tr></thead>
+              <tbody><tr><td>A</td><td style="text-align:center">B</td><td style="text-align:right">C</td></tr><tr><td>D</td><td style="text-align:center">E</td><td style="text-align:right">F</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+        <p>La alineación de columnas se controla mediante la posición de los dos puntos en la fila separadora: <code>:---</code> izquierda, <code>:---:</code> centro, <code>---:</code> derecha.</p>
+      </section>
+
+      <section id="md-code">
+        <h3>Bloques de código</h3>
+        <div class="md-example">
+          <div class="md-example-col"><div class="md-example-label">Markdown</div>```python
+def hello(name):
+    print(f"Hello, {name}!")
+```</div>
+          <div class="md-example-col"><div class="md-example-label">Resultado</div><pre style="margin:0;font-size:0.85em;background:#1c2028;padding:8px"><code>def hello(name):
+    print(f"Hello, {name}!")</code></pre></div>
+        </div>
+        <p>Especifique cualquier identificador de lenguaje después de la triple tilde de apertura para el resaltado de sintaxis: <code>python</code>, <code>javascript</code>, <code>bash</code>, <code>sql</code>, <code>json</code>, etc. (impulsado por Pygments).</p>
+      </section>
+
+      <section id="md-other">
+        <h3>Otros elementos</h3>
+
+        <h4>Citas en bloque</h4>
+        <div class="md-example">
+          <div class="md-example-col"><div class="md-example-label">Markdown</div>&gt; This is a blockquote.
+&gt; It can span multiple lines.</div>
+          <div class="md-example-col"><div class="md-example-label">Resultado</div><blockquote style="border-left:3px solid #58a6ff;padding-left:12px;color:#8b949e">This is a blockquote. It can span multiple lines.</blockquote></div>
+        </div>
+
+        <h4>Notas al pie</h4>
+        <div class="md-example">
+          <div class="md-example-col"><div class="md-example-label">Markdown</div>Some text[^1] with a footnote.
+
+[^1]: The footnote content.</div>
+          <div class="md-example-col"><div class="md-example-label">Resultado</div>Some text<sup>[1]</sup> with a footnote.</div>
+        </div>
+
+        <h4>Abreviaturas</h4>
+        <div class="md-example">
+          <div class="md-example-col"><div class="md-example-label">Markdown</div>The HTML spec is long.
+
+*[HTML]: HyperText Markup Language</div>
+          <div class="md-example-col"><div class="md-example-label">Resultado</div>The <abbr title="HyperText Markup Language">HTML</abbr> spec is long.</div>
+        </div>
+
+        <h4>Tabla de contenidos</h4>
+        <p>Coloque <code>[TOC]</code> en cualquier lugar del documento para insertar una tabla de contenidos generada automáticamente basada en los encabezados del documento.</p>
+
+        <h4>Línea horizontal</h4>
+        <div class="md-example">
+          <div class="md-example-col"><div class="md-example-label">Markdown</div>---
+
+or
+
+***</div>
+          <div class="md-example-col"><div class="md-example-label">Resultado</div><hr style="border:none;border-top:1px solid #444"></div>
+        </div>
+      </section>
+    </section>
+
+    <!-- ═══ 8. FÓRMULAS MATEMÁTICAS ══════════════════════════════════════ -->
+    <section id="math">
+      <h2>8. Fórmulas matemáticas</h2>
+
+      <p>MarkForge renderiza la notación matemática LaTeX usando <strong>MathJax</strong>. Se requiere una conexión a internet en el primer uso (MathJax se carga desde una CDN).</p>
+
+      <h3>Matemáticas en línea</h3>
+      <p>Envuelva una expresión en signos de dólar simples para renderizarla en línea dentro de un párrafo:</p>
+      <pre><code>The famous equation $E = mc^2$ was published in 1905.</code></pre>
+      <p>Resultado: La famosa ecuación <em>E = mc²</em> fue publicada en 1905.</p>
+
+      <h3>Matemáticas en bloque</h3>
+      <p>Envuelva la expresión en signos de dólar dobles para renderizarla centrada en su propia línea:</p>
+      <pre><code>$$\int_0^\infty e^{-x}\, dx = 1$$</code></pre>
+
+      <h3>Matemáticas en bloque de una sola línea</h3>
+      <p>También puede usar un <code>$</code> solitario en su propia línea para abrir y cerrar un bloque de matemáticas en pantalla:</p>
+      <pre><code>$
+\sum_{n=1}^{\infty} \frac{1}{n^2} = \frac{\pi^2}{6}
+$</code></pre>
+
+      <div class="callout tip">
+        <div class="callout-title">Consejo</div>
+        <p>MathJax admite el modo matemático LaTeX completo, incluidas fracciones, matrices, letras griegas, operadores y macros personalizados. Consulte la <a href="https://docs.mathjax.org/" target="_blank" rel="noopener">documentación de MathJax</a> para la sintaxis completa.</p>
+      </div>
+    </section>
+
+    <!-- ═══ 9. DIÁLOGOS DE INSERCIÓN ══════════════════════════════════════ -->
+    <section id="inserts">
+      <h2>9. Diálogos de inserción</h2>
+      <p>MarkForge proporciona diálogos guiados para insertar construcciones comunes de Markdown. Todos los diálogos insertan texto en la posición actual del cursor en el editor.</p>
+
+      <section id="insert-link">
+        <h3>Insertar enlace <kbd>Ctrl</kbd>+<kbd>K</kbd></h3>
+        <p>Abra mediante <strong>Insertar → Enlace…</strong> o presione <kbd>Ctrl</kbd>+<kbd>K</kbd>.</p>
+        <p>El diálogo tiene tres campos:</p>
+        <ul>
+          <li><strong>Texto de visualización</strong> — la etiqueta de enlace visible (por ejemplo, <em>Haga clic aquí</em>).</li>
+          <li><strong>URL</strong> — la dirección de destino (por ejemplo, <code>https://example.com</code>).</li>
+          <li><strong>Título (opcional)</strong> — un tooltip que se muestra cuando el usuario pasa el ratón sobre el enlace.</li>
+        </ul>
+        <p>Haga clic en <strong>Insertar</strong> para colocar <code>[Texto de visualización](URL "Título")</code> en el editor.</p>
+      </section>
+
+      <section id="insert-image">
+        <h3>Insertar imagen <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>K</kbd></h3>
+        <p>Abra mediante <strong>Insertar → Imagen…</strong> o presione <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>K</kbd>.</p>
+        <p>El diálogo tiene dos campos:</p>
+        <ul>
+          <li><strong>Texto alternativo</strong> — una descripción breve para lectores de pantalla.</li>
+          <li><strong>URL / Ruta</strong> — una URL remota o una ruta de archivo local. Use el botón de navegación para seleccionar un archivo de imagen local.</li>
+        </ul>
+        <p>Haga clic en <strong>Insertar</strong> para colocar <code>![Texto alternativo](URL)</code> en el editor.</p>
+      </section>
+
+      <section id="insert-table">
+        <h3>Insertar tabla <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd></h3>
+        <p>Abra mediante <strong>Insertar → Tabla…</strong> o presione <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd>.</p>
+        <p>Configure la estructura de su tabla:</p>
+        <ul>
+          <li><strong>Filas de datos</strong> — número de filas excluyendo la fila de encabezado.</li>
+          <li><strong>Columnas</strong> — número de columnas (hasta el máximo admitido).</li>
+          <li><strong>Nombres de columnas</strong> — ingrese un título para cada columna.</li>
+          <li><strong>Alineación</strong> — elija Izquierda, Centro o Derecha para cada columna de forma independiente.</li>
+        </ul>
+        <p>Una vista previa de Markdown en vivo se actualiza en la parte inferior del diálogo. Haga clic en <strong>Insertar</strong> para colocar la tabla en el editor.</p>
+      </section>
+
+      <section id="insert-plantuml">
+        <h3>Insertar PlantUML <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>U</kbd></h3>
+        <p>Abra mediante <strong>Insertar → PlantUML…</strong> o presione <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>U</kbd>.</p>
+        <p>Elija entre 12 plantillas de diagrama en el desplegable:</p>
+        <ul>
+          <li>Diagrama de secuencia</li>
+          <li>Diagrama de clases</li>
+          <li>Diagrama de actividad</li>
+          <li>Diagrama de estado</li>
+          <li>Diagrama de componentes</li>
+          <li>Diagrama de casos de uso</li>
+          <li>Diagrama de Gantt</li>
+          <li>Mapa mental</li>
+          <li>WBS (Desglose del trabajo)</li>
+          <li>Diagrama de temporización</li>
+          <li>Diagrama de despliegue</li>
+          <li>JSON</li>
+        </ul>
+        <p>La plantilla seleccionada rellena el editor de código PlantUML. Edite el código según sea necesario, luego haga clic en <strong>Insertar</strong>. El diagrama se envuelve en un bloque de código delimitado y se renderiza a través del servicio en línea <code>plantuml.com</code> en la vista previa. Se requiere una conexión a internet.</p>
+
+        <div class="callout note">
+          <div class="callout-title">Nota</div>
+          <p>La vista previa del diagrama aparece automáticamente en la ventana principal después de insertar. El renderizado usa el servidor público <code>plantuml.com</code>; no se necesita ninguna instalación local de PlantUML.</p>
+        </div>
+      </section>
+
+      <section id="insert-mermaid">
+        <h3>Insertar Mermaid <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>M</kbd></h3>
+        <p>Abra mediante <strong>Insertar → Mermaid…</strong> o presione <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>M</kbd>.</p>
+        <p>Elija entre 9 plantillas de diagrama:</p>
+        <ul>
+          <li>Diagrama de flujo</li>
+          <li>Diagrama de secuencia</li>
+          <li>Diagrama de clases</li>
+          <li>Diagrama de estado</li>
+          <li>Gantt</li>
+          <li>Gráfico circular</li>
+          <li>Mapa mental</li>
+          <li>Diagrama ER</li>
+          <li>Gráfico de Git</li>
+        </ul>
+        <p>Edite el código Mermaid en el área de texto y haga clic en <strong>Insertar</strong>. El diagrama se envuelve en un bloque de código <code>mermaid</code> delimitado y se renderiza en la vista previa a través de <code>kroki.io</code>. Se requiere una conexión a internet.</p>
+      </section>
+    </section>
+
+    <!-- ═══ 10. FUNCIONES PDF ════════════════════════════════════════════ -->
+    <section id="pdf">
+      <h2>10. Funciones PDF</h2>
+
+      <h3>Exportar como PDF <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>E</kbd></h3>
+      <p>Elija <strong>Archivo → Exportar como PDF…</strong> o presione <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>E</kbd>. MarkForge renderiza el documento actual a un archivo PDF usando el mismo proceso que la vista previa en vivo, pero con un fondo blanco y CSS optimizado para impresión. Aparece un diálogo de guardar archivo para que pueda elegir la ubicación de salida y el nombre del archivo.</p>
+
+      <div class="callout tip">
+        <div class="callout-title">Consejo</div>
+        <p>Cambie la vista previa al tema Claro antes de exportar a PDF para obtener la salida más limpia lista para imprimir.</p>
+      </div>
+
+      <h3>Importar PDF <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>I</kbd></h3>
+      <p>Elija <strong>Archivo → Importar PDF…</strong> o presione <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>I</kbd>. MarkForge convierte cualquier archivo PDF a Markdown usando la biblioteca <code>pymupdf4llm</code>. La conversión preserva inteligentemente la estructura del documento:</p>
+      <ul>
+        <li>Encabezados y párrafos</li>
+        <li>Tablas</li>
+        <li>Listas</li>
+        <li>Bloques de código donde se detecten</li>
+      </ul>
+      <p>La conversión se ejecuta en un subproceso en segundo plano para que la interfaz de usuario permanezca receptiva. Cuando se completa, MarkForge le pide una ubicación de guardado para el archivo <code>.md</code> resultante y luego lo carga en el editor.</p>
+
+      <div class="callout note">
+        <div class="callout-title">Nota</div>
+        <p>La importación de PDF requiere el paquete <code>pymupdf4llm</code>. Si no está instalado, MarkForge le pedirá que lo instale: <code>pip install pymupdf4llm</code></p>
+      </div>
+    </section>
+
+    <!-- ═══ 11. INTEGRACIÓN CON GIT ══════════════════════════════════════ -->
+    <section id="git">
+      <h2>11. Integración con Git</h2>
+
+      <p>MarkForge puede abrir archivos Markdown directamente desde repositorios Git alojados, permitirle editarlos y enviar los cambios de vuelta, sin necesidad de abrir una terminal. Las operaciones avanzadas como <strong>amend</strong> y <strong>squash</strong> también son compatibles.</p>
+
+      <section id="git-platforms">
+        <h3>Plataformas compatibles</h3>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>Plataforma</th><th>Ejemplo de patrón de URL</th></tr></thead>
+          <tbody>
+            <tr><td>GitHub</td><td><code>https://github.com/owner/repo/blob/main/README.md</code></td></tr>
+            <tr><td>GitHub Enterprise</td><td><code>https://github.mycompany.com/owner/repo/blob/main/docs/guide.md</code></td></tr>
+            <tr><td>Bitbucket Cloud</td><td><code>https://bitbucket.org/owner/repo/src/main/README.md</code></td></tr>
+            <tr><td>Bitbucket Server / Data Center</td><td><code>https://bitbucket.mycompany.com/projects/PROJ/repos/myrepo/browse/README.md?at=main</code></td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p>La plataforma se detecta automáticamente a partir de la estructura de URL, no solo del nombre de host, por lo que las instancias alojadas automáticamente funcionan de forma automática.</p>
+      </section>
+
+      <section id="git-open">
+        <h3>Abrir un archivo desde Git</h3>
+        <ol class="steps">
+          <li>Elija <strong>Archivo → Abrir desde Git…</strong> o presione <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>G</kbd>.</li>
+          <li>Pegue la URL del archivo que desea abrir (cópiela desde el explorador de archivos de GitHub o Bitbucket).</li>
+          <li>MarkForge valida la URL y muestra una línea de vista previa: <em>plataforma · propietario/repo · ruta/al/archivo.md</em>.</li>
+          <li>Opcionalmente, anule la rama, etiqueta o hash de commit en el campo <strong>Ref</strong>.</li>
+          <li>Haga clic en <strong>OK</strong> — el repositorio se clona en segundo plano y el archivo se abre en el editor.</li>
+        </ol>
+        <p>Mientras un archivo administrado por Git está abierto, el encabezado del árbol de archivos muestra <strong>[GIT] reponame</strong> en verde.</p>
+
+        <div class="callout tip">
+          <div class="callout-title">Consejo</div>
+          <p>Los repositorios públicos funcionan sin ninguna credencial configurada. Para repositorios privados, configure sus credenciales en <strong>Ver → Configuración → Autenticación Git</strong> antes de abrir.</p>
+        </div>
+      </section>
+
+      <section id="git-save">
+        <h3>Guardar (Commit &amp; Push)</h3>
+        <p>Cuando un archivo administrado por Git está abierto, presionar <kbd>Ctrl</kbd>+<kbd>S</kbd> abre el diálogo <strong>Git Commit &amp; Push</strong> en lugar del guardado normal del archivo. El diálogo contiene:</p>
+        <ul>
+          <li><strong>Mensaje de commit</strong> — requerido. Ingrese una descripción significativa de sus cambios.</li>
+          <li><strong>Enmendar commit anterior</strong> — disponible a partir del segundo guardado cuando se usa autenticación SSH o git-binary. Reemplaza el commit anterior en lugar de crear uno nuevo; rellena previamente el mensaje de commit anterior; usa automáticamente force-push (<code>--force-with-lease</code>). Solo se pueden enmendar los commits realizados por MarkForge en la sesión actual.</li>
+          <li><strong>Push a:</strong>
+            <ul>
+              <li><em>Rama actual</em> — empuja directamente a la rama desde la que clonó.</li>
+              <li><em>Nueva rama</em> — crea una nueva rama con un nombre que especifique.</li>
+            </ul>
+          </li>
+          <li><strong>Crear Pull Request</strong> — disponible cuando se selecciona "Nueva rama". Abre automáticamente un pull request después de hacer push. Muestra campos para el título del PR y la rama de destino.</li>
+        </ul>
+      </section>
+
+      <section id="git-squash">
+        <h3>Squash de commits <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Q</kbd></h3>
+        <p>Disponible solo con autenticación <strong>SSH</strong> y <strong>HTTPS (git binary)</strong>.</p>
+        <p>Elija <strong>Archivo → Git Squash…</strong> o presione <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Q</kbd>. El diálogo de Squash de commits muestra una tabla de todos los commits en la rama actual que aún no están en la rama base elegida.</p>
+        <ul>
+          <li><strong>Campo de rama base</strong> — la rama de referencia (por ejemplo, <code>main</code>, <code>master</code>, <code>develop</code>). Haga clic en <strong>Recargar</strong> después de cambiarlo.</li>
+          <li><strong>Seleccionar todos los commits nuevos</strong> — marca todos los commits listados a la vez.</li>
+          <li><strong>Mensaje de commit squash</strong> — el mensaje único que reemplazará todos los commits seleccionados.</li>
+          <li><strong>Squash &amp; Push</strong> — reescribe el historial de la rama y hace force-push al remoto.</li>
+        </ul>
+        <p>Debe seleccionar al menos 2 commits, y deben formar un rango contiguo comenzando desde el commit más reciente (HEAD).</p>
+      </section>
+
+      <section id="git-auth">
+        <h3>Modos de autenticación</h3>
+        <p>Configure su método de autenticación en <strong>Ver → Configuración → Autenticación Git</strong>.</p>
+
+        <h4>HTTPS (integrado)</h4>
+        <p>Funciona en todas las plataformas sin ningún software adicional instalado. Usa la API REST de la plataforma directamente. No se requiere ningún binario git local.</p>
+        <div class="callout warn">
+          <div class="callout-title">Limitación</div>
+          <p>Las funciones de amend y squash <strong>no están disponibles</strong> en este modo porque no se mantiene ningún historial git local completo.</p>
+        </div>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>Plataforma</th><th>Tipo de token</th></tr></thead>
+          <tbody>
+            <tr><td>GitHub</td><td>Token de acceso personal (<code>ghp_…</code>) — requiere el alcance <code>repo</code></td></tr>
+            <tr><td>GitHub Enterprise</td><td>Token de acceso personal — igual que GitHub</td></tr>
+            <tr><td>Bitbucket Cloud</td><td>Contraseña de aplicación (Cuenta → Contraseñas de aplicación)</td></tr>
+            <tr><td>Bitbucket Server</td><td>Token de acceso personal o token de acceso HTTP</td></tr>
+          </tbody>
+        </table>
+        </div>
+
+        <h4>HTTPS (git binary)</h4>
+        <p>Usa el ejecutable <code>git</code> del sistema para todas las operaciones: clonación local completa, commit y push. Requiere <a href="https://git-scm.com/" target="_blank" rel="noopener">Git for Windows</a> (o cualquier binario <code>git</code> en su PATH). Admite <strong>amend</strong> y <strong>squash</strong>. Use los mismos campos de nombre de usuario y token que el modo HTTPS (integrado). También debe proporcionar su <strong>Nombre</strong> y <strong>Correo electrónico</strong> para la identidad del commit.</p>
+
+        <h4>SSH (archivo de clave)</h4>
+        <p>Seleccione <strong>SSH (archivo de clave)</strong> y proporcione la ruta a su clave SSH privada y una frase de contraseña opcional. Este modo usa <a href="https://www.paramiko.org/" target="_blank" rel="noopener">paramiko</a> para una conexión SSH en Python puro (no se requiere cliente ssh del sistema). Si paramiko no está instalado, MarkForge recurre al cliente <code>ssh</code> del sistema.</p>
+        <pre><code>pip install paramiko</code></pre>
+        <p>La autenticación SSH admite <strong>amend</strong> y <strong>squash</strong>.</p>
+        <div class="callout note">
+          <div class="callout-title">Almacenamiento de credenciales</div>
+          <p>Los tokens, frases de contraseña SSH y contraseñas de proxy se almacenan en el <strong>llavero del sistema operativo</strong> (GNOME Keyring / KWallet en Linux, Keychain en macOS, Windows Credential Manager en Windows), no en archivos de configuración en texto plano.</p>
+        </div>
+      </section>
+
+      <section id="git-proxy">
+        <h3>Proxy HTTP</h3>
+        <p>Si su red requiere un proxy HTTP para llegar a los servidores Git, configúrelo en <strong>Ver → Configuración → Proxy HTTP</strong>:</p>
+        <ul>
+          <li><strong>URL del proxy</strong> — por ejemplo, <code>http://proxy.company.com:8080</code></li>
+          <li><strong>Nombre de usuario del proxy</strong> — déjelo vacío si no se requiere autenticación.</li>
+          <li><strong>Contraseña del proxy</strong> — déjela vacía si no se requiere autenticación.</li>
+        </ul>
+        <p>Deje todos los campos de proxy vacíos para usar la configuración de proxy predeterminada del sistema.</p>
+      </section>
+
+      <section id="git-close">
+        <h3>Cerrar</h3>
+        <p>Cuando cierre MarkForge mientras un archivo administrado por Git está abierto, MarkForge le preguntará si desea eliminar el directorio de clonación temporal. Eliminar el directorio libera espacio en disco; conservarlo le permite inspeccionar los archivos clonados después.</p>
+      </section>
+    </section>
+
+    <!-- ═══ 12. CONFIGURACIÓN ════════════════════════════════════════════ -->
+    <section id="settings">
+      <h2>12. Configuración</h2>
+      <p>Abra el diálogo de Configuración mediante <strong>Ver → Configuración…</strong>. La configuración se conserva entre sesiones.</p>
+
+      <div class="table-wrap">
+      <table>
+        <thead><tr><th>Configuración</th><th>Opciones</th><th>Notas</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Idioma</strong></td><td>English, Deutsch, Español, Français, Italiano, Nederlands, Português, عربي, فارسی, Tiếng Việt, Svenska, Українська, ಕನ್ನಡ, हिंदी</td><td>Se requiere reinicio para aplicar</td></tr>
+          <tr><td><strong>Tema del editor</strong></td><td>Claro, Oscuro</td><td>Surte efecto inmediatamente</td></tr>
+          <tr><td><strong>Tema de vista previa</strong></td><td>Claro, Oscuro</td><td>Surte efecto inmediatamente</td></tr>
+          <tr><td><strong>Tema de la aplicación</strong></td><td>Claro, Oscuro</td><td>Se requiere reinicio para aplicar</td></tr>
+          <tr><td><strong>Método de autenticación Git</strong></td><td>HTTPS (token), HTTPS (git), SSH</td><td>Consulte <a href="#git-auth">Modos de autenticación</a></td></tr>
+          <tr><td><strong>Nombre de usuario</strong></td><td>Campo de texto</td><td>Modos HTTPS</td></tr>
+          <tr><td><strong>Token</strong></td><td>Campo de texto</td><td>Modos HTTPS — almacenado en el llavero del SO</td></tr>
+          <tr><td><strong>Nombre</strong></td><td>Campo de texto</td><td>HTTPS (git binary) — identidad del commit</td></tr>
+          <tr><td><strong>Correo electrónico</strong></td><td>Campo de texto</td><td>HTTPS (git binary) — identidad del commit</td></tr>
+          <tr><td><strong>Clave SSH</strong></td><td>Ruta de archivo</td><td>Modo SSH</td></tr>
+          <tr><td><strong>Frase de contraseña</strong></td><td>Campo de texto</td><td>Modo SSH — opcional; almacenada en el llavero del SO</td></tr>
+          <tr><td><strong>URL del proxy</strong></td><td>Campo de texto</td><td>Déjelo vacío para el proxy del sistema</td></tr>
+          <tr><td><strong>Nombre de usuario del proxy</strong></td><td>Campo de texto</td><td>Autenticación de proxy opcional</td></tr>
+          <tr><td><strong>Contraseña del proxy</strong></td><td>Campo de texto</td><td>Autenticación de proxy opcional — almacenada en el llavero del SO</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </section>
+
+    <!-- ═══ 13. ATAJOS DE TECLADO ════════════════════════════════════════ -->
+    <section id="shortcuts">
+      <h2>13. Atajos de teclado</h2>
+
+      <p>Todos los atajos de teclado están activos cuando el panel del editor tiene el foco.</p>
+
+      <div class="shortcut-row"><span class="label">Nuevo archivo</span><span><kbd>Ctrl</kbd>+<kbd>N</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Abrir archivo</span><span><kbd>Ctrl</kbd>+<kbd>O</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Abrir desde Git</span><span><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>G</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Git Squash de commits</span><span><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Q</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Guardar</span><span><kbd>Ctrl</kbd>+<kbd>S</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Guardar como</span><span><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>S</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Exportar como PDF</span><span><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>E</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Importar PDF</span><span><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>I</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Alternar árbol de archivos</span><span><kbd>Ctrl</kbd>+<kbd>B</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Alternar vista previa</span><span><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Insertar enlace</span><span><kbd>Ctrl</kbd>+<kbd>K</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Insertar imagen</span><span><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>K</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Insertar diagrama PlantUML</span><span><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>U</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Insertar diagrama Mermaid</span><span><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>M</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Insertar tabla</span><span><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Deshacer</span><span><kbd>Ctrl</kbd>+<kbd>Z</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Rehacer</span><span><kbd>Ctrl</kbd>+<kbd>Y</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Cortar</span><span><kbd>Ctrl</kbd>+<kbd>X</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Copiar</span><span><kbd>Ctrl</kbd>+<kbd>C</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Pegar</span><span><kbd>Ctrl</kbd>+<kbd>V</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Buscar</span><span><kbd>Ctrl</kbd>+<kbd>F</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Buscar &amp; Reemplazar</span><span><kbd>Ctrl</kbd>+<kbd>H</kbd></span></div>
+      <div class="shortcut-row"><span class="label">Buscar siguiente</span><span><kbd>Enter</kbd> <em>(en la barra de búsqueda)</em></span></div>
+      <div class="shortcut-row"><span class="label">Buscar anterior</span><span><kbd>Shift</kbd>+<kbd>Enter</kbd> <em>(en la barra de búsqueda)</em></span></div>
+      <div class="shortcut-row"><span class="label">Cerrar barra de búsqueda</span><span><kbd>Escape</kbd></span></div>
+
+      <hr class="section-divider">
+      <p style="color:var(--text-muted);font-size:0.85em;">MarkForge — Copyright &copy; Marcel Mulch. Publicado bajo la Licencia Pública General GNU v3.0.</p>
+    </section>
+
+  </article>
+</div>
+
+<script>
+  // Close sidebar overlay when a link is clicked on mobile
+  document.querySelectorAll('#toc a').forEach(function(link) {
+    link.addEventListener('click', function() {
+      document.getElementById('sidebar').classList.remove('open');
+    });
+  });
+</script>
+</body>
+</html>

@@ -595,6 +595,12 @@
       <a href="uk.html" class="lang-btn">UK</a>
       <a href="kn.html" class="lang-btn">KN</a>
       <a href="hi.html" class="lang-btn active">HI</a>
+      <a href="es.html" class="lang-btn">ES</a>
+      <a href="fr.html" class="lang-btn">FR</a>
+      <a href="it.html" class="lang-btn">IT</a>
+      <a href="nl.html" class="lang-btn">NL</a>
+      <a href="pt.html" class="lang-btn">PT</a>
+      <a href="fa.html" class="lang-btn">FA</a>
     </div>
   </div>
 
@@ -793,11 +799,12 @@ python src/main.py</code></pre>
       <p>MarkForge गलत綴り वाले शब्दों के नीचे लाल लहरदार रेखा खींच सकता है। वर्तनी जाँच डिफ़ॉल्ट रूप से बंद है।</p>
       <ul>
         <li><strong>दृश्य → वर्तनी जाँच</strong> के माध्यम से सक्षम करें (टॉगल)।</li>
-        <li><strong>दृश्य → वर्तनी जाँच भाषा</strong> के माध्यम से शब्दकोश भाषा चुनें। उपलब्ध भाषाएँ: English, Deutsch, Español, Français, Italiano, Nederlands, Português, Русский, العربية, فارسی।</li>
+        <li><strong>दृश्य → वर्तनी जाँच भाषा</strong> के माध्यम से शब्दकोश भाषा चुनें। उपलब्ध भाषाएँ: English, Deutsch, Español, Français, Italiano, Nederlands, Português, العربية, فارسی (pyspellchecker के माध्यम से) और Tiếng Việt*, Svenska*, Українська*, ಕನ್ನಡ*, हिंदी* (enchant/Hunspell के माध्यम से)।</li>
         <li>इनलाइन कोड स्पैन (<code>`…`</code>) और URL के अंदर के शब्दों पर कभी रेखांकन नहीं होता।</li>
         <li>सभी-कैप संक्षिप्त नाम (HTML, API, URL…) छोड़ दिए जाते हैं।</li>
         <li>वर्तनी जाँच प्राथमिकता और चयनित भाषा सत्रों के बीच सहेजी जाती है।</li>
         <li><code>pyspellchecker</code> लाइब्रेरी की आवश्यकता है। यदि स्थापित नहीं है, तो टॉगल को चुपचाप अनदेखा किया जाता है।</li>
+        <li>* से चिह्नित भाषाओं के लिए <code>pyenchant</code> लाइब्रेरी और सिस्टम Hunspell शब्दकोश (जैसे Debian/Ubuntu पर <code>hunspell-vi</code>) आवश्यक हैं।</li>
       </ul>
     </section>
 
@@ -1276,7 +1283,7 @@ $</code></pre>
       <table>
         <thead><tr><th>सेटिंग</th><th>विकल्प</th><th>नोट</th></tr></thead>
         <tbody>
-          <tr><td><strong>Language (भाषा)</strong></td><td>English, Deutsch</td><td>लागू करने के लिए पुनरारंभ आवश्यक</td></tr>
+          <tr><td><strong>Language (भाषा)</strong></td><td>English, Deutsch, Español, Français, Italiano, Nederlands, Português, عربي, فارسی, Tiếng Việt, Svenska, Українська, ಕನ್ನಡ, हिंदी</td><td>लागू करने के लिए पुनरारंभ आवश्यक</td></tr>
           <tr><td><strong>Editor theme (संपादक थीम)</strong></td><td>Light, Dark</td><td>तुरंत प्रभावी होता है</td></tr>
           <tr><td><strong>Preview theme (पूर्वावलोकन थीम)</strong></td><td>Light, Dark</td><td>तुरंत प्रभावी होता है</td></tr>
           <tr><td><strong>App theme (ऐप थीम)</strong></td><td>Light, Dark</td><td>लागू करने के लिए पुनरारंभ आवश्यक</td></tr>

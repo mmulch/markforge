@@ -1238,7 +1238,7 @@ class MainWindow(QMainWindow):
     def _show_user_manual(self) -> None:
         from PyQt6.QtGui import QDesktopServices
         from i18n import current as _lang
-        filename = "de.html" if _lang() == "de" else "index.html"
+        filename = "index.html" if _lang() == "en" else f"{_lang()}.html"
         if getattr(sys, "frozen", False):
             base = sys._MEIPASS
         else:

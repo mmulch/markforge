@@ -6,7 +6,7 @@ A modern, feature-rich Markdown editor built with Python and PyQt6. Includes a l
 ![Python](https://img.shields.io/badge/python-3.8%2B-blue)
 ![PyQt6](https://img.shields.io/badge/PyQt6-6.4%2B-green)
 
-📖 **[EN](docs/index.html)** · **[DE](docs/de.html)** · **[AR](docs/ar.html)** · **[VI](docs/vi.html)** · **[SV](docs/sv.html)** · **[UK](docs/uk.html)** · **[KN](docs/kn.html)** · **[HI](docs/hi.html)**
+📖 **[EN](docs/index.html)** · **[DE](docs/de.html)** · **[AR](docs/ar.html)** · **[VI](docs/vi.html)** · **[SV](docs/sv.html)** · **[UK](docs/uk.html)** · **[KN](docs/kn.html)** · **[HI](docs/hi.html)** · **[ES](docs/es.html)** · **[FR](docs/fr.html)** · **[IT](docs/it.html)** · **[NL](docs/nl.html)** · **[PT](docs/pt.html)** · **[FA](docs/fa.html)**
 
 ---
 
@@ -19,7 +19,7 @@ A modern, feature-rich Markdown editor built with Python and PyQt6. Includes a l
 - **Find & Replace** — inline find/replace bar (`Ctrl+F` / `Ctrl+H`) with match highlighting, case-sensitive and whole-word options, and Replace All
 - **Document Outline** — collapsible heading tree in the left panel; click any heading to jump there; toggle via View → Show outline
 - **Recent Files** — File → Recent Files submenu tracks the last 10 opened files, persisted between sessions
-- **Spell check** — underlines misspelled words with a red wavy line; 10 languages (EN, DE, ES, FR, IT, NL, PT, RU, AR, FA); toggle and select language via View menu
+- **Spell check** — underlines misspelled words with a red wavy line; 14 languages (EN, DE, ES, FR, IT, NL, PT, AR, FA via pyspellchecker; VI, SV, UK, KN, HI via enchant/Hunspell); toggle and select language via View menu
 - **File tree** — browse Markdown files and images in the project directory
 - **Insert dialogs** — guided dialogs for links, images, tables, PlantUML diagrams, and Mermaid diagrams
 - **PlantUML support** — embed diagrams rendered via the PlantUML online service
@@ -29,8 +29,8 @@ A modern, feature-rich Markdown editor built with Python and PyQt6. Includes a l
 - **PDF export** — export the current document as a PDF
 - **Git integration** — open Markdown files directly from GitHub, GitHub Enterprise, Bitbucket Cloud, or Bitbucket Server; edit and push back without leaving the editor; amend the previous commit or squash multiple commits in one step (see [Git Integration](#git-integration))
 - **Word count & cursor position** — always visible in the status bar
-- **Online user manual** — comprehensive documentation in 8 languages: EN, DE, AR, VI, SV, UK, KN, HI (see [User Manual](docs/index.html))
-- **Multilingual** — UI available in 8 languages: English, Deutsch, عربي, Tiếng Việt, Svenska, Українська, ಕನ್ನಡ, हिंदी
+- **Online user manual** — comprehensive documentation in 14 languages: EN, DE, AR, VI, SV, UK, KN, HI, ES, FR, IT, NL, PT, FA (see [User Manual](docs/index.html))
+- **Multilingual** — UI available in 14 languages: English, Deutsch, Español, Français, Italiano, Nederlands, Português, عربي, فارسی, Tiếng Việt, Svenska, Українська, ಕನ್ನಡ, हिंदी
 - **Persistent settings** — window geometry, splitter positions, and theme preferences are saved across sessions
 
 ### Keyboard Shortcuts
@@ -76,7 +76,8 @@ Python dependencies (installed automatically by CMake):
 | pymupdf4llm | ≥ 0.3.4 | PDF-to-Markdown conversion |
 | dulwich | ≥ 0.20.50 | Pure-Python git client |
 | keyring | ≥ 24.0.0 | Secure OS-keyring credential storage |
-| pyspellchecker | ≥ 0.7 | Spell check (optional) |
+| pyspellchecker | ≥ 0.7 | Spell check for EN/DE/ES/FR/IT/NL/PT/AR/FA (optional) |
+| pyenchant | ≥ 3.2 | Spell check for VI/SV/UK/KN/HI (optional, Linux/macOS) |
 
 ---
 

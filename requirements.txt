@@ -7,3 +7,4 @@ pymupdf4llm>=0.3.4
 dulwich>=0.20.50
 keyring>=24.0.0
 pyspellchecker>=0.7
+pyenchant>=3.2; sys_platform != "win32"

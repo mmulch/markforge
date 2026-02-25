@@ -595,6 +595,12 @@
       <a href="uk.html" class="lang-btn">UK</a>
       <a href="kn.html" class="lang-btn">KN</a>
       <a href="hi.html" class="lang-btn">HI</a>
+      <a href="es.html" class="lang-btn">ES</a>
+      <a href="fr.html" class="lang-btn">FR</a>
+      <a href="it.html" class="lang-btn">IT</a>
+      <a href="nl.html" class="lang-btn">NL</a>
+      <a href="pt.html" class="lang-btn">PT</a>
+      <a href="fa.html" class="lang-btn">FA</a>
     </div>
   </div>
 
@@ -793,11 +799,12 @@ python src/main.py</code></pre>
       <p>MarkForge có thể gạch chân các từ sai chính tả bằng đường gợn sóng màu đỏ khi bạn gõ. Kiểm tra chính tả bị tắt theo mặc định.</p>
       <ul>
         <li>Bật/tắt qua <strong>Xem → Kiểm tra chính tả</strong> (công tắc).</li>
-        <li>Chọn ngôn ngữ từ điển qua <strong>Xem → Ngôn ngữ kiểm tra chính tả</strong>. Ngôn ngữ có sẵn: English, Deutsch, Español, Français, Italiano, Nederlands, Português, Русский, العربية, فارسی.</li>
+        <li>Chọn ngôn ngữ từ điển qua <strong>Xem → Ngôn ngữ kiểm tra chính tả</strong>. Ngôn ngữ có sẵn: English, Deutsch, Español, Français, Italiano, Nederlands, Português, العربية, فارسی (qua pyspellchecker) và Tiếng Việt*, Svenska*, Українська*, ಕನ್ನಡ*, हिंदी* (qua enchant/Hunspell).</li>
         <li>Các từ bên trong đoạn mã nội tuyến (<code>`…`</code>) và URL không bao giờ bị gạch chân.</li>
         <li>Các từ viết tắt VIẾT HOA (HTML, API, URL…) được bỏ qua.</li>
         <li>Tùy chọn kiểm tra chính tả và ngôn ngữ được lưu giữa các phiên làm việc.</li>
         <li>Yêu cầu thư viện <code>pyspellchecker</code>. Nếu chưa cài đặt, công tắc sẽ bị bỏ qua mà không có thông báo.</li>
+        <li>Các ngôn ngữ có dấu * yêu cầu thư viện <code>pyenchant</code> và từ điển Hunspell của hệ thống (ví dụ: <code>hunspell-vi</code> trên Debian/Ubuntu).</li>
       </ul>
     </section>
 
@@ -1276,7 +1283,7 @@ $</code></pre>
       <table>
         <thead><tr><th>Cài đặt</th><th>Tùy chọn</th><th>Ghi chú</th></tr></thead>
         <tbody>
-          <tr><td><strong>Ngôn ngữ</strong></td><td>English, Deutsch</td><td>Yêu cầu khởi động lại để áp dụng</td></tr>
+          <tr><td><strong>Ngôn ngữ</strong></td><td>English, Deutsch, Español, Français, Italiano, Nederlands, Português, عربي, فارسی, Tiếng Việt, Svenska, Українська, ಕನ್ನಡ, हिंदी</td><td>Yêu cầu khởi động lại để áp dụng</td></tr>
           <tr><td><strong>Giao diện trình soạn thảo</strong></td><td>Light, Dark</td><td>Có hiệu lực ngay lập tức</td></tr>
           <tr><td><strong>Giao diện xem trước</strong></td><td>Light, Dark</td><td>Có hiệu lực ngay lập tức</td></tr>
           <tr><td><strong>Giao diện ứng dụng</strong></td><td>Light, Dark</td><td>Yêu cầu khởi động lại để áp dụng</td></tr>

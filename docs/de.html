@@ -594,6 +594,12 @@
       <a href="uk.html" class="lang-btn">UK</a>
       <a href="kn.html" class="lang-btn">KN</a>
       <a href="hi.html" class="lang-btn">HI</a>
+      <a href="es.html" class="lang-btn">ES</a>
+      <a href="fr.html" class="lang-btn">FR</a>
+      <a href="it.html" class="lang-btn">IT</a>
+      <a href="nl.html" class="lang-btn">NL</a>
+      <a href="pt.html" class="lang-btn">PT</a>
+      <a href="fa.html" class="lang-btn">FA</a>
     </div>
   </div>
 
@@ -792,11 +798,12 @@ python src/main.py</code></pre>
       <p>MarkForge kann falsch geschriebene Wörter mit einer roten Wellenlinie unterstreichen. Die Rechtschreibprüfung ist standardmäßig deaktiviert.</p>
       <ul>
         <li>Aktivieren via <strong>Ansicht → Rechtschreibprüfung</strong> (Umschalter).</li>
-        <li>Wörterbuchsprache wählen via <strong>Ansicht → Rechtschreibprüfung Sprache</strong>. Verfügbare Sprachen: English, Deutsch, Español, Français, Italiano, Nederlands, Português, Русский, العربية, فارسی.</li>
+        <li>Wörterbuchsprache wählen via <strong>Ansicht → Rechtschreibprüfung Sprache</strong>. Verfügbare Sprachen: English, Deutsch, Español, Français, Italiano, Nederlands, Português, العربية, فارسی (via pyspellchecker) und Tiếng Việt*, Svenska*, Українська*, ಕನ್ನಡ*, हिंदी* (via enchant/Hunspell).</li>
         <li>Wörter in Inline-Code-Spans (<code>`…`</code>) und URLs werden nie unterstrichen.</li>
         <li>GROSSBUCHSTABEN-Abkürzungen (HTML, API, URL…) werden übersprungen.</li>
         <li>Die Einstellung und die gewählte Sprache werden sitzungsübergreifend gespeichert.</li>
         <li>Erfordert die Bibliothek <code>pyspellchecker</code>. Falls nicht installiert, wird der Schalter stillschweigend ignoriert.</li>
+        <li>Mit * markierte Sprachen erfordern die Bibliothek <code>pyenchant</code> und System-Hunspell-Wörterbücher (z. B. <code>hunspell-vi</code> unter Debian/Ubuntu).</li>
       </ul>
     </section>
 
@@ -1275,7 +1282,7 @@ $</code></pre>
       <table>
         <thead><tr><th>Einstellung</th><th>Optionen</th><th>Hinweis</th></tr></thead>
         <tbody>
-          <tr><td><strong>Sprache</strong></td><td>English, Deutsch</td><td>Neustart erforderlich</td></tr>
+          <tr><td><strong>Sprache</strong></td><td>English, Deutsch, Español, Français, Italiano, Nederlands, Português, عربي, فارسی, Tiếng Việt, Svenska, Українська, ಕನ್ನಡ, हिंदी</td><td>Neustart erforderlich</td></tr>
           <tr><td><strong>Editor-Theme</strong></td><td>Hell, Dunkel</td><td>Sofort wirksam</td></tr>
           <tr><td><strong>Vorschau-Theme</strong></td><td>Hell, Dunkel</td><td>Sofort wirksam</td></tr>
           <tr><td><strong>App-Theme</strong></td><td>Hell, Dunkel</td><td>Neustart erforderlich</td></tr>

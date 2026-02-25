@@ -605,6 +605,12 @@
       <a href="uk.html" class="lang-btn">UK</a>
       <a href="kn.html" class="lang-btn">KN</a>
       <a href="hi.html" class="lang-btn">HI</a>
+      <a href="es.html" class="lang-btn">ES</a>
+      <a href="fr.html" class="lang-btn">FR</a>
+      <a href="it.html" class="lang-btn">IT</a>
+      <a href="nl.html" class="lang-btn">NL</a>
+      <a href="pt.html" class="lang-btn">PT</a>
+      <a href="fa.html" class="lang-btn">FA</a>
     </div>
   </div>
 
@@ -631,7 +637,7 @@
         <div class="feature-card"><strong>الصيغ الرياضية</strong><span>ترميز LaTeX يُعرض باستخدام MathJax</span></div>
         <div class="feature-card"><strong>استيراد PDF</strong><span>تحويل أي PDF إلى Markdown تلقائياً</span></div>
         <div class="feature-card"><strong>تصدير PDF</strong><span>PDF محسَّن للطباعة من أي مستند</span></div>
-        <div class="feature-card"><strong>متعدد اللغات</strong><span>واجهة مستخدم بالإنجليزية والألمانية (Deutsch)</span></div>
+        <div class="feature-card"><strong>متعدد اللغات</strong><span>واجهة مستخدم بـ 14 لغة: EN, DE, ES, FR, IT, NL, PT, AR, FA, VI, SV, UK, KN, HI</span></div>
       </div>
     </section>
 
@@ -803,11 +809,12 @@ python src/main.py</code></pre>
       <p>يمكن لـ MarkForge وضع خط أحمر متموج تحت الكلمات المكتوبة بشكل خاطئ أثناء الكتابة. التدقيق الإملائي معطل افتراضياً.</p>
       <ul>
         <li>تشغيل/إيقاف عبر <strong>عرض ← تدقيق إملائي</strong> (مفتاح تبديل).</li>
-        <li>اختر لغة القاموس عبر <strong>عرض ← لغة التدقيق الإملائي</strong>. اللغات المتاحة: English, Deutsch, Español, Français, Italiano, Nederlands, Português, Русский, العربية, فارسی.</li>
+        <li>اختر لغة القاموس عبر <strong>عرض ← لغة التدقيق الإملائي</strong>. اللغات المتاحة: English, Deutsch, Español, Français, Italiano, Nederlands, Português, العربية, فارسی (عبر pyspellchecker)، و Tiếng Việt*، Svenska*، Українська*، ಕನ್ನಡ*، हिंदी* (عبر enchant/Hunspell).</li>
         <li>الكلمات داخل أجزاء الكود المضمنة (<code>`…`</code>) وعناوين URL لا تُوضع تحتها خطوط أبداً.</li>
         <li>الاختصارات بالأحرف الكبيرة (HTML, API, URL…) يتم تخطيها.</li>
         <li>يُحفظ تفضيل التدقيق الإملائي واللغة المختارة بين الجلسات.</li>
         <li>يتطلب مكتبة <code>pyspellchecker</code>. في حال عدم التثبيت، يُتجاهل المفتاح بصمت.</li>
+        <li>اللغات المعلّمة بـ * تتطلب مكتبة <code>pyenchant</code> وقواميس Hunspell للنظام (مثل <code>hunspell-vi</code> على Debian/Ubuntu).</li>
       </ul>
     </section>
 
@@ -1286,7 +1293,7 @@ $</code></pre>
       <table>
         <thead><tr><th>الإعداد</th><th>الخيارات</th><th>ملاحظات</th></tr></thead>
         <tbody>
-          <tr><td><strong>اللغة</strong></td><td>English، Deutsch</td><td>يلزم إعادة التشغيل للتطبيق</td></tr>
+          <tr><td><strong>اللغة</strong></td><td>English, Deutsch, Español, Français, Italiano, Nederlands, Português, عربي, فارسی, Tiếng Việt, Svenska, Українська, ಕನ್ನಡ, हिंदी</td><td>يلزم إعادة التشغيل للتطبيق</td></tr>
           <tr><td><strong>ثيم المحرر</strong></td><td>فاتح، داكن</td><td>يسري فوراً</td></tr>
           <tr><td><strong>ثيم المعاينة</strong></td><td>فاتح، داكن</td><td>يسري فوراً</td></tr>
           <tr><td><strong>ثيم التطبيق</strong></td><td>فاتح، داكن</td><td>يلزم إعادة التشغيل للتطبيق</td></tr>

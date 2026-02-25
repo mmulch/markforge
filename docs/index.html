@@ -595,6 +595,12 @@
       <a href="uk.html" class="lang-btn">UK</a>
       <a href="kn.html" class="lang-btn">KN</a>
       <a href="hi.html" class="lang-btn">HI</a>
+      <a href="es.html" class="lang-btn">ES</a>
+      <a href="fr.html" class="lang-btn">FR</a>
+      <a href="it.html" class="lang-btn">IT</a>
+      <a href="nl.html" class="lang-btn">NL</a>
+      <a href="pt.html" class="lang-btn">PT</a>
+      <a href="fa.html" class="lang-btn">FA</a>
     </div>
   </div>
 
@@ -793,11 +799,12 @@ python src/main.py</code></pre>
       <p>MarkForge can underline misspelled words with a red wavy line as you type. Spell check is disabled by default.</p>
       <ul>
         <li>Enable via <strong>View → Spell check</strong> (toggle).</li>
-        <li>Select the dictionary language via <strong>View → Spell check language</strong>. Available languages: English, Deutsch, Español, Français, Italiano, Nederlands, Português, Русский, العربية, فارسی.</li>
+        <li>Select the dictionary language via <strong>View → Spell check language</strong>. Available languages: English, Deutsch, Español, Français, Italiano, Nederlands, Português, العربية, فارسی (via pyspellchecker), and Tiếng Việt*, Svenska*, Українська*, ಕನ್ನಡ*, हिंदी* (via enchant/Hunspell).</li>
         <li>Words inside inline code spans (<code>`…`</code>) and URLs are never underlined.</li>
         <li>ALL-CAPS abbreviations (HTML, API, URL…) are skipped.</li>
         <li>The spell check preference and selected language are saved between sessions.</li>
         <li>Requires the <code>pyspellchecker</code> library. If it is not installed, the toggle is silently ignored.</li>
+        <li>Languages marked with * require the <code>pyenchant</code> library and system Hunspell dictionaries (e.g. <code>hunspell-vi</code> on Debian/Ubuntu).</li>
       </ul>
     </section>
 
@@ -1276,7 +1283,7 @@ $</code></pre>
       <table>
         <thead><tr><th>Setting</th><th>Options</th><th>Notes</th></tr></thead>
         <tbody>
-          <tr><td><strong>Language</strong></td><td>English, Deutsch</td><td>Restart required to apply</td></tr>
+          <tr><td><strong>Language</strong></td><td>English, Deutsch, Español, Français, Italiano, Nederlands, Português, عربي, فارسی, Tiếng Việt, Svenska, Українська, ಕನ್ನಡ, हिंदी</td><td>Restart required to apply</td></tr>
           <tr><td><strong>Editor theme</strong></td><td>Light, Dark</td><td>Takes effect immediately</td></tr>
           <tr><td><strong>Preview theme</strong></td><td>Light, Dark</td><td>Takes effect immediately</td></tr>
           <tr><td><strong>App theme</strong></td><td>Light, Dark</td><td>Restart required to apply</td></tr>

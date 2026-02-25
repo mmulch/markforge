@@ -595,6 +595,12 @@
       <a href="uk.html" class="lang-btn">UK</a>
       <a href="kn.html" class="lang-btn">KN</a>
       <a href="hi.html" class="lang-btn">HI</a>
+      <a href="es.html" class="lang-btn">ES</a>
+      <a href="fr.html" class="lang-btn">FR</a>
+      <a href="it.html" class="lang-btn">IT</a>
+      <a href="nl.html" class="lang-btn">NL</a>
+      <a href="pt.html" class="lang-btn">PT</a>
+      <a href="fa.html" class="lang-btn">FA</a>
     </div>
   </div>
 
@@ -793,11 +799,12 @@ python src/main.py</code></pre>
       <p>MarkForge kan understryka felstavade ord med en röd vågig linje medan du skriver. Stavningskontroll är inaktiverat som standard.</p>
       <ul>
         <li>Aktivera via <strong>Visa → Stavningskontroll</strong> (växla).</li>
-        <li>Välj ordlistespråk via <strong>Visa → Stavningskontrollspråk</strong>. Tillgängliga språk: English, Deutsch, Español, Français, Italiano, Nederlands, Português, Русский, العربية, فارسی.</li>
+        <li>Välj ordlistespråk via <strong>Visa → Stavningskontrollspråk</strong>. Tillgängliga språk: English, Deutsch, Español, Français, Italiano, Nederlands, Português, العربية, فارسی (via pyspellchecker) och Tiếng Việt*, Svenska*, Українська*, ಕನ್ನಡ*, हिंदी* (via enchant/Hunspell).</li>
         <li>Ord inuti infogade kodavsnitt (<code>`…`</code>) och URL:er underlyks aldrig.</li>
         <li>VERSALA förkortningar (HTML, API, URL…) hoppas över.</li>
         <li>Stavningskontrollinställningen och det valda språket sparas mellan sessioner.</li>
         <li>Kräver biblioteket <code>pyspellchecker</code>. Om det inte är installerat ignoreras växeln tyst.</li>
+        <li>Språk markerade med * kräver biblioteket <code>pyenchant</code> och system-Hunspell-ordlistor (t.ex. <code>hunspell-vi</code> på Debian/Ubuntu).</li>
       </ul>
     </section>
 
@@ -1276,7 +1283,7 @@ $</code></pre>
       <table>
         <thead><tr><th>Inställning</th><th>Alternativ</th><th>Anteckningar</th></tr></thead>
         <tbody>
-          <tr><td><strong>Språk</strong></td><td>English, Deutsch</td><td>Omstart krävs för att tillämpa</td></tr>
+          <tr><td><strong>Språk</strong></td><td>English, Deutsch, Español, Français, Italiano, Nederlands, Português, عربي, فارسی, Tiếng Việt, Svenska, Українська, ಕನ್ನಡ, हिंदी</td><td>Omstart krävs för att tillämpa</td></tr>
           <tr><td><strong>Redigeringstema</strong></td><td>Light, Dark</td><td>Träder i kraft omedelbart</td></tr>
           <tr><td><strong>Förhandsvisningstema</strong></td><td>Light, Dark</td><td>Träder i kraft omedelbart</td></tr>
           <tr><td><strong>Apptema</strong></td><td>Light, Dark</td><td>Omstart krävs för att tillämpa</td></tr>

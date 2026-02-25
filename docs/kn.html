@@ -595,6 +595,12 @@
       <a href="uk.html" class="lang-btn">UK</a>
       <a href="kn.html" class="lang-btn active">KN</a>
       <a href="hi.html" class="lang-btn">HI</a>
+      <a href="es.html" class="lang-btn">ES</a>
+      <a href="fr.html" class="lang-btn">FR</a>
+      <a href="it.html" class="lang-btn">IT</a>
+      <a href="nl.html" class="lang-btn">NL</a>
+      <a href="pt.html" class="lang-btn">PT</a>
+      <a href="fa.html" class="lang-btn">FA</a>
     </div>
   </div>
 
@@ -793,11 +799,12 @@ python src/main.py</code></pre>
       <p>MarkForge ತಪ್ಪಾಗಿ ಬರೆದ ಪದಗಳಿಗೆ ಕೆಂಪು ಅಲೆಯ ರೇಖೆ ಎಳೆಯಬಹುದು. ಕಾಗುಣಿತ ಪರಿಶೀಲನೆ ಡಿಫಾಲ್ಟ್ ಆಗಿ ಆಫ್ ಆಗಿರುತ್ತದೆ.</p>
       <ul>
         <li><strong>ವೀಕ್ಷಣೆ → ಕಾಗುಣಿತ ಪರಿಶೀಲನೆ</strong> ಮೂಲಕ ಸಕ್ರಿಯಗೊಳಿಸಿ (ಟಾಗಲ್).</li>
-        <li><strong>ವೀಕ್ಷಣೆ → ಕಾಗುಣಿತ ಪರಿಶೀಲನೆ ಭಾಷೆ</strong> ಮೂಲಕ ನಿಘಂಟು ಭಾಷೆ ಆಯ್ಕೆ ಮಾಡಿ. ಲಭ್ಯ ಭಾಷೆಗಳು: English, Deutsch, Español, Français, Italiano, Nederlands, Português, Русский, العربية, فارسی.</li>
+        <li><strong>ವೀಕ್ಷಣೆ → ಕಾಗುಣಿತ ಪರಿಶೀಲನೆ ಭಾಷೆ</strong> ಮೂಲಕ ನಿಘಂಟು ಭಾಷೆ ಆಯ್ಕೆ ಮಾಡಿ. ಲಭ್ಯ ಭಾಷೆಗಳು: English, Deutsch, Español, Français, Italiano, Nederlands, Português, العربية, فارسی (pyspellchecker ಮೂಲಕ) ಮತ್ತು Tiếng Việt*, Svenska*, Українська*, ಕನ್ನಡ*, हिंदी* (enchant/Hunspell ಮೂಲಕ).</li>
         <li>ಇನ್‌ಲೈನ್ ಕೋಡ್ ಸ್ಪ್ಯಾನ್‌ಗಳಲ್ಲಿ (<code>`…`</code>) ಮತ್ತು URL ಗಳಲ್ಲಿ ಇರುವ ಪದಗಳಿಗೆ ಎಂದಿಗೂ ಅಂಡರ್‌ಲೈನ್ ಮಾಡಲಾಗುವುದಿಲ್ಲ.</li>
         <li>ಎಲ್ಲಾ ಕ್ಯಾಪಿಟಲ್ ಅಕ್ಷರಗಳ ಸಂಕ್ಷಿಪ್ತ ರೂಪಗಳು (HTML, API, URL…) ಬಿಡಲ್ಪಡುತ್ತವೆ.</li>
         <li>ಕಾಗುಣಿತ ಪರಿಶೀಲನೆ ಆದ್ಯತೆ ಮತ್ತು ಆಯ್ಕೆ ಮಾಡಿದ ಭಾಷೆ ಸೆಶನ್‌ಗಳ ನಡುವೆ ಉಳಿಸಲ್ಪಡುತ್ತದೆ.</li>
         <li><code>pyspellchecker</code> ಲೈಬ್ರರಿ ಅಗತ್ಯ. ಸ್ಥಾಪಿಸಲ್ಪಟ್ಟಿಲ್ಲದಿದ್ದರೆ, ಟಾಗಲ್ ಮೌನವಾಗಿ ನಿರ್ಲಕ್ಷಿಸಲ್ಪಡುತ್ತದೆ.</li>
+        <li>* ಎಂದು ಗುರುತಿಸಿದ ಭಾಷೆಗಳಿಗೆ <code>pyenchant</code> ಲೈಬ್ರರಿ ಮತ್ತು ಸಿಸ್ಟಮ್ Hunspell ನಿಘಂಟುಗಳು ಅಗತ್ಯ (ಉದಾ: Debian/Ubuntu ನಲ್ಲಿ <code>hunspell-vi</code>).</li>
       </ul>
     </section>
 
@@ -1276,7 +1283,7 @@ $</code></pre>
       <table>
         <thead><tr><th>ಸೆಟ್ಟಿಂಗ್</th><th>ಆಯ್ಕೆಗಳು</th><th>ಟಿಪ್ಪಣಿಗಳು</th></tr></thead>
         <tbody>
-          <tr><td><strong>ಭಾಷೆ</strong></td><td>English, Deutsch</td><td>ಅನ್ವಯಿಸಲು ಮರಾರ್ಟ್ ಅಗತ್ಯ</td></tr>
+          <tr><td><strong>ಭಾಷೆ</strong></td><td>English, Deutsch, Español, Français, Italiano, Nederlands, Português, عربي, فارسی, Tiếng Việt, Svenska, Українська, ಕನ್ನಡ, हिंदी</td><td>ಅನ್ವಯಿಸಲು ಮರಾರ್ಟ್ ಅಗತ್ಯ</td></tr>
           <tr><td><strong>ಸಂಪಾದಕ ಥೀಮ್</strong></td><td>Light, Dark</td><td>ತಕ್ಷಣ ಜಾರಿಗೆ ಬರುತ್ತದೆ</td></tr>
           <tr><td><strong>ಮುನ್ನೋಟ ಥೀಮ್</strong></td><td>Light, Dark</td><td>ತಕ್ಷಣ ಜಾರಿಗೆ ಬರುತ್ತದೆ</td></tr>
           <tr><td><strong>ಅಪ್ಲಿಕೇಶನ್ ಥೀಮ್</strong></td><td>Light, Dark</td><td>ಅನ್ವಯಿಸಲು ಮರಾರ್ಟ್ ಅಗತ್ಯ</td></tr>

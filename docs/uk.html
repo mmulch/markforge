@@ -595,6 +595,12 @@
       <a href="uk.html" class="lang-btn active">UK</a>
       <a href="kn.html" class="lang-btn">KN</a>
       <a href="hi.html" class="lang-btn">HI</a>
+      <a href="es.html" class="lang-btn">ES</a>
+      <a href="fr.html" class="lang-btn">FR</a>
+      <a href="it.html" class="lang-btn">IT</a>
+      <a href="nl.html" class="lang-btn">NL</a>
+      <a href="pt.html" class="lang-btn">PT</a>
+      <a href="fa.html" class="lang-btn">FA</a>
     </div>
   </div>
 
@@ -793,11 +799,12 @@ python src/main.py</code></pre>
       <p>MarkForge може підкреслювати неправильно написані слова червоною хвилястою лінією під час введення. Перевірка правопису вимкнена за замовчуванням.</p>
       <ul>
         <li>Увімкнути через <strong>Вигляд → Перевірка правопису</strong> (перемикач).</li>
-        <li>Вибір мови словника через <strong>Вигляд → Мова перевірки правопису</strong>. Доступні мови: English, Deutsch, Español, Français, Italiano, Nederlands, Português, Русский, العربية, فارسی.</li>
+        <li>Вибір мови словника через <strong>Вигляд → Мова перевірки правопису</strong>. Доступні мови: English, Deutsch, Español, Français, Italiano, Nederlands, Português, العربية, فارسی (через pyspellchecker) та Tiếng Việt*, Svenska*, Українська*, ಕನ್ನಡ*, हिंदी* (через enchant/Hunspell).</li>
         <li>Слова всередині фрагментів вбудованого коду (<code>`…`</code>) та URL-адрес ніколи не підкреслюються.</li>
         <li>Абревіатури ВЕЛИКИМИ ЛІТЕРАМИ (HTML, API, URL…) пропускаються.</li>
         <li>Налаштування перевірки правопису та вибрана мова зберігаються між сеансами.</li>
         <li>Потрібна бібліотека <code>pyspellchecker</code>. Якщо не встановлена, перемикач мовчки ігнорується.</li>
+        <li>Мови, позначені *, потребують бібліотеки <code>pyenchant</code> та системних словників Hunspell (наприклад, <code>hunspell-vi</code> у Debian/Ubuntu).</li>
       </ul>
     </section>
 
@@ -1276,7 +1283,7 @@ $</code></pre>
       <table>
         <thead><tr><th>Налаштування</th><th>Параметри</th><th>Примітки</th></tr></thead>
         <tbody>
-          <tr><td><strong>Мова</strong></td><td>English, Deutsch</td><td>Для застосування потрібен перезапуск</td></tr>
+          <tr><td><strong>Мова</strong></td><td>English, Deutsch, Español, Français, Italiano, Nederlands, Português, عربي, فارسی, Tiếng Việt, Svenska, Українська, ಕನ್ನಡ, हिंदी</td><td>Для застосування потрібен перезапуск</td></tr>
           <tr><td><strong>Тема редактора</strong></td><td>Light, Dark</td><td>Набирає чинності негайно</td></tr>
           <tr><td><strong>Тема попереднього перегляду</strong></td><td>Light, Dark</td><td>Набирає чинності негайно</td></tr>
           <tr><td><strong>Тема застосунку</strong></td><td>Light, Dark</td><td>Для застосування потрібен перезапуск</td></tr>
