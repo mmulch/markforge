@@ -26,6 +26,7 @@ from PyQt6.QtWidgets import (
 from editor_widget import EditorWidget
 from file_tree_widget import FileTreeWidget
 from find_replace_bar import FindReplaceBar
+from outline_widget import OutlineWidget
 from git_dialogs import GitCommitDialog, GitOpenDialog, GitSquashDialog
 from git_manager import GitFileInfo, CommitSpec  # noqa: F401
 from i18n import tr
@@ -196,10 +197,19 @@ class MainWindow(QMainWindow):
         self._splitter.addWidget(self._preview)
         self._splitter.setSizes([640, 640])
 
-        self._outer_splitter = QSplitter(Qt.Orientation.Horizontal)
+        self._outline   = OutlineWidget()
         self._file_tree = FileTreeWidget()
         self._file_tree.set_root(os.getcwd())
-        self._outer_splitter.addWidget(self._file_tree)
+
+        self._left_splitter = QSplitter(Qt.Orientation.Vertical)
+        self._left_splitter.addWidget(self._outline)
+        self._left_splitter.addWidget(self._file_tree)
+        self._left_splitter.setSizes([200, 400])
+        self._left_splitter.setStretchFactor(0, 1)
+        self._left_splitter.setStretchFactor(1, 1)
+
+        self._outer_splitter = QSplitter(Qt.Orientation.Horizontal)
+        self._outer_splitter.addWidget(self._left_splitter)
         self._outer_splitter.addWidget(self._splitter)
         self._outer_splitter.setSizes([200, 1080])
         self._outer_splitter.setStretchFactor(0, 0)
@@ -212,8 +222,8 @@ class MainWindow(QMainWindow):
         vbox = QVBoxLayout(container)
         vbox.setContentsMargins(0, 0, 0, 0)
         vbox.setSpacing(0)
-        vbox.addWidget(self._find_bar)
-        vbox.addWidget(self._outer_splitter)
+        vbox.addWidget(self._find_bar, 0)
+        vbox.addWidget(self._outer_splitter, 1)
         self.setCentralWidget(container)
 
     def _build_menu(self) -> None:
@@ -270,6 +280,10 @@ class MainWindow(QMainWindow):
             tr("Show file tree"), "Ctrl+B", m, checkable=True
         )
         self._act_filetree.setChecked(True)
+        self._act_outline = self._mk_action(
+            tr("Show outline"), "Ctrl+Shift+O", m, checkable=True
+        )
+        self._act_outline.setChecked(True)
         self._act_preview = self._mk_action(
             tr("Show preview"), "Ctrl+Shift+P", m, checkable=True
         )
@@ -349,10 +363,12 @@ class MainWindow(QMainWindow):
         self._act_insert_mermaid.triggered.connect(self._insert_mermaid)
         self._act_insert_table.triggered.connect(self._insert_table)
         self._act_filetree.toggled.connect(self._file_tree.setVisible)
+        self._act_outline.toggled.connect(self._outline.setVisible)
         self._act_preview.toggled.connect(self._preview.setVisible)
         self._act_wrap.toggled.connect(self._editor.set_word_wrap)
         self._file_tree.file_activated.connect(self._load)
         self._preview.open_file.connect(self._load)
+        self._outline.jump_to_line.connect(self._jump_to_outline_line)
 
         self._editor.textChanged.connect(self._on_change)
         self._editor.cursorPositionChanged.connect(self._update_pos)
@@ -371,7 +387,19 @@ class MainWindow(QMainWindow):
         self._timer.start()
 
     def _refresh_preview(self) -> None:
-        self._preview.set_markdown(self._editor.toPlainText(), self._doc_base_url())
+        text = self._editor.toPlainText()
+        self._preview.set_markdown(text, self._doc_base_url())
+        self._outline.refresh(text)
+
+    def _jump_to_outline_line(self, lineno: int) -> None:
+        """Move the editor cursor to the heading at the given 0-based line."""
+        from PyQt6.QtGui import QTextCursor
+        block = self._editor.document().findBlockByLineNumber(lineno)
+        if block.isValid():
+            cursor = QTextCursor(block)
+            self._editor.setTextCursor(cursor)
+            self._editor.ensureCursorVisible()
+            self._editor.setFocus()
 
     def _doc_base_url(self) -> QUrl:
         """Base URL for the preview: directory of the currently open file."""
@@ -410,6 +438,7 @@ class MainWindow(QMainWindow):
             act.setEnabled(active)
         if not active:
             self._find_bar.close_bar()
+            self._outline.clear()
 
     def _update_title(self) -> None:
         name = (
@@ -967,6 +996,11 @@ class MainWindow(QMainWindow):
             self._splitter.setSizes([int(s) for s in sizes])
         if sizes := self._settings.value("outer_splitter"):
             self._outer_splitter.setSizes([int(s) for s in sizes])
+        if sizes := self._settings.value("left_splitter"):
+            self._left_splitter.setSizes([int(s) for s in sizes])
+        outline_visible = self._settings.value("outline_visible", True, type=bool)
+        self._act_outline.setChecked(outline_visible)
+        self._outline.setVisible(outline_visible)
         self._apply_themes()
 
     def _apply_themes(self) -> None:
@@ -1015,6 +1049,8 @@ class MainWindow(QMainWindow):
         self._settings.setValue("geometry", self.saveGeometry())
         self._settings.setValue("splitter", self._splitter.sizes())
         self._settings.setValue("outer_splitter", self._outer_splitter.sizes())
+        self._settings.setValue("left_splitter", self._left_splitter.sizes())
+        self._settings.setValue("outline_visible", self._act_outline.isChecked())
         event.accept()
 
     # ── Insert actions ────────────────────────────────────────────────────────

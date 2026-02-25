@@ -10,6 +10,7 @@ from PyQt6.QtWidgets import (
     QLabel,
     QLineEdit,
     QPushButton,
+    QSizePolicy,
     QTextEdit,
     QVBoxLayout,
     QWidget,
@@ -29,6 +30,7 @@ class FindReplaceBar(QWidget):
         self._matches: list[QTextCursor] = []
         self._current: int = -1
 
+        self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
         self._build_ui()
 
     # ── Build UI ──────────────────────────────────────────────────────────────

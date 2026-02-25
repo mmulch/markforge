@@ -292,6 +292,9 @@ _DE: dict[str, str] = {
     "Find previous (Shift+Enter)": "Vorheriges suchen (Umschalt+Eingabe)",
     "Find next (Enter)":           "Nächstes suchen (Eingabe)",
     "Close (Escape)":              "Schließen (Escape)",
+    # ── Outline ───────────────────────────────────────────────────────────────
+    "Outline":       "Gliederung",
+    "Show outline":  "Gliederung anzeigen",
 }
 
 # ── Arabic (Egyptian / MSA) ───────────────────────────────────────────────────
