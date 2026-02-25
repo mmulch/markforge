@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from PyQt6.QtCore import QSettings
+from PyQt6.QtCore import QSettings, Qt
 from PyQt6.QtWidgets import (
     QComboBox,
     QDialog,
@@ -13,12 +13,14 @@ from PyQt6.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QLineEdit,
+    QListWidget,
+    QListWidgetItem,
     QPushButton,
     QVBoxLayout,
 )
 
 from credentials import get_secret, set_secret
-from i18n import LANGUAGES, tr
+from i18n import LANGUAGES, SPELL_CHECK_LANGUAGES, UI_LANGUAGES, tr
 from themes import APP_THEMES, EDITOR_THEMES, PREVIEW_THEMES
 
 
@@ -51,8 +53,8 @@ class SettingsDialog(QDialog):
 
         # ── Language ──────────────────────────────────────────────────────────
         self._lang_combo = QComboBox()
-        for code, name in LANGUAGES.items():
-            self._lang_combo.addItem(name, code)
+        for code in UI_LANGUAGES:
+            self._lang_combo.addItem(LANGUAGES[code], code)
 
         lang_settings = QSettings("Markforge", "Markforge")
         current_lang = lang_settings.value("language", "en")
@@ -101,6 +103,34 @@ class SettingsDialog(QDialog):
         app_theme_info = QLabel(tr("App theme requires restart."))
         app_theme_info.setStyleSheet("color: #888; font-size: 12px;")
         root.addWidget(app_theme_info)
+
+        # ── Spell Check Languages ─────────────────────────────────────────────
+        spell_grp = QGroupBox(tr("Spell Check Languages"))
+        spell_vbox = QVBoxLayout(spell_grp)
+
+        spell_hint = QLabel(tr("Active spell check languages (shown in View menu):"))
+        spell_hint.setStyleSheet("font-size: 12px;")
+        spell_vbox.addWidget(spell_hint)
+
+        self._spell_lang_list = QListWidget()
+        self._spell_lang_list.setFixedHeight(140)
+
+        s_spell = QSettings("MarkdownEditor", "MarkdownEditor")
+        enabled_langs = s_spell.value("spell_langs_enabled", list(SPELL_CHECK_LANGUAGES))
+        if isinstance(enabled_langs, str):
+            enabled_langs = [enabled_langs]
+
+        for code in SPELL_CHECK_LANGUAGES:
+            item = QListWidgetItem(LANGUAGES[code])
+            item.setData(Qt.ItemDataRole.UserRole, code)
+            item.setCheckState(
+                Qt.CheckState.Checked if code in enabled_langs
+                else Qt.CheckState.Unchecked
+            )
+            self._spell_lang_list.addItem(item)
+
+        spell_vbox.addWidget(self._spell_lang_list)
+        root.addWidget(spell_grp)
 
         # ── Git Authentication ─────────────────────────────────────────────────
         git_grp = QGroupBox(tr("Git Authentication"))
@@ -234,6 +264,13 @@ class SettingsDialog(QDialog):
         theme_settings.setValue("editor_theme",  self._editor_theme_combo.currentText())
         theme_settings.setValue("preview_theme", self._preview_theme_combo.currentText())
         theme_settings.setValue("app_theme",     self._app_theme_combo.currentText())
+
+        enabled_langs = []
+        for i in range(self._spell_lang_list.count()):
+            item = self._spell_lang_list.item(i)
+            if item.checkState() == Qt.CheckState.Checked:
+                enabled_langs.append(item.data(Qt.ItemDataRole.UserRole))
+        theme_settings.setValue("spell_langs_enabled", enabled_langs)
 
         # Git credentials (non-sensitive in QSettings, secrets in OS keyring)
         theme_settings.setValue("git/auth_method",    self._git_auth_combo.currentData())

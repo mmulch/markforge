@@ -29,7 +29,7 @@ from find_replace_bar import FindReplaceBar
 from outline_widget import OutlineWidget
 from git_dialogs import GitCommitDialog, GitOpenDialog, GitSquashDialog
 from git_manager import GitFileInfo, CommitSpec  # noqa: F401
-from i18n import tr
+from i18n import LANGUAGES, SPELL_CHECK_LANGUAGES, tr
 from insert_media_dialogs import InsertImageDialog, InsertLinkDialog
 from insert_mermaid_dialog import InsertMermaidDialog
 from insert_plantuml_dialog import InsertPlantUMLDialog
@@ -307,31 +307,14 @@ class MainWindow(QMainWindow):
         self._act_spellcheck.setChecked(False)
         from PyQt6.QtGui import QActionGroup
         self._spell_lang_menu = m.addMenu(tr("Spell check language"))
-        lang_group = QActionGroup(self)
-        lang_group.setExclusive(True)
-        for code, name in [
-            ("en", "English"),
-            ("de", "Deutsch"),
-            ("es", "Español"),
-            ("fr", "Français"),
-            ("it", "Italiano"),
-            ("nl", "Nederlands"),
-            ("pt", "Português"),
-            ("ru", "Русский"),
-            ("ar", "العربية"),
-            ("fa", "فارسی"),
-        ]:
-            act = self._spell_lang_menu.addAction(name)
-            act.setCheckable(True)
-            act.setData(code)
-            lang_group.addAction(act)
-        lang_group.actions()[0].setChecked(True)  # English default
-        lang_group.triggered.connect(
+        self._spell_lang_group = QActionGroup(self)
+        self._spell_lang_group.setExclusive(True)
+        self._spell_lang_group.triggered.connect(
             lambda a: self._editor.set_spell_check(
                 self._act_spellcheck.isChecked(), a.data()
             )
         )
-        self._spell_lang_group = lang_group
+        # Populated dynamically by _rebuild_spell_lang_menu() once settings load
         m.addSeparator()
         settings_act = self._mk_action(tr("Settings …"), None, m)
         settings_act.triggered.connect(self._open_settings)
@@ -1003,6 +986,33 @@ class MainWindow(QMainWindow):
         self._recent_files.clear()
         self._rebuild_recent_menu()
 
+    def _rebuild_spell_lang_menu(self) -> None:
+        """Repopulate View → Spell check language from user-selected languages in Settings."""
+        # Remove all actions from group and menu
+        for act in list(self._spell_lang_group.actions()):
+            self._spell_lang_group.removeAction(act)
+        self._spell_lang_menu.clear()
+
+        enabled = self._settings.value("spell_langs_enabled", list(SPELL_CHECK_LANGUAGES))
+        if isinstance(enabled, str):
+            enabled = [enabled]
+
+        current_lang = self._settings.value("spell_lang", "en")
+
+        for code in SPELL_CHECK_LANGUAGES:
+            if code not in enabled:
+                continue
+            act = self._spell_lang_menu.addAction(LANGUAGES[code])
+            act.setCheckable(True)
+            act.setData(code)
+            self._spell_lang_group.addAction(act)
+            if code == current_lang:
+                act.setChecked(True)
+
+        # Fallback: check first entry if nothing matched
+        if not self._spell_lang_group.checkedAction() and self._spell_lang_group.actions():
+            self._spell_lang_group.actions()[0].setChecked(True)
+
     def _save(self) -> None:
         if self._file and self._git_file_info is not None:
             self._write(self._file)   # persist to local temp file first
@@ -1101,13 +1111,8 @@ class MainWindow(QMainWindow):
             recent = [recent]
         self._recent_files = [p for p in recent if isinstance(p, str)]
         self._rebuild_recent_menu()
+        self._rebuild_spell_lang_menu()
         spell_on = self._settings.value("spell_check", False, type=bool)
-        spell_lang = self._settings.value("spell_lang", "en")
-        # Restore language selection
-        for act in self._spell_lang_group.actions():
-            if act.data() == spell_lang:
-                act.setChecked(True)
-                break
         self._act_spellcheck.setChecked(spell_on)
         self._apply_themes()
 
@@ -1121,6 +1126,7 @@ class MainWindow(QMainWindow):
         dlg = SettingsDialog(self)
         if dlg.exec() == QDialog.DialogCode.Accepted:
             self._apply_themes()
+            self._rebuild_spell_lang_menu()
 
     def closeEvent(self, event) -> None:  # type: ignore[override]
         if not self._maybe_save():

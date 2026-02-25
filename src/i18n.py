@@ -4,20 +4,38 @@ from __future__ import annotations
 
 _lang: str = "en"
 
-# Language registry: code → display name (shown in Settings combo)
+# Master language registry: code → display name (single source of truth)
 LANGUAGES: dict[str, str] = {
+    # Has both UI translation and spell-check dictionary
     "en": "English",
     "de": "Deutsch",
     "ar": "عربي (مصري)",
+    # UI translation only
     "vi": "Tiếng Việt",
     "sv": "Svenska",
     "uk": "Українська",
     "kn": "ಕನ್ನಡ",
     "hi": "हिंदी",
+    # Spell-check dictionary only
+    "es": "Español",
+    "fr": "Français",
+    "it": "Italiano",
+    "nl": "Nederlands",
+    "pt": "Português",
+    "ru": "Русский",
+    "fa": "فارسی",
 }
 
+# Languages with a full UI translation
+UI_LANGUAGES: tuple[str, ...] = ("en", "de", "ar", "vi", "sv", "uk", "kn", "hi")
+
+# Languages with a pyspellchecker dictionary
+SPELL_CHECK_LANGUAGES: tuple[str, ...] = (
+    "en", "de", "es", "fr", "it", "nl", "pt", "ru", "ar", "fa",
+)
+
 # Right-to-left languages
-RTL_LANGUAGES: frozenset[str] = frozenset({"ar"})
+RTL_LANGUAGES: frozenset[str] = frozenset({"ar", "fa"})
 
 # ── German ────────────────────────────────────────────────────────────────────
 _DE: dict[str, str] = {
@@ -301,8 +319,11 @@ _DE: dict[str, str] = {
     "Recent Files":       "Zuletzt geöffnet",
     "File not found:\n{path}": "Datei nicht gefunden:\n{path}",
     # ── Spell check ───────────────────────────────────────────────────────────
-    "Spell check":          "Rechtschreibprüfung",
-    "Spell check language": "Rechtschreibprüfung Sprache",
+    "Spell check":               "Rechtschreibprüfung",
+    "Spell check language":      "Rechtschreibprüfung Sprache",
+    "Spell Check Languages":     "Rechtschreibprüfung Sprachen",
+    "Active spell check languages (shown in View menu):":
+        "Aktive Rechtschreibprüfungssprachen (im Ansicht-Menü angezeigt):",
 }
 
 # ── Arabic (Egyptian / MSA) ───────────────────────────────────────────────────
