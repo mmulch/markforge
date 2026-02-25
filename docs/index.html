@@ -542,6 +542,7 @@
         <ul>
           <li><a href="#recent-files">Recent Files</a></li>
           <li><a href="#drag-drop">Drag &amp; Drop</a></li>
+          <li><a href="#focus-mode">Focus Mode</a></li>
         </ul>
       </li>
       <li><a href="#markdown-ref">7. Markdown Reference</a>
@@ -631,6 +632,7 @@
         <div class="feature-card"><strong>HTML Export</strong><span>Self-contained HTML with inline CSS and images</span></div>
         <div class="feature-card"><strong>Pandoc Export</strong><span>DOCX, EPUB, LaTeX via pandoc (optional)</span></div>
         <div class="feature-card"><strong>Drag &amp; Drop</strong><span>Drop images, Markdown, or PDF files with smart copy/import prompts</span></div>
+        <div class="feature-card"><strong>Focus Mode</strong><span>Hide all panels with <kbd>F11</kbd> for distraction-free writing</span></div>
         <div class="feature-card"><strong>Multilingual</strong><span>English and German (Deutsch) user interface</span></div>
       </div>
     </section>
@@ -889,6 +891,14 @@ python src/main.py</code></pre>
       <div class="callout note">
         <div class="callout-title">Note</div>
         <p>For operations that copy or import to the current document's folder, a file must already be open and saved so MarkForge knows the target directory.</p>
+      </div>
+
+      <h3 id="focus-mode">Focus Mode <kbd>F11</kbd></h3>
+      <p>Press <kbd>F11</kbd> or choose <strong>View → Focus Mode</strong> to enter distraction-free writing mode. MarkForge hides the file tree, document outline, live preview, and status bar, leaving the editor occupying the full window.</p>
+      <p>Press <kbd>F11</kbd> again to exit: all panels and the status bar are restored exactly as they were before — the same panels are visible, and the splitter sizes are preserved.</p>
+      <div class="callout tip">
+        <div class="callout-title">Tip</div>
+        <p>Focus mode works independently of the individual panel toggles (<kbd>Ctrl</kbd>+<kbd>B</kbd>, <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>). If the preview was already hidden when you entered focus mode it will remain hidden after you leave it.</p>
       </div>
     </section>
 

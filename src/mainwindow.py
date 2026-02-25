@@ -209,6 +209,7 @@ class MainWindow(QMainWindow):
 
         self._recent_files: list[str] = []
         self._word_goal: int = 0
+        self._pre_focus: dict = {}
 
         self._autosave_timer = QTimer(self)
         self._autosave_timer.timeout.connect(self._autosave)
@@ -338,6 +339,9 @@ class MainWindow(QMainWindow):
             tr("Show preview"), "Ctrl+Shift+P", m, checkable=True
         )
         self._act_preview.setChecked(True)
+        self._act_focus = self._mk_action(
+            tr("Focus Mode"), "F11", m, checkable=True
+        )
         m.addSeparator()
         self._act_wrap = self._mk_action(tr("Word wrap"), None, m, checkable=True)
         self._act_wrap.setChecked(True)
@@ -445,6 +449,7 @@ class MainWindow(QMainWindow):
         self._act_filetree.toggled.connect(self._file_tree.setVisible)
         self._act_outline.toggled.connect(self._outline.setVisible)
         self._act_preview.toggled.connect(self._preview.setVisible)
+        self._act_focus.toggled.connect(self._toggle_focus_mode)
         self._act_wrap.toggled.connect(self._editor.set_word_wrap)
         self._act_spellcheck.toggled.connect(
             lambda on: self._editor.set_spell_check(
@@ -545,6 +550,44 @@ class MainWindow(QMainWindow):
         if not active:
             self._find_bar.close_bar()
             self._outline.clear()
+
+    def _toggle_focus_mode(self, on: bool) -> None:
+        """Enter or leave distraction-free focus mode (F11)."""
+        if on:
+            self._pre_focus = {
+                "left_visible":     self._left_splitter.isVisible(),
+                "preview_visible":  self._preview.isVisible(),
+                "sb_visible":       self.statusBar().isVisible(),
+                "filetree_checked": self._act_filetree.isChecked(),
+                "outline_checked":  self._act_outline.isChecked(),
+                "preview_checked":  self._act_preview.isChecked(),
+                "outer_sizes":      list(self._outer_splitter.sizes()),
+                "splitter_sizes":   list(self._splitter.sizes()),
+            }
+            self._left_splitter.setVisible(False)
+            self._preview.setVisible(False)
+            self.statusBar().setVisible(False)
+            for act in (self._act_filetree, self._act_outline, self._act_preview):
+                act.blockSignals(True)
+                act.setChecked(False)
+                act.blockSignals(False)
+        else:
+            pre = self._pre_focus
+            self._left_splitter.setVisible(pre.get("left_visible", True))
+            self._preview.setVisible(pre.get("preview_visible", True))
+            self.statusBar().setVisible(pre.get("sb_visible", True))
+            if sizes := pre.get("outer_sizes"):
+                self._outer_splitter.setSizes(sizes)
+            if sizes := pre.get("splitter_sizes"):
+                self._splitter.setSizes(sizes)
+            for act, key in (
+                (self._act_filetree, "filetree_checked"),
+                (self._act_outline,  "outline_checked"),
+                (self._act_preview,  "preview_checked"),
+            ):
+                act.blockSignals(True)
+                act.setChecked(pre.get(key, True))
+                act.blockSignals(False)
 
     def _update_title(self) -> None:
         name = (
