@@ -17,7 +17,7 @@ from PyQt6.QtGui import (
     QTextFormat,
     QTextOption,
 )
-from PyQt6.QtWidgets import QApplication, QPlainTextEdit, QTextEdit, QWidget
+from PyQt6.QtWidgets import QApplication, QMessageBox, QPlainTextEdit, QTextEdit, QWidget
 
 from highlighter import MarkdownHighlighter
 from themes import EDITOR_THEMES
@@ -252,15 +252,15 @@ class EditorWidget(QPlainTextEdit):
                     continue
                 dropped_path = url.toLocalFile()
                 ext = os.path.splitext(dropped_path)[1].lower()
-                assets_dir = self._get_assets_dir()
-                if not assets_dir:
-                    self._show_no_file_message()
-                    return
-                doc_dir = os.path.dirname(assets_dir)  # assets_dir = doc_dir/assets
-                rel_path = os.path.relpath(dropped_path, start=doc_dir)
                 if ext in _IMAGE_EXTENSIONS:
-                    self._insert_md_image(rel_path)
+                    self._handle_dropped_image_file(dropped_path)
                 else:
+                    assets_dir = self._get_assets_dir()
+                    if not assets_dir:
+                        self._show_no_file_message()
+                        return
+                    doc_dir = os.path.dirname(assets_dir)
+                    rel_path = os.path.relpath(dropped_path, start=doc_dir)
                     self._insert_md_link(rel_path)
         elif mime.hasImage():
             image = mime.imageData()
@@ -273,6 +273,37 @@ class EditorWidget(QPlainTextEdit):
                 self._show_no_file_message()
                 return
             rel_path = self._save_image_to_assets(image, "image")
+            if rel_path:
+                self._insert_md_image(rel_path)
+
+    def _handle_dropped_image_file(self, dropped_path: str) -> None:
+        """Show a dialog asking whether to use the original path or copy to assets."""
+        from i18n import tr
+        fname = os.path.basename(dropped_path)
+        msg = QMessageBox(self)
+        msg.setWindowTitle(tr("Add Image"))
+        msg.setIcon(QMessageBox.Icon.Question)
+        msg.setText(tr("How would you like to add <b>{name}</b>?", name=fname))
+        btn_orig  = msg.addButton(tr("Original path"),  QMessageBox.ButtonRole.AcceptRole)
+        btn_asset = msg.addButton(tr("Copy to assets"), QMessageBox.ButtonRole.ActionRole)
+        msg.addButton(QMessageBox.StandardButton.Cancel)
+        msg.setDefaultButton(btn_orig)
+        msg.exec()
+        clicked = msg.clickedButton()
+        if clicked == btn_orig:
+            assets_dir = self._get_assets_dir()
+            if assets_dir:
+                doc_dir = os.path.dirname(assets_dir)
+                path = os.path.relpath(dropped_path, start=doc_dir)
+            else:
+                path = dropped_path
+            self._insert_md_image(path)
+        elif clicked == btn_asset:
+            assets_dir = self._get_assets_dir()
+            if not assets_dir:
+                self._show_no_file_message()
+                return
+            rel_path = self._copy_file_to_assets(dropped_path)
             if rel_path:
                 self._insert_md_image(rel_path)
 
@@ -294,6 +325,23 @@ class EditorWidget(QPlainTextEdit):
             return None
         doc_dir = os.path.dirname(assets_dir)
         return os.path.relpath(full_path, start=doc_dir)
+
+    def _copy_file_to_assets(self, src_path: str) -> str | None:
+        """Copy a file to the assets directory, preserving its name/extension. Returns relative path."""
+        import shutil
+        assets_dir = self._get_assets_dir()
+        if not assets_dir:
+            return None
+        os.makedirs(assets_dir, exist_ok=True)
+        name, ext = os.path.splitext(os.path.basename(src_path))
+        dest = os.path.join(assets_dir, f"{name}{ext}")
+        n = 1
+        while os.path.exists(dest):
+            dest = os.path.join(assets_dir, f"{name}_{n:03d}{ext}")
+            n += 1
+        shutil.copy2(src_path, dest)
+        doc_dir = os.path.dirname(assets_dir)
+        return os.path.relpath(dest, start=doc_dir)
 
     def _insert_md_image(self, rel_path: str) -> None:
         cursor = self.textCursor()
