@@ -6,7 +6,7 @@ import os
 import shutil
 import sys
 
-from PyQt6.QtCore import QSettings, QStandardPaths, QThread, QTimer, Qt, QUrl, pyqtSignal
+from PyQt6.QtCore import QEvent, QSettings, QStandardPaths, QThread, QTimer, Qt, QUrl, pyqtSignal
 from PyQt6.QtGui import QAction, QKeySequence
 from PyQt6.QtWidgets import (
     QApplication,
@@ -207,6 +207,9 @@ class MainWindow(QMainWindow):
         self._git_pending_commit_msg: str = ""
 
         self._recent_files: list[str] = []
+
+        self._autosave_timer = QTimer(self)
+        self._autosave_timer.timeout.connect(self._autosave)
 
         self._build_ui()
         self._build_menu()
@@ -1266,6 +1269,7 @@ class MainWindow(QMainWindow):
         spell_on = self._settings.value("spell_check", False, type=bool)
         self._act_spellcheck.setChecked(spell_on)
         self._apply_themes()
+        self._apply_autosave_settings()
 
     def _apply_themes(self) -> None:
         editor_theme  = self._settings.value("editor_theme",  "VS Code Dark")
@@ -1273,11 +1277,36 @@ class MainWindow(QMainWindow):
         self._editor.set_theme(editor_theme)
         self._preview.set_theme(preview_theme)
 
+    def _apply_autosave_settings(self) -> None:
+        """Start, stop, or reconfigure the periodic auto-save timer."""
+        enabled  = self._settings.value("autosave/enabled",  False, type=bool)
+        interval = int(self._settings.value("autosave/interval", 30))
+        if enabled:
+            self._autosave_timer.start(interval * 1000)
+        else:
+            self._autosave_timer.stop()
+
+    def _autosave(self) -> None:
+        """Write the current file to disk (no git commit). Skips git-managed files."""
+        if not self._file or not self._modified:
+            return
+        if self._git_file_info is not None:
+            return
+        self._write(self._file)
+
+    def changeEvent(self, event) -> None:  # type: ignore[override]
+        super().changeEvent(event)
+        if event.type() == QEvent.Type.WindowDeactivate:
+            if self._settings.value("autosave/enabled", False, type=bool) and \
+               self._settings.value("autosave/on_focus_loss", False, type=bool):
+                self._autosave()
+
     def _open_settings(self) -> None:
         dlg = SettingsDialog(self)
         if dlg.exec() == QDialog.DialogCode.Accepted:
             self._apply_themes()
             self._rebuild_spell_lang_menu()
+            self._apply_autosave_settings()
 
     def closeEvent(self, event) -> None:  # type: ignore[override]
         if not self._maybe_save():

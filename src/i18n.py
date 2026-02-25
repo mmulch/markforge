@@ -333,6 +333,14 @@ _DE: dict[str, str] = {
     "Spell Check Languages":     "Rechtschreibprüfung Sprachen",
     "Active spell check languages (shown in View menu):":
         "Aktive Rechtschreibprüfungssprachen (im Ansicht-Menü angezeigt):",
+    # ── Auto-Save ─────────────────────────────────────────────────────────────
+    "Auto-Save":                 "Automatisches Speichern",
+    "Enable auto-save":          "Automatisches Speichern aktivieren",
+    "Interval (seconds):":       "Intervall (Sekunden):",
+    "Save on focus loss":        "Speichern bei Fokusverlust",
+    "Auto-saved.":               "Automatisch gespeichert.",
+    "Save the file first to paste images.": "Datei zuerst speichern, um Bilder einzufügen.",
+
 }
 
 # ── Arabic (Egyptian / MSA) ───────────────────────────────────────────────────
@@ -586,6 +594,52 @@ _AR: dict[str, str] = {
     "Proxy password:": "كلمة مرور البروكسي:",
     "Leave empty to use system proxy settings.":
         "اتركه فارغاً لاستخدام إعدادات البروكسي للنظام.",
+    # ── Find & Replace ────────────────────────────────────────────────────────
+    "&Find …": "&بحث …",
+    "Find && &Replace …": "بحث && &استبدال …",
+    "Find…": "بحث…",
+    "Replace…": "استبدال…",
+    "Replace": "استبدال",
+    "Replace All": "استبدال الكل",
+    "Match case": "مطابقة حالة الأحرف",
+    "Whole words": "الكلمات الكاملة",
+    "No results": "لا نتائج",
+    "{cur} / {total}": "{cur} / {total}",
+    "{n} replaced": "تم استبدال {n}",
+    "Find previous (Shift+Enter)": "البحث عن السابق (Shift+Enter)",
+    "Find next (Enter)": "البحث عن التالي (Enter)",
+    "Close (Escape)": "إغلاق (Escape)",
+    # ── Outline ───────────────────────────────────────────────────────────────
+    "Outline": "المخطط التفصيلي",
+    "Show outline": "عرض المخطط التفصيلي",
+    # ── Recent files ──────────────────────────────────────────────────────────
+    "Recent &Files": "الملفات &الأخيرة",
+    "Clear Recent Files": "مسح الملفات الأخيرة",
+    "Recent Files": "الملفات الأخيرة",
+    "File not found:\n{path}": "الملف غير موجود:\n{path}",
+    # ── Spell check ───────────────────────────────────────────────────────────
+    "Spell check": "التدقيق الإملائي",
+    "Spell check language": "لغة التدقيق الإملائي",
+    "Spell Check Languages": "لغات التدقيق الإملائي",
+    "Active spell check languages (shown in View menu):":
+        "لغات التدقيق الإملائي النشطة (تظهر في قائمة عرض):",
+    # ── Git Branch ────────────────────────────────────────────────────────────
+    "Open Git &Branch …": "فتح &فرع Git …",
+    "Open Git Branch": "فتح فرع Git",
+    "GitHub / Bitbucket repository URL:": "رابط مستودع GitHub / Bitbucket:",
+    "Detecting default branch…": "يتم الكشف عن الفرع الافتراضي …",
+    "detecting…": "جارٍ الكشف …",
+    "enter branch name": "أدخل اسم الفرع",
+    "Could not detect default branch. Enter it manually above.":
+        "تعذّر الكشف عن الفرع الافتراضي. يُرجى الإدخال يدوياً أعلاه.",
+    # ── Auto-Save ─────────────────────────────────────────────────────────────
+    "Auto-Save": "الحفظ التلقائي",
+    "Enable auto-save": "تفعيل الحفظ التلقائي",
+    "Interval (seconds):": "الفترة الزمنية (ثانية):",
+    "Save on focus loss": "الحفظ عند فقدان التركيز",
+    "Auto-saved.": "تم الحفظ تلقائياً.",
+    "Save the file first to paste images.": "احفظ الملف أولاً لإدراج الصور",
+
 }
 
 # ── Vietnamese ────────────────────────────────────────────────────────────────
@@ -840,6 +894,52 @@ _VI: dict[str, str] = {
     "Proxy password:": "Mật khẩu Proxy:",
     "Leave empty to use system proxy settings.":
         "Để trống để dùng cài đặt proxy hệ thống.",
+    # ── Find & Replace ────────────────────────────────────────────────────────
+    "&Find …": "&Tìm …",
+    "Find && &Replace …": "Tìm && &Thay thế …",
+    "Find…": "Tìm…",
+    "Replace…": "Thay thế…",
+    "Replace": "Thay thế",
+    "Replace All": "Thay thế tất cả",
+    "Match case": "Phân biệt hoa thường",
+    "Whole words": "Toàn bộ từ",
+    "No results": "Không có kết quả",
+    "{cur} / {total}": "{cur} / {total}",
+    "{n} replaced": "Đã thay thế {n}",
+    "Find previous (Shift+Enter)": "Tìm trước (Shift+Enter)",
+    "Find next (Enter)": "Tìm tiếp (Enter)",
+    "Close (Escape)": "Đóng (Escape)",
+    # ── Outline ───────────────────────────────────────────────────────────────
+    "Outline": "Đề mục",
+    "Show outline": "Hiển thị đề mục",
+    # ── Recent files ──────────────────────────────────────────────────────────
+    "Recent &Files": "Tệp &gần đây",
+    "Clear Recent Files": "Xóa danh sách gần đây",
+    "Recent Files": "Tệp gần đây",
+    "File not found:\n{path}": "Không tìm thấy tệp:\n{path}",
+    # ── Spell check ───────────────────────────────────────────────────────────
+    "Spell check": "Kiểm tra chính tả",
+    "Spell check language": "Ngôn ngữ kiểm tra chính tả",
+    "Spell Check Languages": "Ngôn ngữ kiểm tra chính tả",
+    "Active spell check languages (shown in View menu):":
+        "Ngôn ngữ kiểm tra chính tả hiện hoạt (hiện trong menu Xem):",
+    # ── Git Branch ────────────────────────────────────────────────────────────
+    "Open Git &Branch …": "Mở &nhánh Git …",
+    "Open Git Branch": "Mở nhánh Git",
+    "GitHub / Bitbucket repository URL:": "URL kho lưu trữ GitHub / Bitbucket:",
+    "Detecting default branch…": "Đang phát hiện nhánh mặc định …",
+    "detecting…": "đang phát hiện …",
+    "enter branch name": "nhập tên nhánh",
+    "Could not detect default branch. Enter it manually above.":
+        "Không thể phát hiện nhánh mặc định. Vui lòng nhập thủ công ở trên.",
+    # ── Auto-Save ─────────────────────────────────────────────────────────────
+    "Auto-Save": "Tự động lưu",
+    "Enable auto-save": "Bật tự động lưu",
+    "Interval (seconds):": "Khoảng thời gian (giây):",
+    "Save on focus loss": "Lưu khi mất tiêu điểm",
+    "Auto-saved.": "Đã tự động lưu.",
+    "Save the file first to paste images.": "Lưu tệp trước để dán hình ảnh",
+
 }
 
 # ── Swedish ───────────────────────────────────────────────────────────────────
@@ -1094,6 +1194,52 @@ _SV: dict[str, str] = {
     "Proxy password:": "Proxy-lösenord:",
     "Leave empty to use system proxy settings.":
         "Lämna tomt för att använda systemets proxyinställningar.",
+    # ── Find & Replace ────────────────────────────────────────────────────────
+    "&Find …": "&Sök …",
+    "Find && &Replace …": "Sök && &Ersätt …",
+    "Find…": "Sök…",
+    "Replace…": "Ersätt…",
+    "Replace": "Ersätt",
+    "Replace All": "Ersätt alla",
+    "Match case": "Skiftlägeskänslig",
+    "Whole words": "Hela ord",
+    "No results": "Inga träffar",
+    "{cur} / {total}": "{cur} / {total}",
+    "{n} replaced": "{n} ersatta",
+    "Find previous (Shift+Enter)": "Föregående (Skift+Enter)",
+    "Find next (Enter)": "Nästa (Enter)",
+    "Close (Escape)": "Stäng (Escape)",
+    # ── Outline ───────────────────────────────────────────────────────────────
+    "Outline": "Disposition",
+    "Show outline": "Visa disposition",
+    # ── Recent files ──────────────────────────────────────────────────────────
+    "Recent &Files": "Senaste &filer",
+    "Clear Recent Files": "Rensa senaste",
+    "Recent Files": "Senaste filer",
+    "File not found:\n{path}": "Filen hittades inte:\n{path}",
+    # ── Spell check ───────────────────────────────────────────────────────────
+    "Spell check": "Stavningskontroll",
+    "Spell check language": "Stavningsspråk",
+    "Spell Check Languages": "Stavningsspråk",
+    "Active spell check languages (shown in View menu):":
+        "Aktiva stavningsspråk (visas i Visa-menyn):",
+    # ── Git Branch ────────────────────────────────────────────────────────────
+    "Open Git &Branch …": "Öppna Git-&gren …",
+    "Open Git Branch": "Öppna Git-gren",
+    "GitHub / Bitbucket repository URL:": "URL till GitHub/Bitbucket-arkiv:",
+    "Detecting default branch…": "Identifierar standardgrenen …",
+    "detecting…": "identifierar …",
+    "enter branch name": "ange grennamn",
+    "Could not detect default branch. Enter it manually above.":
+        "Kunde inte identifiera standardgrenen. Ange den manuellt ovan.",
+    # ── Auto-Save ─────────────────────────────────────────────────────────────
+    "Auto-Save": "Autospara",
+    "Enable auto-save": "Aktivera autospara",
+    "Interval (seconds):": "Intervall (sekunder):",
+    "Save on focus loss": "Spara vid fokusbortfall",
+    "Auto-saved.": "Autosparades.",
+    "Save the file first to paste images.": "Spara filen först för att klistra in bilder",
+
 }
 
 # ── Ukrainian ────────────────────────────────────────────────────────────────
@@ -1348,6 +1494,52 @@ _UK: dict[str, str] = {
     "Proxy password:": "Пароль проксі:",
     "Leave empty to use system proxy settings.":
         "Залиште порожнім для використання системних налаштувань проксі.",
+    # ── Find & Replace ────────────────────────────────────────────────────────
+    "&Find …": "&Знайти …",
+    "Find && &Replace …": "Знайти && &Замінити …",
+    "Find…": "Знайти…",
+    "Replace…": "Замінити…",
+    "Replace": "Замінити",
+    "Replace All": "Замінити все",
+    "Match case": "З урахуванням регістру",
+    "Whole words": "Цілі слова",
+    "No results": "Немає результатів",
+    "{cur} / {total}": "{cur} / {total}",
+    "{n} replaced": "{n} замінено",
+    "Find previous (Shift+Enter)": "Попередній (Shift+Enter)",
+    "Find next (Enter)": "Наступний (Enter)",
+    "Close (Escape)": "Закрити (Escape)",
+    # ── Outline ───────────────────────────────────────────────────────────────
+    "Outline": "Структура",
+    "Show outline": "Показати структуру",
+    # ── Recent files ──────────────────────────────────────────────────────────
+    "Recent &Files": "Останні &файли",
+    "Clear Recent Files": "Очистити список",
+    "Recent Files": "Останні файли",
+    "File not found:\n{path}": "Файл не знайдено:\n{path}",
+    # ── Spell check ───────────────────────────────────────────────────────────
+    "Spell check": "Перевірка орфографії",
+    "Spell check language": "Мова перевірки орфографії",
+    "Spell Check Languages": "Мови перевірки орфографії",
+    "Active spell check languages (shown in View menu):":
+        "Активні мови перевірки орфографії (у меню Вигляд):",
+    # ── Git Branch ────────────────────────────────────────────────────────────
+    "Open Git &Branch …": "Відкрити &гілку Git …",
+    "Open Git Branch": "Відкрити гілку Git",
+    "GitHub / Bitbucket repository URL:": "URL репозиторію GitHub / Bitbucket:",
+    "Detecting default branch…": "Визначення стандартної гілки …",
+    "detecting…": "визначення …",
+    "enter branch name": "введіть назву гілки",
+    "Could not detect default branch. Enter it manually above.":
+        "Не вдалося визначити стандартну гілку. Введіть її вручну вище.",
+    # ── Auto-Save ─────────────────────────────────────────────────────────────
+    "Auto-Save": "Автозбереження",
+    "Enable auto-save": "Увімкнути автозбереження",
+    "Interval (seconds):": "Інтервал (секунди):",
+    "Save on focus loss": "Зберігати при втраті фокусу",
+    "Auto-saved.": "Автоматично збережено.",
+    "Save the file first to paste images.": "Спочатку збережіть файл, щоб вставити зображення",
+
 }
 
 # ── Kannada ───────────────────────────────────────────────────────────────────
@@ -1602,6 +1794,52 @@ _KN: dict[str, str] = {
     "Proxy password:": "ಪ್ರಾಕ್ಸಿ ಪಾಸ್‌ವರ್ಡ್:",
     "Leave empty to use system proxy settings.":
         "ಸಿಸ್ಟಂ ಪ್ರಾಕ್ಸಿ ಸೆಟ್ಟಿಂಗ್‌ಗಳನ್ನು ಬಳಸಲು ಖಾಲಿ ಬಿಡಿ.",
+    # ── Find & Replace ────────────────────────────────────────────────────────
+    "&Find …": "&ಹುಡುಕು …",
+    "Find && &Replace …": "ಹುಡುಕು && &ಬದಲಾಯಿಸು …",
+    "Find…": "ಹುಡುಕು…",
+    "Replace…": "ಬದಲಾಯಿಸು…",
+    "Replace": "ಬದಲಾಯಿಸು",
+    "Replace All": "ಎಲ್ಲವನ್ನು ಬದಲಾಯಿಸು",
+    "Match case": "ಕೇಸ್ ಹೊಂದಾಣಿಕೆ",
+    "Whole words": "ಪೂರ್ಣ ಪದಗಳು",
+    "No results": "ಫಲಿತಾಂಶಗಳಿಲ್ಲ",
+    "{cur} / {total}": "{cur} / {total}",
+    "{n} replaced": "{n} ಬದಲಾಯಿಸಲಾಗಿದೆ",
+    "Find previous (Shift+Enter)": "ಹಿಂದಿನದನ್ನು ಹುಡುಕು (Shift+Enter)",
+    "Find next (Enter)": "ಮುಂದಿನದನ್ನು ಹುಡುಕು (Enter)",
+    "Close (Escape)": "ಮುಚ್ಚು (Escape)",
+    # ── Outline ───────────────────────────────────────────────────────────────
+    "Outline": "ರೂಪರೇಖೆ",
+    "Show outline": "ರೂಪರೇಖೆ ತೋರಿಸು",
+    # ── Recent files ──────────────────────────────────────────────────────────
+    "Recent &Files": "ಇತ್ತೀಚಿನ &ಫೈಲ್‌ಗಳು",
+    "Clear Recent Files": "ಇತ್ತೀಚಿನ ಫೈಲ್‌ಗಳನ್ನು ತೆಗೆ",
+    "Recent Files": "ಇತ್ತೀಚಿನ ಫೈಲ್‌ಗಳು",
+    "File not found:\n{path}": "ಫೈಲ್ ಕಂಡುಬಂದಿಲ್ಲ:\n{path}",
+    # ── Spell check ───────────────────────────────────────────────────────────
+    "Spell check": "ಕಾಗುಣಿತ ತಪಾಸಣೆ",
+    "Spell check language": "ಕಾಗುಣಿತ ತಪಾಸಣೆ ಭಾಷೆ",
+    "Spell Check Languages": "ಕಾಗುಣಿತ ತಪಾಸಣೆ ಭಾಷೆಗಳು",
+    "Active spell check languages (shown in View menu):":
+        "ಸಕ್ರಿಯ ಕಾಗುಣಿತ ತಪಾಸಣೆ ಭಾಷೆಗಳು (ವೀಕ್ಷಣೆ ಮೆನುವಿನಲ್ಲಿ ತೋರಿಸಲಾಗಿದೆ):",
+    # ── Git Branch ────────────────────────────────────────────────────────────
+    "Open Git &Branch …": "Git &ಶಾಖೆ ತೆರೆ …",
+    "Open Git Branch": "Git ಶಾಖೆ ತೆರೆ",
+    "GitHub / Bitbucket repository URL:": "GitHub / Bitbucket ರೆಪೊಸಿಟರಿ URL:",
+    "Detecting default branch…": "ಡಿಫಾಲ್ಟ್ ಶಾಖೆ ಪತ್ತೆ ಹಚ್ಚಲಾಗುತ್ತಿದೆ …",
+    "detecting…": "ಪತ್ತೆ ಹಚ್ಚಲಾಗುತ್ತಿದೆ …",
+    "enter branch name": "ಶಾಖೆ ಹೆಸರು ನಮೂದಿಸಿ",
+    "Could not detect default branch. Enter it manually above.":
+        "ಡಿಫಾಲ್ಟ್ ಶಾಖೆ ಪತ್ತೆ ಹಚ್ಚಲಾಗಲಿಲ್ಲ. ಮೇಲೆ ಹಸ್ತಚಾಲಿತವಾಗಿ ನಮೂದಿಸಿ.",
+    # ── Auto-Save ─────────────────────────────────────────────────────────────
+    "Auto-Save": "ಸ್ವಯಂ-ಉಳಿಸಿ",
+    "Enable auto-save": "ಸ್ವಯಂ-ಉಳಿಕೆ ಸಕ್ರಿಯಗೊಳಿಸಿ",
+    "Interval (seconds):": "ಮಧ್ಯಂತರ (ಸೆಕೆಂಡ್‌ಗಳು):",
+    "Save on focus loss": "ಫೋಕಸ್ ಕಳೆದಾಗ ಉಳಿಸಿ",
+    "Auto-saved.": "ಸ್ವಯಂ-ಉಳಿಸಲಾಗಿದೆ.",
+    "Save the file first to paste images.": "ಚಿತ್ರಗಳನ್ನು ಅಂಟಿಸಲು ಮೊದಲು ಫೈಲ್ ಉಳಿಸಿ",
+
 }
 
 # ── Hindi ────────────────────────────────────────────────────────────────────
@@ -1856,6 +2094,52 @@ _HI: dict[str, str] = {
     "Proxy password:": "प्रॉक्सी पासवर्ड:",
     "Leave empty to use system proxy settings.":
         "सिस्टम प्रॉक्सी सेटिंग्स उपयोग करने के लिए खाली छोड़ें।",
+    # ── Find & Replace ────────────────────────────────────────────────────────
+    "&Find …": "&खोजें …",
+    "Find && &Replace …": "खोजें && &बदलें …",
+    "Find…": "खोजें…",
+    "Replace…": "बदलें…",
+    "Replace": "बदलें",
+    "Replace All": "सभी बदलें",
+    "Match case": "केस मिलाएं",
+    "Whole words": "पूरे शब्द",
+    "No results": "कोई परिणाम नहीं",
+    "{cur} / {total}": "{cur} / {total}",
+    "{n} replaced": "{n} बदले गए",
+    "Find previous (Shift+Enter)": "पिछला खोजें (Shift+Enter)",
+    "Find next (Enter)": "अगला खोजें (Enter)",
+    "Close (Escape)": "बंद करें (Escape)",
+    # ── Outline ───────────────────────────────────────────────────────────────
+    "Outline": "रूपरेखा",
+    "Show outline": "रूपरेखा दिखाएं",
+    # ── Recent files ──────────────────────────────────────────────────────────
+    "Recent &Files": "हाल की &फ़ाइलें",
+    "Clear Recent Files": "हाल की फ़ाइलें साफ़ करें",
+    "Recent Files": "हाल की फ़ाइलें",
+    "File not found:\n{path}": "फ़ाइल नहीं मिली:\n{path}",
+    # ── Spell check ───────────────────────────────────────────────────────────
+    "Spell check": "वर्तनी जाँच",
+    "Spell check language": "वर्तनी जाँच भाषा",
+    "Spell Check Languages": "वर्तनी जाँच भाषाएं",
+    "Active spell check languages (shown in View menu):":
+        "सक्रिय वर्तनी जाँच भाषाएं (व्यू मेनू में दिखाई गई):",
+    # ── Git Branch ────────────────────────────────────────────────────────────
+    "Open Git &Branch …": "Git &ब्रांच खोलें …",
+    "Open Git Branch": "Git ब्रांच खोलें",
+    "GitHub / Bitbucket repository URL:": "GitHub / Bitbucket रिपॉजिटरी URL:",
+    "Detecting default branch…": "डिफ़ॉल्ट ब्रांच का पता लगाया जा रहा है …",
+    "detecting…": "पता लगाया जा रहा है …",
+    "enter branch name": "ब्रांच का नाम दर्ज करें",
+    "Could not detect default branch. Enter it manually above.":
+        "डिफ़ॉल्ट ब्रांच का पता नहीं लगाया जा सका। ऊपर मैन्युअल रूप से दर्ज करें।",
+    # ── Auto-Save ─────────────────────────────────────────────────────────────
+    "Auto-Save": "ऑटो-सेव",
+    "Enable auto-save": "ऑटो-सेव सक्षम करें",
+    "Interval (seconds):": "अंतराल (सेकंड):",
+    "Save on focus loss": "फ़ोकस खोने पर सहेजें",
+    "Auto-saved.": "ऑटो-सहेजा गया.",
+    "Save the file first to paste images.": "चित्र चिपकाने के लिए पहले फ़ाइल सहेजें",
+
 }
 
 # ── Spanish ───────────────────────────────────────────────────────────────────
@@ -2113,6 +2397,23 @@ _ES: dict[str, str] = {
     "Spell Check Languages": "Idiomas del corrector",
     "Active spell check languages (shown in View menu):":
         "Idiomas activos del corrector (mostrados en el menú Ver):",
+    # ── Git Branch ────────────────────────────────────────────────────────────
+    "Open Git &Branch …": "Abrir &rama Git …",
+    "Open Git Branch": "Abrir rama Git",
+    "GitHub / Bitbucket repository URL:": "URL del repositorio de GitHub / Bitbucket:",
+    "Detecting default branch…": "Detectando la rama predeterminada …",
+    "detecting…": "detectando …",
+    "enter branch name": "introduce el nombre de la rama",
+    "Could not detect default branch. Enter it manually above.":
+        "No se pudo detectar la rama predeterminada. Introdúcela manualmente arriba.",
+    # ── Auto-Save ─────────────────────────────────────────────────────────────
+    "Auto-Save": "Guardado automático",
+    "Enable auto-save": "Activar guardado automático",
+    "Interval (seconds):": "Intervalo (segundos):",
+    "Save on focus loss": "Guardar al perder el foco",
+    "Auto-saved.": "Guardado automáticamente.",
+    "Save the file first to paste images.": "Guarda el archivo primero para pegar imágenes",
+
 }
 
 # ── French ────────────────────────────────────────────────────────────────────
@@ -2371,6 +2672,23 @@ _FR: dict[str, str] = {
     "Spell Check Languages": "Langues du correcteur",
     "Active spell check languages (shown in View menu):":
         "Langues actives du correcteur (affichées dans le menu Affichage):",
+    # ── Git Branch ────────────────────────────────────────────────────────────
+    "Open Git &Branch …": "Ouvrir une &branche Git …",
+    "Open Git Branch": "Ouvrir une branche Git",
+    "GitHub / Bitbucket repository URL:": "URL du dépôt GitHub / Bitbucket :",
+    "Detecting default branch…": "Détection de la branche par défaut …",
+    "detecting…": "détection …",
+    "enter branch name": "entrer le nom de la branche",
+    "Could not detect default branch. Enter it manually above.":
+        "Impossible de détecter la branche par défaut. Saisissez-la manuellement ci-dessus.",
+    # ── Auto-Save ─────────────────────────────────────────────────────────────
+    "Auto-Save": "Sauvegarde automatique",
+    "Enable auto-save": "Activer la sauvegarde automatique",
+    "Interval (seconds):": "Intervalle (secondes) :",
+    "Save on focus loss": "Enregistrer à la perte de focus",
+    "Auto-saved.": "Sauvegardé automatiquement.",
+    "Save the file first to paste images.": "Enregistrez d'abord le fichier pour coller des images",
+
 }
 
 # ── Italian ───────────────────────────────────────────────────────────────────
@@ -2629,6 +2947,23 @@ _IT: dict[str, str] = {
     "Spell Check Languages": "Lingue del correttore",
     "Active spell check languages (shown in View menu):":
         "Lingue attive del correttore (mostrate nel menu Visualizza):",
+    # ── Git Branch ────────────────────────────────────────────────────────────
+    "Open Git &Branch …": "Apri &ramo Git …",
+    "Open Git Branch": "Apri ramo Git",
+    "GitHub / Bitbucket repository URL:": "URL del repository GitHub / Bitbucket:",
+    "Detecting default branch…": "Rilevamento del ramo predefinito …",
+    "detecting…": "rilevamento …",
+    "enter branch name": "inserire il nome del ramo",
+    "Could not detect default branch. Enter it manually above.":
+        "Impossibile rilevare il ramo predefinito. Inseriscilo manualmente sopra.",
+    # ── Auto-Save ─────────────────────────────────────────────────────────────
+    "Auto-Save": "Salvataggio automatico",
+    "Enable auto-save": "Abilita salvataggio automatico",
+    "Interval (seconds):": "Intervallo (secondi):",
+    "Save on focus loss": "Salva alla perdita del focus",
+    "Auto-saved.": "Salvato automaticamente.",
+    "Save the file first to paste images.": "Salva prima il file per incollare immagini",
+
 }
 
 # ── Dutch ─────────────────────────────────────────────────────────────────────
@@ -2887,6 +3222,23 @@ _NL: dict[str, str] = {
     "Spell Check Languages": "Talen spellingcontrole",
     "Active spell check languages (shown in View menu):":
         "Actieve talen voor spellingcontrole (weergegeven in het menu Beeld):",
+    # ── Git Branch ────────────────────────────────────────────────────────────
+    "Open Git &Branch …": "Git-&branch openen …",
+    "Open Git Branch": "Git-branch openen",
+    "GitHub / Bitbucket repository URL:": "URL van GitHub/Bitbucket-opslagplaats:",
+    "Detecting default branch…": "Standaardbranch wordt gedetecteerd …",
+    "detecting…": "detecteren …",
+    "enter branch name": "voer branchnaam in",
+    "Could not detect default branch. Enter it manually above.":
+        "Kon standaardbranch niet detecteren. Voer deze hierboven handmatig in.",
+    # ── Auto-Save ─────────────────────────────────────────────────────────────
+    "Auto-Save": "Automatisch opslaan",
+    "Enable auto-save": "Automatisch opslaan inschakelen",
+    "Interval (seconds):": "Interval (seconden):",
+    "Save on focus loss": "Opslaan bij focusverlies",
+    "Auto-saved.": "Automatisch opgeslagen.",
+    "Save the file first to paste images.": "Sla het bestand eerst op om afbeeldingen te plakken",
+
 }
 
 # ── Portuguese ────────────────────────────────────────────────────────────────
@@ -3145,6 +3497,23 @@ _PT: dict[str, str] = {
     "Spell Check Languages": "Idiomas do verificador",
     "Active spell check languages (shown in View menu):":
         "Idiomas ativos do verificador (mostrados no menu Ver):",
+    # ── Git Branch ────────────────────────────────────────────────────────────
+    "Open Git &Branch …": "Abrir &ramo Git …",
+    "Open Git Branch": "Abrir ramo Git",
+    "GitHub / Bitbucket repository URL:": "URL do repositório GitHub / Bitbucket:",
+    "Detecting default branch…": "Detectando ramo padrão …",
+    "detecting…": "detectando …",
+    "enter branch name": "inserir nome do ramo",
+    "Could not detect default branch. Enter it manually above.":
+        "Não foi possível detectar o ramo padrão. Insira-o manualmente acima.",
+    # ── Auto-Save ─────────────────────────────────────────────────────────────
+    "Auto-Save": "Salvamento automático",
+    "Enable auto-save": "Ativar salvamento automático",
+    "Interval (seconds):": "Intervalo (segundos):",
+    "Save on focus loss": "Salvar ao perder o foco",
+    "Auto-saved.": "Salvo automaticamente.",
+    "Save the file first to paste images.": "Salve o arquivo primeiro para colar imagens",
+
 }
 
 # ── Persian (Farsi) ───────────────────────────────────────────────────────────
@@ -3403,6 +3772,22 @@ _FA: dict[str, str] = {
     "Spell Check Languages": "زبان‌های بررسی املا",
     "Active spell check languages (shown in View menu):":
         "زبان‌های فعال بررسی املا (نشان داده‌شده در منوی نمایش):",
+    # ── Git Branch ────────────────────────────────────────────────────────────
+    "Open Git &Branch …": "باز کردن &شاخه Git …",
+    "Open Git Branch": "باز کردن شاخه Git",
+    "GitHub / Bitbucket repository URL:": "نشانی مخزن GitHub / Bitbucket:",
+    "Detecting default branch…": "شاخه پیش‌فرض در حال شناسایی است …",
+    "detecting…": "در حال شناسایی …",
+    "enter branch name": "نام شاخه را وارد کنید",
+    "Could not detect default branch. Enter it manually above.":
+        "شناسایی شاخه پیش‌فرض ممکن نشد. آن را به صورت دستی در بالا وارد کنید.",
+    # ── Auto-Save ─────────────────────────────────────────────────────────────
+    "Auto-Save": "ذخیره خودکار",
+    "Enable auto-save": "فعال‌سازی ذخیره خودکار",
+    "Interval (seconds):": "فاصله (ثانیه):",
+    "Save on focus loss": "ذخیره هنگام از دست دادن فوکوس",
+    "Auto-saved.": "ذخیره خودکار انجام شد.",
+    "Save the file first to paste images.": "ابتدا فایل را ذخیره کنید تا تصاویر را جای‌گذاری کنید",
 }
 
 _TRANSLATIONS: dict[str, dict[str, str]] = {

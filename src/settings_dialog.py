@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from PyQt6.QtCore import QSettings, Qt
 from PyQt6.QtWidgets import (
+    QCheckBox,
     QComboBox,
     QDialog,
     QDialogButtonBox,
@@ -16,6 +17,7 @@ from PyQt6.QtWidgets import (
     QListWidget,
     QListWidgetItem,
     QPushButton,
+    QSpinBox,
     QVBoxLayout,
 )
 
@@ -232,6 +234,32 @@ class SettingsDialog(QDialog):
 
         root.addWidget(proxy_grp)
 
+        # ── Auto-Save ─────────────────────────────────────────────────────────
+        autosave_grp = QGroupBox(tr("Auto-Save"))
+        autosave_form = QFormLayout(autosave_grp)
+
+        self._autosave_enabled_cb = QCheckBox()
+        autosave_form.addRow(tr("Enable auto-save"), self._autosave_enabled_cb)
+
+        self._autosave_interval_spin = QSpinBox()
+        self._autosave_interval_spin.setRange(5, 600)
+        self._autosave_interval_spin.setSuffix(" s")
+        autosave_form.addRow(tr("Interval (seconds):"), self._autosave_interval_spin)
+
+        self._autosave_focus_cb = QCheckBox()
+        autosave_form.addRow(tr("Save on focus loss"), self._autosave_focus_cb)
+
+        s3 = QSettings("MarkdownEditor", "MarkdownEditor")
+        self._autosave_enabled_cb.setChecked(s3.value("autosave/enabled", False, type=bool))
+        self._autosave_interval_spin.setValue(int(s3.value("autosave/interval", 30)))
+        self._autosave_focus_cb.setChecked(s3.value("autosave/on_focus_loss", False, type=bool))
+
+        # Disable controls when auto-save is off
+        self._autosave_enabled_cb.toggled.connect(self._on_autosave_toggled)
+        self._on_autosave_toggled(self._autosave_enabled_cb.isChecked())
+
+        root.addWidget(autosave_grp)
+
         # ── Buttons ───────────────────────────────────────────────────────────
         btns = QDialogButtonBox(
             QDialogButtonBox.StandardButton.Ok
@@ -240,6 +268,10 @@ class SettingsDialog(QDialog):
         btns.accepted.connect(self._save_and_accept)
         btns.rejected.connect(self.reject)
         root.addWidget(btns)
+
+    def _on_autosave_toggled(self, checked: bool) -> None:
+        self._autosave_interval_spin.setEnabled(checked)
+        self._autosave_focus_cb.setEnabled(checked)
 
     def _on_auth_changed(self) -> None:
         method = self._git_auth_combo.currentData()
@@ -285,5 +317,10 @@ class SettingsDialog(QDialog):
         theme_settings.setValue("proxy/url",      self._proxy_url_edit.text().strip())
         theme_settings.setValue("proxy/username", self._proxy_user_edit.text().strip())
         set_secret("proxy/password",              self._proxy_pass_edit.text())
+
+        # Auto-save
+        theme_settings.setValue("autosave/enabled",       self._autosave_enabled_cb.isChecked())
+        theme_settings.setValue("autosave/interval",      self._autosave_interval_spin.value())
+        theme_settings.setValue("autosave/on_focus_loss", self._autosave_focus_cb.isChecked())
 
         self.accept()
