@@ -69,6 +69,7 @@ Python dependencies (installed automatically by CMake):
 | PyMuPDF | ≥ 1.23.0 | PDF import |
 | pymupdf4llm | ≥ 0.3.4 | PDF-to-Markdown conversion |
 | dulwich | ≥ 0.20.50 | Pure-Python git client |
+| keyring | ≥ 24.0.0 | Secure OS-keyring credential storage |
 
 ---
 
@@ -150,6 +151,8 @@ When you close the application while a git-managed file is open, MarkForge asks 
 ### Authentication
 
 Configure credentials in **View → Settings → Git Authentication**.
+
+> **Secure storage:** Tokens, SSH passphrases, and proxy passwords are stored in the OS keyring (GNOME Keyring / KWallet on Linux, Keychain on macOS, Windows Credential Manager on Windows), not in plaintext configuration files.
 
 #### HTTPS (embedded)
 

@@ -592,7 +592,7 @@
   <article>
 
     <!-- ─── TITLE ─────────────────────────────────────────────────────────── -->
-    <h1>Hướng dẫn sử dụng MarkForge <span class="version-badge">v1.0</span></h1>
+    <h1>Hướng dẫn sử dụng MarkForge <span class="version-badge">v1.6.1</span></h1>
 
     <!-- ═══ 1. GIỚI THIỆU ════════════════════════════════════════════════ -->
     <section id="introduction">
@@ -1192,6 +1192,10 @@ $</code></pre>
         <p>Chọn <strong>SSH (tệp khóa)</strong> và cung cấp đường dẫn đến khóa SSH riêng tư và cụm mật khẩu tùy chọn. Chế độ này sử dụng <a href="https://www.paramiko.org/" target="_blank" rel="noopener">paramiko</a> cho kết nối SSH thuần Python (không yêu cầu client ssh hệ thống). Nếu paramiko chưa được cài đặt, MarkForge sẽ dự phòng sang client <code>ssh</code> hệ thống.</p>
         <pre><code>pip install paramiko</code></pre>
         <p>Xác thực SSH hỗ trợ <strong>amend</strong> và <strong>squash</strong>.</p>
+        <div class="callout note">
+          <div class="callout-title">Lưu trữ thông tin xác thực</div>
+          <p>Token, cụm mật khẩu SSH và mật khẩu proxy được lưu trong <strong>kho khóa của hệ điều hành</strong> (GNOME Keyring / KWallet trên Linux, Keychain trên macOS, Windows Credential Manager trên Windows) — không lưu trong các tệp cấu hình dạng văn bản thuần túy.</p>
+        </div>
       </section>
 
       <section id="git-proxy">
@@ -1226,14 +1230,14 @@ $</code></pre>
           <tr><td><strong>Giao diện ứng dụng</strong></td><td>Light, Dark</td><td>Yêu cầu khởi động lại để áp dụng</td></tr>
           <tr><td><strong>Phương thức xác thực Git</strong></td><td>HTTPS (token), HTTPS (git), SSH</td><td>Xem <a href="#git-auth">Chế độ xác thực</a></td></tr>
           <tr><td><strong>Tên người dùng</strong></td><td>Trường văn bản</td><td>Chế độ HTTPS</td></tr>
-          <tr><td><strong>Token</strong></td><td>Trường văn bản</td><td>Chế độ HTTPS</td></tr>
+          <tr><td><strong>Token</strong></td><td>Trường văn bản</td><td>Chế độ HTTPS — lưu trong OS keyring</td></tr>
           <tr><td><strong>Tên</strong></td><td>Trường văn bản</td><td>HTTPS (git binary) — danh tính commit</td></tr>
           <tr><td><strong>Email</strong></td><td>Trường văn bản</td><td>HTTPS (git binary) — danh tính commit</td></tr>
           <tr><td><strong>Khóa SSH</strong></td><td>Đường dẫn tệp</td><td>Chế độ SSH</td></tr>
-          <tr><td><strong>Cụm mật khẩu</strong></td><td>Trường văn bản</td><td>Chế độ SSH — tùy chọn</td></tr>
+          <tr><td><strong>Cụm mật khẩu</strong></td><td>Trường văn bản</td><td>Chế độ SSH — tùy chọn; lưu trong OS keyring</td></tr>
           <tr><td><strong>URL Proxy</strong></td><td>Trường văn bản</td><td>Để trống cho proxy hệ thống</td></tr>
           <tr><td><strong>Tên người dùng proxy</strong></td><td>Trường văn bản</td><td>Xác thực proxy tùy chọn</td></tr>
-          <tr><td><strong>Mật khẩu proxy</strong></td><td>Trường văn bản</td><td>Xác thực proxy tùy chọn</td></tr>
+          <tr><td><strong>Mật khẩu proxy</strong></td><td>Trường văn bản</td><td>Xác thực proxy tùy chọn — lưu trong OS keyring</td></tr>
         </tbody>
       </table>
       </div>

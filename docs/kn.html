@@ -592,7 +592,7 @@
   <article>
 
     <!-- ─── TITLE ─────────────────────────────────────────────────────────── -->
-    <h1>MarkForge ಬಳಕೆದಾರ ಕೈಪಿಡಿ <span class="version-badge">v1.0</span></h1>
+    <h1>MarkForge ಬಳಕೆದಾರ ಕೈಪಿಡಿ <span class="version-badge">v1.6.1</span></h1>
 
     <!-- ═══ 1. INTRODUCTION ═══════════════════════════════════════════════ -->
     <section id="introduction">
@@ -1192,6 +1192,10 @@ $</code></pre>
         <p><strong>SSH (key file)</strong> ಆರಿಸಿ ಮತ್ತು ನಿಮ್ಮ ಖಾಸಗಿ SSH key ಮಾರ್ಗ ಮತ್ತು ಐಚ್ಛಿಕ passphrase ನೀಡಿ. ಈ ವಿಧಾನ ಶುದ್ಧ-Python SSH ಸಂಪರ್ಕಕ್ಕಾಗಿ <a href="https://www.paramiko.org/" target="_blank" rel="noopener">paramiko</a> ಬಳಸುತ್ತದೆ (ಸಿಸ್ಟಮ್ ssh client ಅಗತ್ಯವಿಲ್ಲ). paramiko ಸ್ಥಾಪಿಸದಿದ್ದರೆ, MarkForge ಸಿಸ್ಟಮ್ <code>ssh</code> client ಗೆ ಹಿಂದಿರುಗುತ್ತದೆ.</p>
         <pre><code>pip install paramiko</code></pre>
         <p>SSH ದೃಢೀಕರಣ <strong>amend</strong> ಮತ್ತು <strong>squash</strong> ಬೆಂಬಲಿಸುತ್ತದೆ.</p>
+        <div class="callout note">
+          <div class="callout-title">ಪ್ರಮಾಣಪತ್ರ ಸಂಗ್ರಹಣೆ</div>
+          <p>Tokens, SSH passphrases ಮತ್ತು proxy passwords <strong>OS keyring</strong> ನಲ್ಲಿ ಸಂಗ್ರಹಿಸಲಾಗುತ್ತದೆ (Linux ನಲ್ಲಿ GNOME Keyring / KWallet, macOS ನಲ್ಲಿ Keychain, Windows ನಲ್ಲಿ Windows Credential Manager) — ಸಾದಾ-ಪಠ್ಯ ಸಂರಚನಾ ಫೈಲ್‌ಗಳಲ್ಲಿ ಅಲ್ಲ.</p>
+        </div>
       </section>
 
       <section id="git-proxy">
@@ -1226,14 +1230,14 @@ $</code></pre>
           <tr><td><strong>ಅಪ್ಲಿಕೇಶನ್ ಥೀಮ್</strong></td><td>Light, Dark</td><td>ಅನ್ವಯಿಸಲು ಮರಾರ್ಟ್ ಅಗತ್ಯ</td></tr>
           <tr><td><strong>Git Auth ವಿಧಾನ</strong></td><td>HTTPS (token), HTTPS (git), SSH</td><td>ನೋಡಿ <a href="#git-auth">ದೃಢೀಕರಣ ವಿಧಾನಗಳು</a></td></tr>
           <tr><td><strong>ಬಳಕೆದಾರಹೆಸರು</strong></td><td>ಪಠ್ಯ ಕ್ಷೇತ್ರ</td><td>HTTPS ವಿಧಾನಗಳು</td></tr>
-          <tr><td><strong>Token</strong></td><td>ಪಠ್ಯ ಕ್ಷೇತ್ರ</td><td>HTTPS ವಿಧಾನಗಳು</td></tr>
+          <tr><td><strong>Token</strong></td><td>ಪಠ್ಯ ಕ್ಷೇತ್ರ</td><td>HTTPS ವಿಧಾನಗಳು — OS keyring ನಲ್ಲಿ ಸಂಗ್ರಹಿತ</td></tr>
           <tr><td><strong>ಹೆಸರು</strong></td><td>ಪಠ್ಯ ಕ್ಷೇತ್ರ</td><td>HTTPS (git binary) — commit ಗುರುತು</td></tr>
           <tr><td><strong>Email</strong></td><td>ಪಠ್ಯ ಕ್ಷೇತ್ರ</td><td>HTTPS (git binary) — commit ಗುರುತು</td></tr>
           <tr><td><strong>SSH key</strong></td><td>ಫೈಲ್ ಮಾರ್ಗ</td><td>SSH ವಿಧಾನ</td></tr>
-          <tr><td><strong>Passphrase</strong></td><td>ಪಠ್ಯ ಕ್ಷೇತ್ರ</td><td>SSH ವಿಧಾನ — ಐಚ್ಛಿಕ</td></tr>
+          <tr><td><strong>Passphrase</strong></td><td>ಪಠ್ಯ ಕ್ಷೇತ್ರ</td><td>SSH ವಿಧಾನ — ಐಚ್ಛಿಕ; OS keyring ನಲ್ಲಿ ಸಂಗ್ರಹಿತ</td></tr>
           <tr><td><strong>Proxy URL</strong></td><td>ಪಠ್ಯ ಕ್ಷೇತ್ರ</td><td>ಸಿಸ್ಟಮ್ proxy ಗಾಗಿ ಖಾಲಿ ಬಿಡಿ</td></tr>
           <tr><td><strong>Proxy ಬಳಕೆದಾರಹೆಸರು</strong></td><td>ಪಠ್ಯ ಕ್ಷೇತ್ರ</td><td>ಐಚ್ಛಿಕ proxy ದೃಢೀಕರಣ</td></tr>
-          <tr><td><strong>Proxy ಪಾಸ್‌ವರ್ಡ್</strong></td><td>ಪಠ್ಯ ಕ್ಷೇತ್ರ</td><td>ಐಚ್ಛಿಕ proxy ದೃಢೀಕರಣ</td></tr>
+          <tr><td><strong>Proxy ಪಾಸ್‌ವರ್ಡ್</strong></td><td>ಪಠ್ಯ ಕ್ಷೇತ್ರ</td><td>ಐಚ್ಛಿಕ proxy ದೃಢೀಕರಣ — OS keyring ನಲ್ಲಿ ಸಂಗ್ರಹಿತ</td></tr>
         </tbody>
       </table>
       </div>

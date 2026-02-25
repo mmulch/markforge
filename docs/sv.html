@@ -592,7 +592,7 @@
   <article>
 
     <!-- ─── TITLE ─────────────────────────────────────────────────────────── -->
-    <h1>MarkForge Användarmanual <span class="version-badge">v1.0</span></h1>
+    <h1>MarkForge Användarmanual <span class="version-badge">v1.6.1</span></h1>
 
     <!-- ═══ 1. INTRODUKTION ═══════════════════════════════════════════════ -->
     <section id="introduction">
@@ -1192,6 +1192,10 @@ $</code></pre>
         <p>Välj <strong>SSH (nyckelfil)</strong> och ange sökvägen till din privata SSH-nyckel och en valfri lösenfras. Detta läge använder <a href="https://www.paramiko.org/" target="_blank" rel="noopener">paramiko</a> för en ren Python-SSH-anslutning (ingen system-SSH-klient krävs). Om paramiko inte är installerat faller MarkForge tillbaka på systemets <code>ssh</code>-klient.</p>
         <pre><code>pip install paramiko</code></pre>
         <p>SSH-autentisering stöder <strong>amend</strong> och <strong>squash</strong>.</p>
+        <div class="callout note">
+          <div class="callout-title">Lagring av inloggningsuppgifter</div>
+          <p>Tokens, SSH-lösenfraser och proxylösenord lagras i <strong>OS-nyckelringen</strong> (GNOME Keyring / KWallet på Linux, Keychain på macOS, Windows Credential Manager på Windows) — inte i konfigurationsfiler i klartext.</p>
+        </div>
       </section>
 
       <section id="git-proxy">
@@ -1226,14 +1230,14 @@ $</code></pre>
           <tr><td><strong>Apptema</strong></td><td>Light, Dark</td><td>Omstart krävs för att tillämpa</td></tr>
           <tr><td><strong>Git-autentiseringsmetod</strong></td><td>HTTPS (token), HTTPS (git), SSH</td><td>Se <a href="#git-auth">Autentiseringslägen</a></td></tr>
           <tr><td><strong>Användarnamn</strong></td><td>Textfält</td><td>HTTPS-lägen</td></tr>
-          <tr><td><strong>Token</strong></td><td>Textfält</td><td>HTTPS-lägen</td></tr>
+          <tr><td><strong>Token</strong></td><td>Textfält</td><td>HTTPS-lägen — lagras i OS-nyckelringen</td></tr>
           <tr><td><strong>Namn</strong></td><td>Textfält</td><td>HTTPS (git binary) — commit-identitet</td></tr>
           <tr><td><strong>E-post</strong></td><td>Textfält</td><td>HTTPS (git binary) — commit-identitet</td></tr>
           <tr><td><strong>SSH-nyckel</strong></td><td>Filsökväg</td><td>SSH-läge</td></tr>
-          <tr><td><strong>Lösenfras</strong></td><td>Textfält</td><td>SSH-läge — valfri</td></tr>
+          <tr><td><strong>Lösenfras</strong></td><td>Textfält</td><td>SSH-läge — valfri; lagras i OS-nyckelringen</td></tr>
           <tr><td><strong>Proxy-URL</strong></td><td>Textfält</td><td>Lämna tomt för systemproxy</td></tr>
           <tr><td><strong>Proxyanvändarnamn</strong></td><td>Textfält</td><td>Valfri proxyautentisering</td></tr>
-          <tr><td><strong>Proxylösenord</strong></td><td>Textfält</td><td>Valfri proxyautentisering</td></tr>
+          <tr><td><strong>Proxylösenord</strong></td><td>Textfält</td><td>Valfri proxyautentisering — lagras i OS-nyckelringen</td></tr>
         </tbody>
       </table>
       </div>

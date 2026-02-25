@@ -17,8 +17,21 @@ from PyQt6.QtWidgets import (
     QVBoxLayout,
 )
 
+from credentials import get_secret, set_secret
 from i18n import LANGUAGES, tr
 from themes import APP_THEMES, EDITOR_THEMES, PREVIEW_THEMES
+
+
+_SECRET_KEYS = ("git/https_token", "git/ssh_passphrase", "proxy/password")
+
+
+def _migrate_plaintext_credentials(s: QSettings) -> None:
+    """One-time migration: move plaintext secrets from QSettings into the OS keyring."""
+    for key in _SECRET_KEYS:
+        old_val = s.value(key, "")
+        if old_val:
+            set_secret(key, old_val)
+            s.remove(key)
 
 
 class SettingsDialog(QDialog):
@@ -146,16 +159,17 @@ class SettingsDialog(QDialog):
 
         # Load saved git settings
         s = QSettings("MarkdownEditor", "MarkdownEditor")
+        _migrate_plaintext_credentials(s)
         saved_method = s.value("git/auth_method", "https")
         idx = self._git_auth_combo.findData(saved_method)
         if idx >= 0:
             self._git_auth_combo.setCurrentIndex(idx)
         self._git_username_edit.setText(s.value("git/https_username", ""))
-        self._git_token_edit.setText(s.value("git/https_token",       ""))
+        self._git_token_edit.setText(get_secret("git/https_token"))
         self._git_name_edit.setText(s.value("git/user_name",          ""))
         self._git_email_edit.setText(s.value("git/user_email",        ""))
         self._git_ssh_key_edit.setText(s.value("git/ssh_key_path",    ""))
-        self._git_passphrase_edit.setText(s.value("git/ssh_passphrase", ""))
+        self._git_passphrase_edit.setText(get_secret("git/ssh_passphrase"))
 
         # Wire toggle
         self._git_auth_combo.currentIndexChanged.connect(self._on_auth_changed)
@@ -184,7 +198,7 @@ class SettingsDialog(QDialog):
         s2 = QSettings("MarkdownEditor", "MarkdownEditor")
         self._proxy_url_edit.setText(s2.value("proxy/url",      ""))
         self._proxy_user_edit.setText(s2.value("proxy/username", ""))
-        self._proxy_pass_edit.setText(s2.value("proxy/password", ""))
+        self._proxy_pass_edit.setText(get_secret("proxy/password"))
 
         root.addWidget(proxy_grp)
 
@@ -221,18 +235,18 @@ class SettingsDialog(QDialog):
         theme_settings.setValue("preview_theme", self._preview_theme_combo.currentText())
         theme_settings.setValue("app_theme",     self._app_theme_combo.currentText())
 
-        # Git credentials
+        # Git credentials (non-sensitive in QSettings, secrets in OS keyring)
         theme_settings.setValue("git/auth_method",    self._git_auth_combo.currentData())
         theme_settings.setValue("git/https_username", self._git_username_edit.text())
-        theme_settings.setValue("git/https_token",    self._git_token_edit.text())
+        set_secret("git/https_token",                 self._git_token_edit.text())
         theme_settings.setValue("git/user_name",      self._git_name_edit.text())
         theme_settings.setValue("git/user_email",     self._git_email_edit.text())
         theme_settings.setValue("git/ssh_key_path",   self._git_ssh_key_edit.text())
-        theme_settings.setValue("git/ssh_passphrase", self._git_passphrase_edit.text())
+        set_secret("git/ssh_passphrase",              self._git_passphrase_edit.text())
 
         # Proxy
         theme_settings.setValue("proxy/url",      self._proxy_url_edit.text().strip())
         theme_settings.setValue("proxy/username", self._proxy_user_edit.text().strip())
-        theme_settings.setValue("proxy/password", self._proxy_pass_edit.text())
+        set_secret("proxy/password",              self._proxy_pass_edit.text())
 
         self.accept()

@@ -21,6 +21,8 @@ import urllib.request
 from dataclasses import dataclass, field
 from urllib.parse import urlparse, parse_qs
 
+from credentials import get_secret
+
 
 # ── Dataclasses ───────────────────────────────────────────────────────────────
 
@@ -202,7 +204,7 @@ def _ssh_clone_url(info: GitFileInfo) -> str:
 def _https_headers(settings, platform: str) -> dict[str, str]:
     """Return request headers with Authorization for HTTPS REST API calls."""
     user  = settings.value("git/https_username", "")
-    token = settings.value("git/https_token",    "")
+    token = get_secret("git/https_token")
     headers: dict[str, str] = {"User-Agent": "MarkForge", "Accept": "application/json"}
     if user and token:
         if platform in ("github", "github_enterprise"):
@@ -225,7 +227,7 @@ def _apply_proxy(settings) -> None:
     """
     proxy_url  = (settings.value("proxy/url",      "") or "").strip()
     proxy_user = (settings.value("proxy/username", "") or "").strip()
-    proxy_pass = (settings.value("proxy/password", "") or "").strip()
+    proxy_pass = get_secret("proxy/password").strip()
 
     if not proxy_url:
         return   # keep default urllib behaviour (reads system/env proxies)
@@ -532,8 +534,8 @@ def clone_repo(info: GitFileInfo, settings, progress_cb) -> str:
     errstream = _ProgressStream(progress_cb)
 
     try:
-        key_path   = settings.value("git/ssh_key_path",   "")
-        passphrase = settings.value("git/ssh_passphrase", "")
+        key_path   = settings.value("git/ssh_key_path", "")
+        passphrase = get_secret("git/ssh_passphrase")
         clone_url  = _ssh_clone_url(info)
 
         vendor = _make_paramiko_vendor(key_path, passphrase)
@@ -593,7 +595,7 @@ def _git_env(settings) -> dict:
     env = {**os.environ, "GIT_TERMINAL_PROMPT": "0"}
     proxy_url  = (settings.value("proxy/url",      "") or "").strip()
     proxy_user = (settings.value("proxy/username", "") or "").strip()
-    proxy_pass = (settings.value("proxy/password", "") or "").strip()
+    proxy_pass = get_secret("proxy/password").strip()
     if proxy_url:
         if proxy_user:
             scheme, rest = proxy_url.split("://", 1)
@@ -610,7 +612,7 @@ def _clone_via_git_binary(info: GitFileInfo, settings, progress_cb) -> str:
     import subprocess
 
     user  = settings.value("git/https_username", "")
-    token = settings.value("git/https_token",    "")
+    token = get_secret("git/https_token")
     clone_url = _build_https_clone_url(info.clone_url, user, token)
     env = _git_env(settings)
 
@@ -645,7 +647,7 @@ def _push_via_git_binary(info: GitFileInfo, spec: CommitSpec,
     import subprocess
 
     user  = settings.value("git/https_username", "")
-    token = settings.value("git/https_token",    "")
+    token = get_secret("git/https_token")
     name  = (settings.value("git/user_name",  "") or "").strip()
     email = (settings.value("git/user_email", "") or "").strip()
     repo_path = info.local_repo_path
@@ -816,7 +818,7 @@ def _squash_via_git_binary(info: GitFileInfo, squash_count: int,
     import subprocess
 
     user  = settings.value("git/https_username", "")
-    token = settings.value("git/https_token",    "")
+    token = get_secret("git/https_token")
     name  = (settings.value("git/user_name",  "") or "").strip()
     email = (settings.value("git/user_email", "") or "").strip()
 
@@ -888,8 +890,8 @@ def _squash_via_ssh(info: GitFileInfo, squash_count: int,
 
     progress_cb(60, "Force-pushing …")
     errstream  = _ProgressStream(progress_cb)
-    key_path   = settings.value("git/ssh_key_path",   "")
-    passphrase = settings.value("git/ssh_passphrase", "")
+    key_path   = settings.value("git/ssh_key_path", "")
+    passphrase = get_secret("git/ssh_passphrase")
     push_url   = _ssh_clone_url(info)
     refspec    = f"+refs/heads/{info.branch}:refs/heads/{info.branch}".encode()
 
@@ -985,8 +987,8 @@ def commit_and_push(info: GitFileInfo, spec: CommitSpec, settings, progress_cb) 
     # Use '+' prefix for force-push when amending (rewrites remote history)
     force_prefix = "+" if spec.amend else ""
     refspec    = f"{force_prefix}refs/heads/{push_branch}:refs/heads/{push_branch}".encode()
-    key_path   = settings.value("git/ssh_key_path",   "")
-    passphrase = settings.value("git/ssh_passphrase", "")
+    key_path   = settings.value("git/ssh_key_path", "")
+    passphrase = get_secret("git/ssh_passphrase")
     push_url   = _ssh_clone_url(info)
 
     vendor = _make_paramiko_vendor(key_path, passphrase)
@@ -1033,7 +1035,7 @@ def _git_author(repo_path: str) -> bytes:
 def _create_pull_request(info: GitFileInfo, spec: CommitSpec, settings) -> None:
     """Create a PR on GitHub, GitHub Enterprise, Bitbucket Cloud, or Bitbucket Server."""
     user  = settings.value("git/https_username", "")
-    token = settings.value("git/https_token",    "")
+    token = get_secret("git/https_token")
 
     head_branch   = spec.new_branch or info.branch
     target_branch = spec.pr_target  or info.branch

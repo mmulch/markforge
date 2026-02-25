@@ -64,6 +64,14 @@ hiddenimports += [
     'fitz',
     'pymupdf',
     'pymupdf4llm',
+    # keyring OS-specific backends
+    'keyring',
+    'keyring.backends',
+    'keyring.backends.SecretService',
+    'keyring.backends.macOS',
+    'keyring.backends.Windows',
+    'keyring.backends.fail',
+    'secretstorage',
 ]
 
 a = Analysis(

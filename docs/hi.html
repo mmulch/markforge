@@ -592,7 +592,7 @@
   <article>
 
     <!-- ─── TITLE ─────────────────────────────────────────────────────────── -->
-    <h1>MarkForge उपयोगकर्ता मैनुअल <span class="version-badge">v1.0</span></h1>
+    <h1>MarkForge उपयोगकर्ता मैनुअल <span class="version-badge">v1.6.1</span></h1>
 
     <!-- ═══ 1. INTRODUCTION ═══════════════════════════════════════════════ -->
     <section id="introduction">
@@ -1192,6 +1192,10 @@ $</code></pre>
         <p><strong>SSH (key file)</strong> चुनें और अपनी निजी SSH key और एक वैकल्पिक passphrase का पथ दें। यह मोड एक शुद्ध-Python SSH कनेक्शन के लिए <a href="https://www.paramiko.org/" target="_blank" rel="noopener">paramiko</a> का उपयोग करता है (कोई सिस्टम ssh client की आवश्यकता नहीं)। यदि paramiko स्थापित नहीं है, तो MarkForge सिस्टम <code>ssh</code> client पर वापस आ जाता है।</p>
         <pre><code>pip install paramiko</code></pre>
         <p>SSH प्रमाणीकरण <strong>amend</strong> और <strong>squash</strong> का समर्थन करता है।</p>
+        <div class="callout note">
+          <div class="callout-title">क्रेडेंशियल संग्रहण</div>
+          <p>टोकन, SSH पासफ़्रेज़ और प्रॉक्सी पासवर्ड <strong>OS कीरिंग</strong> में संग्रहीत होते हैं (Linux पर GNOME Keyring / KWallet, macOS पर Keychain, Windows पर Windows Credential Manager) — सादे-पाठ कॉन्फ़िगरेशन फ़ाइलों में नहीं।</p>
+        </div>
       </section>
 
       <section id="git-proxy">
@@ -1226,14 +1230,14 @@ $</code></pre>
           <tr><td><strong>App theme (ऐप थीम)</strong></td><td>Light, Dark</td><td>लागू करने के लिए पुनरारंभ आवश्यक</td></tr>
           <tr><td><strong>Git Auth method (Git प्रमाणीकरण विधि)</strong></td><td>HTTPS (token), HTTPS (git), SSH</td><td>देखें <a href="#git-auth">प्रमाणीकरण मोड</a></td></tr>
           <tr><td><strong>Username (उपयोगकर्ता नाम)</strong></td><td>टेक्स्ट फ़ील्ड</td><td>HTTPS मोड</td></tr>
-          <tr><td><strong>Token</strong></td><td>टेक्स्ट फ़ील्ड</td><td>HTTPS मोड</td></tr>
+          <tr><td><strong>Token</strong></td><td>टेक्स्ट फ़ील्ड</td><td>HTTPS मोड — OS कीरिंग में संग्रहीत</td></tr>
           <tr><td><strong>Name (नाम)</strong></td><td>टेक्स्ट फ़ील्ड</td><td>HTTPS (git binary) — commit पहचान</td></tr>
           <tr><td><strong>Email (ईमेल)</strong></td><td>टेक्स्ट फ़ील्ड</td><td>HTTPS (git binary) — commit पहचान</td></tr>
           <tr><td><strong>SSH key</strong></td><td>फ़ाइल पथ</td><td>SSH मोड</td></tr>
-          <tr><td><strong>Passphrase</strong></td><td>टेक्स्ट फ़ील्ड</td><td>SSH मोड — वैकल्पिक</td></tr>
+          <tr><td><strong>Passphrase</strong></td><td>टेक्स्ट फ़ील्ड</td><td>SSH मोड — वैकल्पिक; OS कीरिंग में संग्रहीत</td></tr>
           <tr><td><strong>Proxy URL</strong></td><td>टेक्स्ट फ़ील्ड</td><td>सिस्टम proxy के लिए खाली छोड़ें</td></tr>
           <tr><td><strong>Proxy username</strong></td><td>टेक्स्ट फ़ील्ड</td><td>वैकल्पिक proxy प्रमाणीकरण</td></tr>
-          <tr><td><strong>Proxy password</strong></td><td>टेक्स्ट फ़ील्ड</td><td>वैकल्पिक proxy प्रमाणीकरण</td></tr>
+          <tr><td><strong>Proxy password</strong></td><td>टेक्स्ट फ़ील्ड</td><td>वैकल्पिक proxy प्रमाणीकरण — OS कीरिंग में संग्रहीत</td></tr>
         </tbody>
       </table>
       </div>

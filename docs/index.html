@@ -592,7 +592,7 @@
   <article>
 
     <!-- ─── TITLE ─────────────────────────────────────────────────────────── -->
-    <h1>MarkForge User Manual <span class="version-badge">v1.0</span></h1>
+    <h1>MarkForge User Manual <span class="version-badge">v1.6.1</span></h1>
 
     <!-- ═══ 1. INTRODUCTION ═══════════════════════════════════════════════ -->
     <section id="introduction">
@@ -1192,6 +1192,10 @@ $</code></pre>
         <p>Select <strong>SSH (key file)</strong> and provide the path to your private SSH key and an optional passphrase. This mode uses <a href="https://www.paramiko.org/" target="_blank" rel="noopener">paramiko</a> for a pure-Python SSH connection (no system ssh client required). If paramiko is not installed, MarkForge falls back to the system <code>ssh</code> client.</p>
         <pre><code>pip install paramiko</code></pre>
         <p>SSH authentication supports <strong>amend</strong> and <strong>squash</strong>.</p>
+        <div class="callout note">
+          <div class="callout-title">Credential Storage</div>
+          <p>Tokens, SSH passphrases, and proxy passwords are stored in the <strong>OS keyring</strong> (GNOME Keyring / KWallet on Linux, Keychain on macOS, Windows Credential Manager on Windows) — not in plaintext configuration files.</p>
+        </div>
       </section>
 
       <section id="git-proxy">
@@ -1226,14 +1230,14 @@ $</code></pre>
           <tr><td><strong>App theme</strong></td><td>Light, Dark</td><td>Restart required to apply</td></tr>
           <tr><td><strong>Git Auth method</strong></td><td>HTTPS (token), HTTPS (git), SSH</td><td>See <a href="#git-auth">Authentication Modes</a></td></tr>
           <tr><td><strong>Username</strong></td><td>Text field</td><td>HTTPS modes</td></tr>
-          <tr><td><strong>Token</strong></td><td>Text field</td><td>HTTPS modes</td></tr>
+          <tr><td><strong>Token</strong></td><td>Text field</td><td>HTTPS modes — stored in OS keyring</td></tr>
           <tr><td><strong>Name</strong></td><td>Text field</td><td>HTTPS (git binary) — commit identity</td></tr>
           <tr><td><strong>Email</strong></td><td>Text field</td><td>HTTPS (git binary) — commit identity</td></tr>
           <tr><td><strong>SSH key</strong></td><td>File path</td><td>SSH mode</td></tr>
-          <tr><td><strong>Passphrase</strong></td><td>Text field</td><td>SSH mode — optional</td></tr>
+          <tr><td><strong>Passphrase</strong></td><td>Text field</td><td>SSH mode — optional; stored in OS keyring</td></tr>
           <tr><td><strong>Proxy URL</strong></td><td>Text field</td><td>Leave empty for system proxy</td></tr>
           <tr><td><strong>Proxy username</strong></td><td>Text field</td><td>Optional proxy auth</td></tr>
-          <tr><td><strong>Proxy password</strong></td><td>Text field</td><td>Optional proxy auth</td></tr>
+          <tr><td><strong>Proxy password</strong></td><td>Text field</td><td>Optional proxy auth — stored in OS keyring</td></tr>
         </tbody>
       </table>
       </div>

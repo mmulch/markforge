@@ -592,7 +592,7 @@
   <article>
 
     <!-- ─── TITLE ─────────────────────────────────────────────────────────── -->
-    <h1>Посібник користувача MarkForge <span class="version-badge">v1.0</span></h1>
+    <h1>Посібник користувача MarkForge <span class="version-badge">v1.6.1</span></h1>
 
     <!-- ═══ 1. ВСТУП ══════════════════════════════════════════════════════ -->
     <section id="introduction">
@@ -1192,6 +1192,10 @@ $</code></pre>
         <p>Виберіть <strong>SSH (файл ключа)</strong> та вкажіть шлях до вашого приватного ключа SSH і необов'язкову парольну фразу. Цей режим використовує <a href="https://www.paramiko.org/" target="_blank" rel="noopener">paramiko</a> для чистого Python SSH-з'єднання (системний клієнт ssh не потрібний). Якщо paramiko не встановлено, MarkForge використовує системний клієнт <code>ssh</code>.</p>
         <pre><code>pip install paramiko</code></pre>
         <p>Автентифікація SSH підтримує <strong>amend</strong> і <strong>squash</strong>.</p>
+        <div class="callout note">
+          <div class="callout-title">Зберігання облікових даних</div>
+          <p>Токени, парольні фрази SSH і паролі проксі зберігаються у <strong>сховищі ключів ОС</strong> (GNOME Keyring / KWallet на Linux, Keychain на macOS, Windows Credential Manager на Windows) — не у файлах конфігурації у відкритому тексті.</p>
+        </div>
       </section>
 
       <section id="git-proxy">
@@ -1226,14 +1230,14 @@ $</code></pre>
           <tr><td><strong>Тема застосунку</strong></td><td>Light, Dark</td><td>Для застосування потрібен перезапуск</td></tr>
           <tr><td><strong>Метод автентифікації Git</strong></td><td>HTTPS (token), HTTPS (git), SSH</td><td>Див. <a href="#git-auth">Режими автентифікації</a></td></tr>
           <tr><td><strong>Ім'я користувача</strong></td><td>Текстове поле</td><td>Режими HTTPS</td></tr>
-          <tr><td><strong>Токен</strong></td><td>Текстове поле</td><td>Режими HTTPS</td></tr>
+          <tr><td><strong>Токен</strong></td><td>Текстове поле</td><td>Режими HTTPS — зберігається у сховищі ключів ОС</td></tr>
           <tr><td><strong>Ім'я</strong></td><td>Текстове поле</td><td>HTTPS (git binary) — ідентифікація commit</td></tr>
           <tr><td><strong>Електронна пошта</strong></td><td>Текстове поле</td><td>HTTPS (git binary) — ідентифікація commit</td></tr>
           <tr><td><strong>Ключ SSH</strong></td><td>Шлях до файлу</td><td>Режим SSH</td></tr>
-          <tr><td><strong>Парольна фраза</strong></td><td>Текстове поле</td><td>Режим SSH — необов'язково</td></tr>
+          <tr><td><strong>Парольна фраза</strong></td><td>Текстове поле</td><td>Режим SSH — необов'язково; зберігається у сховищі ключів ОС</td></tr>
           <tr><td><strong>URL проксі</strong></td><td>Текстове поле</td><td>Залиште порожнім для системного проксі</td></tr>
           <tr><td><strong>Ім'я користувача проксі</strong></td><td>Текстове поле</td><td>Необов'язкова автентифікація проксі</td></tr>
-          <tr><td><strong>Пароль проксі</strong></td><td>Текстове поле</td><td>Необов'язкова автентифікація проксі</td></tr>
+          <tr><td><strong>Пароль проксі</strong></td><td>Текстове поле</td><td>Необов'язкова автентифікація проксі — зберігається у сховищі ключів ОС</td></tr>
         </tbody>
       </table>
       </div>

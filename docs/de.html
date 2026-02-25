@@ -591,7 +591,7 @@
   <article>
 
     <!-- ─── TITEL ─────────────────────────────────────────────────────────── -->
-    <h1>MarkForge Benutzerhandbuch <span class="version-badge">v1.0</span></h1>
+    <h1>MarkForge Benutzerhandbuch <span class="version-badge">v1.6.1</span></h1>
 
     <!-- ═══ 1. EINLEITUNG ════════════════════════════════════════════════ -->
     <section id="einleitung">
@@ -1191,6 +1191,10 @@ $</code></pre>
         <p>Wählen Sie <strong>SSH (Schlüsseldatei)</strong> und geben Sie den Pfad zu Ihrem privaten SSH-Schlüssel und optional eine Passphrase an. Dieser Modus verwendet <a href="https://www.paramiko.org/" target="_blank" rel="noopener">paramiko</a> für eine rein Python-basierte SSH-Verbindung (kein System-SSH-Client erforderlich). Wenn paramiko nicht installiert ist, fällt MarkForge auf den System-<code>ssh</code>-Client zurück.</p>
         <pre><code>pip install paramiko</code></pre>
         <p>SSH-Authentifizierung unterstützt <strong>Amend</strong> und <strong>Squash</strong>.</p>
+        <div class="callout note">
+          <div class="callout-title">Speicherung von Anmeldedaten</div>
+          <p>Tokens, SSH-Passphrasen und Proxy-Passwörter werden im <strong>OS-Schlüsselbund</strong> gespeichert (GNOME Keyring / KWallet unter Linux, Keychain unter macOS, Windows Credential Manager unter Windows) — nicht in Klartextkonfigurationsdateien.</p>
+        </div>
       </section>
 
       <section id="git-proxy">
@@ -1225,14 +1229,14 @@ $</code></pre>
           <tr><td><strong>App-Theme</strong></td><td>Hell, Dunkel</td><td>Neustart erforderlich</td></tr>
           <tr><td><strong>Auth-Methode</strong></td><td>HTTPS (Token), HTTPS (git), SSH</td><td>Siehe <a href="#git-auth">Authentifizierungsmodi</a></td></tr>
           <tr><td><strong>Benutzername</strong></td><td>Textfeld</td><td>HTTPS-Modi</td></tr>
-          <tr><td><strong>Token</strong></td><td>Textfeld</td><td>HTTPS-Modi</td></tr>
+          <tr><td><strong>Token</strong></td><td>Textfeld</td><td>HTTPS-Modi — im OS-Schlüsselbund gespeichert</td></tr>
           <tr><td><strong>Name</strong></td><td>Textfeld</td><td>HTTPS (git) — Commit-Identität</td></tr>
           <tr><td><strong>E-Mail</strong></td><td>Textfeld</td><td>HTTPS (git) — Commit-Identität</td></tr>
           <tr><td><strong>SSH-Schlüssel</strong></td><td>Dateipfad</td><td>SSH-Modus</td></tr>
-          <tr><td><strong>Passphrase</strong></td><td>Textfeld</td><td>SSH-Modus — optional</td></tr>
+          <tr><td><strong>Passphrase</strong></td><td>Textfeld</td><td>SSH-Modus — optional; im OS-Schlüsselbund gespeichert</td></tr>
           <tr><td><strong>Proxy-URL</strong></td><td>Textfeld</td><td>Leer lassen für System-Proxy</td></tr>
           <tr><td><strong>Proxy-Benutzername</strong></td><td>Textfeld</td><td>Optionale Proxy-Authentifizierung</td></tr>
-          <tr><td><strong>Proxy-Passwort</strong></td><td>Textfeld</td><td>Optionale Proxy-Authentifizierung</td></tr>
+          <tr><td><strong>Proxy-Passwort</strong></td><td>Textfeld</td><td>Optionale Proxy-Authentifizierung — im OS-Schlüsselbund gespeichert</td></tr>
         </tbody>
       </table>
       </div>

@@ -5,3 +5,4 @@ Pygments>=2.14.0
 PyMuPDF>=1.23.0
 pymupdf4llm>=0.3.4
 dulwich>=0.20.50
+keyring>=24.0.0

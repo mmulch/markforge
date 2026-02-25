@@ -602,7 +602,7 @@
   <article>
 
     <!-- ─── TITLE ─────────────────────────────────────────────────────────── -->
-    <h1>دليل مستخدم MarkForge <span class="version-badge">v1.0</span></h1>
+    <h1>دليل مستخدم MarkForge <span class="version-badge">v1.6.1</span></h1>
 
     <!-- ═══ 1. INTRODUCTION ═══════════════════════════════════════════════ -->
     <section id="introduction">
@@ -1202,6 +1202,10 @@ $</code></pre>
         <p>حدد <strong>SSH (ملف مفتاح)</strong> وأدخل المسار إلى مفتاح SSH الخاص وعبارة مرور اختيارية. يستخدم هذا الوضع <a href="https://www.paramiko.org/" target="_blank" rel="noopener">paramiko</a> لاتصال SSH خالص بـ Python (لا يلزم عميل ssh للنظام). إذا لم يكن paramiko مثبتاً، يلجأ MarkForge إلى عميل <code>ssh</code> للنظام.</p>
         <pre><code>pip install paramiko</code></pre>
         <p>تدعم مصادقة SSH كلاً من <strong>amend</strong> و<strong>squash</strong>.</p>
+        <div class="callout note">
+          <div class="callout-title">تخزين بيانات الاعتماد</div>
+          <p>يتم تخزين الرموز وعبارات مرور SSH وكلمات مرور الوكيل في <strong>سلسلة مفاتيح نظام التشغيل</strong> (GNOME Keyring / KWallet على Linux، وKeychain على macOS، وWindows Credential Manager على Windows) — وليس في ملفات تهيئة نصية عادية.</p>
+        </div>
       </section>
 
       <section id="git-proxy">
@@ -1236,14 +1240,14 @@ $</code></pre>
           <tr><td><strong>ثيم التطبيق</strong></td><td>فاتح، داكن</td><td>يلزم إعادة التشغيل للتطبيق</td></tr>
           <tr><td><strong>طريقة مصادقة Git</strong></td><td>HTTPS (token)، HTTPS (git)، SSH</td><td>انظر <a href="#git-auth">أوضاع المصادقة</a></td></tr>
           <tr><td><strong>اسم المستخدم</strong></td><td>حقل نص</td><td>أوضاع HTTPS</td></tr>
-          <tr><td><strong>الرمز (Token)</strong></td><td>حقل نص</td><td>أوضاع HTTPS</td></tr>
+          <tr><td><strong>الرمز (Token)</strong></td><td>حقل نص</td><td>أوضاع HTTPS — مخزَّن في سلسلة مفاتيح النظام</td></tr>
           <tr><td><strong>الاسم</strong></td><td>حقل نص</td><td>HTTPS (git binary) — هوية الـ commit</td></tr>
           <tr><td><strong>البريد الإلكتروني</strong></td><td>حقل نص</td><td>HTTPS (git binary) — هوية الـ commit</td></tr>
           <tr><td><strong>مفتاح SSH</strong></td><td>مسار الملف</td><td>وضع SSH</td></tr>
-          <tr><td><strong>عبارة المرور</strong></td><td>حقل نص</td><td>وضع SSH — اختياري</td></tr>
+          <tr><td><strong>عبارة المرور</strong></td><td>حقل نص</td><td>وضع SSH — اختياري؛ مخزَّن في سلسلة مفاتيح النظام</td></tr>
           <tr><td><strong>رابط الوكيل</strong></td><td>حقل نص</td><td>اتركه فارغاً لوكيل النظام</td></tr>
           <tr><td><strong>اسم مستخدم الوكيل</strong></td><td>حقل نص</td><td>مصادقة الوكيل الاختيارية</td></tr>
-          <tr><td><strong>كلمة مرور الوكيل</strong></td><td>حقل نص</td><td>مصادقة الوكيل الاختيارية</td></tr>
+          <tr><td><strong>كلمة مرور الوكيل</strong></td><td>حقل نص</td><td>مصادقة الوكيل الاختيارية — مخزَّن في سلسلة مفاتيح النظام</td></tr>
         </tbody>
       </table>
       </div>
