@@ -607,7 +607,7 @@
   <article>
 
     <!-- ─── TITLE ─────────────────────────────────────────────────────────── -->
-    <h1>Manuel utilisateur MarkForge <span class="version-badge">v1.7.2</span></h1>
+    <h1>Manuel utilisateur MarkForge <span class="version-badge">v1.8.0</span></h1>
 
     <!-- ═══ 1. INTRODUCTION ══════════════════════════════════════════════ -->
     <section id="introduction">
@@ -627,6 +627,8 @@
         <div class="feature-card"><strong>Formules mathématiques</strong><span>Notation LaTeX rendue avec MathJax</span></div>
         <div class="feature-card"><strong>Import PDF</strong><span>Convertit automatiquement n'importe quel PDF en Markdown</span></div>
         <div class="feature-card"><strong>Export PDF</strong><span>PDF optimisé pour l'impression depuis n'importe quel document</span></div>
+        <div class="feature-card"><strong>Export HTML</strong><span>HTML autonome avec CSS et images intégrés</span></div>
+        <div class="feature-card"><strong>Export Pandoc</strong><span>DOCX, EPUB, LaTeX via pandoc (optionnel)</span></div>
         <div class="feature-card"><strong>Multilingue</strong><span>Interface utilisateur en 14 langues</span></div>
       </div>
     </section>
@@ -735,7 +737,7 @@ python src/main.py</code></pre>
         <table>
           <thead><tr><th>Menu</th><th>Contenu</th></tr></thead>
           <tbody>
-            <tr><td><strong>Fichier</strong></td><td>Nouveau, Ouvrir, Ouvrir un dossier, Fichiers récents, Importer PDF, Ouvrir depuis Git, Git Squash, Enregistrer, Enregistrer sous, Exporter en PDF, Quitter</td></tr>
+            <tr><td><strong>Fichier</strong></td><td>Nouveau, Ouvrir, Ouvrir un dossier, Fichiers récents, Importer PDF, Ouvrir depuis Git, Git Squash, Enregistrer, Enregistrer sous, Exporter en HTML, Exporter en DOCX (Pandoc), Exporter en EPUB (Pandoc), Exporter en LaTeX (Pandoc), Exporter en PDF, Quitter</td></tr>
             <tr><td><strong>Édition</strong></td><td>Annuler, Rétablir, Couper, Copier, Coller</td></tr>
             <tr><td><strong>Insérer</strong></td><td>Lien, Image, PlantUML, Mermaid, Tableau</td></tr>
             <tr><td><strong>Affichage</strong></td><td>Afficher l'arborescence, Afficher le plan, Afficher l'aperçu, Retour à la ligne, Vérification orthographique, Langue de vérification, Paramètres</td></tr>
@@ -1139,7 +1141,13 @@ $</code></pre>
         <p>Passez l'aperçu au thème Clair avant d'exporter en PDF pour obtenir la sortie la plus propre prête à imprimer.</p>
       </div>
 
-      <h3>Importer PDF <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>I</kbd></h3>
+            <h3>Exporter en HTML</h3>
+      <p>Choisissez <strong>Fichier → Exporter en HTML…</strong>. MarkForge rend le document actuel en un fichier HTML autonome avec tout le CSS intégré et les images locales converties en URI de données Base64, permettant d'ouvrir le fichier dans n'importe quel navigateur sans connexion internet.</p>
+
+      <h3>Exporter via Pandoc (DOCX, EPUB, LaTeX)</h3>
+      <p>Choisissez <strong>Fichier → Exporter en DOCX (Pandoc)…</strong>, <strong>Exporter en EPUB (Pandoc)…</strong> ou <strong>Exporter en LaTeX (Pandoc)…</strong>. Ces options nécessitent que <a href="https://pandoc.org/installing.html" target="_blank">pandoc</a> soit installé et disponible dans le PATH. Si pandoc n'est pas trouvé, un dialogue d'avertissement s'affiche.</p>
+
+<h3>Importer PDF <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>I</kbd></h3>
       <p>Choisissez <strong>Fichier → Importer PDF…</strong> ou appuyez sur <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>I</kbd>. MarkForge convertit n'importe quel fichier PDF en Markdown en utilisant la bibliothèque <code>pymupdf4llm</code>. La conversion préserve intelligemment la structure du document :</p>
       <ul>
         <li>Titres et paragraphes</li>

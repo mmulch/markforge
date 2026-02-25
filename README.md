@@ -1,6 +1,6 @@
 # MarkForge
 
-A modern, feature-rich Markdown editor built with Python and PyQt6. Includes a live side-by-side preview, syntax highlighting, PlantUML and Mermaid diagram support, math formulas, PDF export, and full Git integration — in a clean, dual-pane interface.
+A modern, feature-rich Markdown editor built with Python and PyQt6. Includes a live side-by-side preview, syntax highlighting, PlantUML and Mermaid diagram support, math formulas, PDF/HTML/DOCX/EPUB/LaTeX export, and full Git integration — in a clean, dual-pane interface.
 
 ![License](https://img.shields.io/badge/license-GPL--3.0-blue)
 ![Python](https://img.shields.io/badge/python-3.8%2B-blue)
@@ -30,6 +30,8 @@ A modern, feature-rich Markdown editor built with Python and PyQt6. Includes a l
 - **Math formulas** — LaTeX notation rendered with MathJax
 - **PDF import** — import any PDF and convert it to Markdown automatically (headings, paragraphs, tables preserved)
 - **PDF export** — export the current document as a PDF
+- **HTML export** — single-file self-contained HTML with inline CSS and images, preserving syntax highlighting and theme (File → Export as HTML)
+- **Pandoc export** *(optional)* — DOCX, EPUB, LaTeX via `pandoc` if installed on PATH (File → Export as DOCX/EPUB/LaTeX)
 - **Git integration** — open individual files or entire branches directly from GitHub, GitHub Enterprise, Bitbucket Cloud, or Bitbucket Server; edit and push back without leaving the editor; amend the previous commit or squash multiple commits in one step (see [Git Integration](#git-integration))
 - **Word count & reading time** — word count and estimated reading time always visible in the status bar; set an optional target word count (View → Set Word Goal) to show a compact progress bar toward your goal
 - **Online user manual** — comprehensive documentation in 14 languages: EN, DE, AR, VI, SV, UK, KN, HI, ES, FR, IT, NL, PT, FA (see [User Manual](docs/index.html))

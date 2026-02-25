@@ -607,7 +607,7 @@
   <article>
 
     <!-- ─── TITLE ─────────────────────────────────────────────────────────── -->
-    <h1>MarkForge Användarmanual <span class="version-badge">v1.7.2</span></h1>
+    <h1>MarkForge Användarmanual <span class="version-badge">v1.8.0</span></h1>
 
     <!-- ═══ 1. INTRODUKTION ═══════════════════════════════════════════════ -->
     <section id="introduction">
@@ -627,6 +627,8 @@
         <div class="feature-card"><strong>Matematikformler</strong><span>LaTeX-notation renderad med MathJax</span></div>
         <div class="feature-card"><strong>PDF-import</strong><span>Konvertera valfri PDF till Markdown automatiskt</span></div>
         <div class="feature-card"><strong>PDF-export</strong><span>Utskriftsoptimerad PDF från valfritt dokument</span></div>
+        <div class="feature-card"><strong>HTML-export</strong><span>Fristående HTML med inbäddad CSS och bilder</span></div>
+        <div class="feature-card"><strong>Pandoc-export</strong><span>DOCX, EPUB, LaTeX via pandoc (valfritt)</span></div>
         <div class="feature-card"><strong>Flerspråkig</strong><span>Engelska och tyska (Deutsch) användargränssnitt</span></div>
       </div>
     </section>
@@ -735,7 +737,7 @@ python src/main.py</code></pre>
         <table>
           <thead><tr><th>Meny</th><th>Innehåll</th></tr></thead>
           <tbody>
-            <tr><td><strong>Arkiv</strong></td><td>Ny, Öppna, Öppna mapp, Senaste filer, Importera PDF, Öppna från Git, Git-sammanslagning, Spara, Spara som, Exportera som PDF, Avsluta</td></tr>
+            <tr><td><strong>Arkiv</strong></td><td>Ny, Öppna, Öppna mapp, Senaste filer, Importera PDF, Öppna från Git, Git-sammanslagning, Spara, Spara som, Exportera som HTML, Exportera som DOCX (Pandoc), Exportera som EPUB (Pandoc), Exportera som LaTeX (Pandoc), Exportera som PDF, Avsluta</td></tr>
             <tr><td><strong>Redigera</strong></td><td>Ångra, Gör om, Klipp ut, Kopiera, Klistra in</td></tr>
             <tr><td><strong>Infoga</strong></td><td>Länk, Bild, PlantUML, Mermaid, Tabell</td></tr>
             <tr><td><strong>Visa</strong></td><td>Visa filträd, Visa disposition, Visa förhandsvisning, Radbrytning, Stavningskontroll, Stavningskontrollspråk, Inställningar</td></tr>
@@ -1139,7 +1141,13 @@ $</code></pre>
         <p>Byt förhandsvisning till temat Ljust innan du exporterar till PDF för den renaste utskriftsfärdiga utmatningen.</p>
       </div>
 
-      <h3>Importera PDF <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>I</kbd></h3>
+            <h3>Exportera som HTML</h3>
+      <p>Välj <strong>Arkiv → Exportera som HTML…</strong>. MarkForge renderar det aktuella dokumentet till en fristående HTML-fil med all CSS inbäddad och lokala bilder konverterade till Base64 data-URI:er, så att filen kan öppnas i valfri webbläsare utan internetanslutning.</p>
+
+      <h3>Exportera via Pandoc (DOCX, EPUB, LaTeX)</h3>
+      <p>Välj <strong>Arkiv → Exportera som DOCX (Pandoc)…</strong>, <strong>Exportera som EPUB (Pandoc)…</strong> eller <strong>Exportera som LaTeX (Pandoc)…</strong>. Dessa alternativ kräver att <a href="https://pandoc.org/installing.html" target="_blank">pandoc</a> är installerat och tillgängligt i PATH. Om pandoc inte hittas visas en varningsdialog.</p>
+
+<h3>Importera PDF <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>I</kbd></h3>
       <p>Välj <strong>Arkiv → Importera PDF…</strong> eller tryck <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>I</kbd>. MarkForge konverterar valfri PDF-fil till Markdown med hjälp av biblioteket <code>pymupdf4llm</code>. Konverteringen bevarar dokumentstrukturen intelligent:</p>
       <ul>
         <li>Rubriker och stycken</li>

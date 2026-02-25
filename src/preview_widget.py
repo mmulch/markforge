@@ -448,6 +448,10 @@ class PreviewWidget(QWidget):
         else:
             self._view.setHtml(html)  # type: ignore[attr-defined]
 
+    def get_html(self) -> str:
+        """Return the current document rendered as a complete HTML string."""
+        return _render(self._last_md, self._theme_name)
+
     def set_theme(self, theme_name: str) -> None:
         """Switch preview theme and re-render."""
         self._theme_name = theme_name

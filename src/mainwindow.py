@@ -287,7 +287,11 @@ class MainWindow(QMainWindow):
         m.addSeparator()
         self._act_save    = self._mk_action(tr("&Save"),           QKeySequence.StandardKey.Save,   m)
         self._act_save_as = self._mk_action(tr("Save &As …"),      QKeySequence.StandardKey.SaveAs, m)
-        self._act_export_pdf = self._mk_action(tr("Export as PDF …"), "Ctrl+Shift+E", m)
+        self._act_export_pdf   = self._mk_action(tr("Export as PDF …"),           "Ctrl+Shift+E", m)
+        self._act_export_html  = self._mk_action(tr("Export as HTML …"),           None,           m)
+        self._act_export_docx  = self._mk_action(tr("Export as DOCX (Pandoc) …"),  None,           m)
+        self._act_export_epub  = self._mk_action(tr("Export as EPUB (Pandoc) …"),  None,           m)
+        self._act_export_latex = self._mk_action(tr("Export as LaTeX (Pandoc) …"), None,           m)
         m.addSeparator()
         quit_act = self._mk_action(tr("&Quit"), QKeySequence.StandardKey.Quit, m)
         quit_act.triggered.connect(self.close)
@@ -428,6 +432,10 @@ class MainWindow(QMainWindow):
         self._act_save.triggered.connect(self._save)
         self._act_save_as.triggered.connect(self._save_as)
         self._act_export_pdf.triggered.connect(self._export_pdf)
+        self._act_export_html.triggered.connect(self._export_html)
+        self._act_export_docx.triggered.connect(lambda: self._export_pandoc("docx"))
+        self._act_export_epub.triggered.connect(lambda: self._export_pandoc("epub"))
+        self._act_export_latex.triggered.connect(lambda: self._export_pandoc("latex"))
         self._preview.pdf_saved.connect(self._on_pdf_saved)
         self._act_insert_link.triggered.connect(self._insert_link)
         self._act_insert_image.triggered.connect(self._insert_image)
@@ -527,6 +535,8 @@ class MainWindow(QMainWindow):
         )
         for act in (
             self._act_save, self._act_save_as, self._act_export_pdf,
+            self._act_export_html, self._act_export_docx,
+            self._act_export_epub, self._act_export_latex,
             self._act_insert_link, self._act_insert_image,
             self._act_insert_plantuml, self._act_insert_mermaid, self._act_insert_table,
             self._act_find, self._act_replace,
@@ -1251,6 +1261,94 @@ class MainWindow(QMainWindow):
             QMessageBox.critical(
                 self, tr("Error"), tr("Could not save PDF:\n{path}", path=path)
             )
+
+    def _export_html(self) -> None:
+        default = os.path.splitext(self._file)[0] + ".html" if self._file else ""
+        path, _ = QFileDialog.getSaveFileName(
+            self, tr("Export as HTML"),
+            default, tr("HTML files (*.html);;All files (*)")
+        )
+        if not path:
+            return
+        html = self._inline_local_images(self._preview.get_html())
+        try:
+            with open(path, "w", encoding="utf-8") as f:
+                f.write(html)
+            self.statusBar().showMessage(tr("HTML saved: {path}", path=path), 5000)
+        except OSError:
+            QMessageBox.critical(self, tr("Error"),
+                                 tr("Could not save HTML:\n{path}", path=path))
+
+    def _inline_local_images(self, html: str) -> str:
+        """Replace local <img src="..."> with base64 data URIs."""
+        import base64
+        import re as _re2
+        if not self._file:
+            return html
+        base_dir = os.path.dirname(os.path.abspath(self._file))
+        _mime = {
+            "png": "image/png", "jpg": "image/jpeg", "jpeg": "image/jpeg",
+            "gif": "image/gif", "svg": "image/svg+xml",
+            "webp": "image/webp", "bmp": "image/bmp",
+        }
+        def _sub(m):
+            src = m.group(1)
+            if src.startswith(("http://", "https://", "data:")):
+                return m.group(0)
+            img_path = src[7:] if src.startswith("file://") else os.path.join(base_dir, src)
+            if not os.path.isfile(img_path):
+                return m.group(0)
+            ext = os.path.splitext(img_path)[1].lstrip(".").lower()
+            mime = _mime.get(ext, "image/png")
+            with open(img_path, "rb") as f:
+                data = base64.b64encode(f.read()).decode()
+            return f'src="data:{mime};base64,{data}"'
+        return _re2.sub(r'src="([^"]*)"', _sub, html)
+
+    def _export_pandoc(self, fmt: str) -> None:
+        import shutil
+        import subprocess
+        import tempfile
+        pandoc = shutil.which("pandoc")
+        if not pandoc:
+            QMessageBox.warning(self, tr("Pandoc not found"),
+                tr("Pandoc is not installed or not on PATH.\n"
+                   "Install it from https://pandoc.org/installing.html"))
+            return
+        ext   = {"docx": ".docx", "epub": ".epub", "latex": ".tex"}[fmt]
+        filt  = {
+            "docx":  tr("Word documents (*.docx);;All files (*)"),
+            "epub":  tr("EPUB files (*.epub);;All files (*)"),
+            "latex": tr("LaTeX files (*.tex);;All files (*)"),
+        }[fmt]
+        title = {
+            "docx":  tr("Export as DOCX"),
+            "epub":  tr("Export as EPUB"),
+            "latex": tr("Export as LaTeX"),
+        }[fmt]
+        default = (os.path.splitext(self._file)[0] + ext) if self._file else ""
+        path, _ = QFileDialog.getSaveFileName(self, title, default, filt)
+        if not path:
+            return
+        base_dir = os.path.dirname(os.path.abspath(self._file)) if self._file else None
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".md",
+                                        delete=False, encoding="utf-8") as tmp:
+            tmp.write(self._editor.toPlainText())
+            tmp_path = tmp.name
+        try:
+            result = subprocess.run(
+                [pandoc, "-f", "markdown", "-t", fmt, "-o", path, tmp_path],
+                capture_output=True, text=True, timeout=30, cwd=base_dir,
+            )
+            if result.returncode == 0:
+                self.statusBar().showMessage(tr("Exported: {path}", path=path), 5000)
+            else:
+                QMessageBox.critical(self, tr("Error"),
+                    tr("Pandoc export failed:\n{err}", err=result.stderr[:500]))
+        except Exception as e:
+            QMessageBox.critical(self, tr("Error"), str(e))
+        finally:
+            os.unlink(tmp_path)
 
     def _maybe_save(self) -> bool:
         """Returns True if the current content may be discarded."""

@@ -607,7 +607,7 @@
   <article>
 
     <!-- ─── TITLE ─────────────────────────────────────────────────────────── -->
-    <h1>Hướng dẫn sử dụng MarkForge <span class="version-badge">v1.7.2</span></h1>
+    <h1>Hướng dẫn sử dụng MarkForge <span class="version-badge">v1.8.0</span></h1>
 
     <!-- ═══ 1. GIỚI THIỆU ════════════════════════════════════════════════ -->
     <section id="introduction">
@@ -627,6 +627,8 @@
         <div class="feature-card"><strong>Công thức toán học</strong><span>Ký hiệu LaTeX được hiển thị bằng MathJax</span></div>
         <div class="feature-card"><strong>Nhập PDF</strong><span>Tự động chuyển đổi bất kỳ PDF nào sang Markdown</span></div>
         <div class="feature-card"><strong>Xuất PDF</strong><span>Tạo PDF tối ưu cho in ấn từ bất kỳ tài liệu nào</span></div>
+        <div class="feature-card"><strong>Xuất HTML</strong><span>HTML độc lập với CSS và hình ảnh nhúng nội tuyến</span></div>
+        <div class="feature-card"><strong>Xuất qua Pandoc</strong><span>DOCX, EPUB, LaTeX qua pandoc (tùy chọn)</span></div>
         <div class="feature-card"><strong>Đa ngôn ngữ</strong><span>Giao diện người dùng bằng tiếng Anh và tiếng Đức (Deutsch)</span></div>
       </div>
     </section>
@@ -735,7 +737,7 @@ python src/main.py</code></pre>
         <table>
           <thead><tr><th>Menu</th><th>Nội dung</th></tr></thead>
           <tbody>
-            <tr><td><strong>Tệp</strong></td><td>Mới, Mở, Mở thư mục, Tệp gần đây, Nhập PDF, Mở từ Git, Git Squash, Lưu, Lưu thành, Xuất dạng PDF, Thoát</td></tr>
+            <tr><td><strong>Tệp</strong></td><td>Mới, Mở, Mở thư mục, Tệp gần đây, Nhập PDF, Mở từ Git, Git Squash, Lưu, Lưu thành, Xuất dạng HTML, Xuất dạng DOCX (Pandoc), Xuất dạng EPUB (Pandoc), Xuất dạng LaTeX (Pandoc), Xuất dạng PDF, Thoát</td></tr>
             <tr><td><strong>Chỉnh sửa</strong></td><td>Hoàn tác, Làm lại, Cắt, Sao chép, Dán</td></tr>
             <tr><td><strong>Chèn</strong></td><td>Liên kết, Hình ảnh, PlantUML, Mermaid, Bảng</td></tr>
             <tr><td><strong>Xem</strong></td><td>Hiển thị cây tệp, Hiển thị dàn ý, Hiển thị xem trước, Xuống dòng tự động, Kiểm tra chính tả, Ngôn ngữ kiểm tra chính tả, Cài đặt</td></tr>
@@ -1139,7 +1141,13 @@ $</code></pre>
         <p>Chuyển xem trước sang giao diện Sáng trước khi xuất PDF để có đầu ra sẵn sàng in đẹp nhất.</p>
       </div>
 
-      <h3>Nhập PDF <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>I</kbd></h3>
+            <h3>Xuất sang HTML</h3>
+      <p>Chọn <strong>Tệp → Xuất sang HTML…</strong>. MarkForge kết xuất tài liệu hiện tại thành tệp HTML độc lập với toàn bộ CSS nhúng nội tuyến và hình ảnh cục bộ được chuyển đổi thành URI dữ liệu Base64, giúp mở tệp trong bất kỳ trình duyệt nào mà không cần kết nối internet.</p>
+
+      <h3>Xuất qua Pandoc (DOCX, EPUB, LaTeX)</h3>
+      <p>Chọn <strong>Tệp → Xuất dạng DOCX (Pandoc)…</strong>, <strong>Xuất dạng EPUB (Pandoc)…</strong>, hoặc <strong>Xuất dạng LaTeX (Pandoc)…</strong>. Các tùy chọn này yêu cầu <a href="https://pandoc.org/installing.html" target="_blank">pandoc</a> được cài đặt và có trên PATH. Nếu pandoc không được tìm thấy, hộp thoại cảnh báo sẽ hiển thị.</p>
+
+<h3>Nhập PDF <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>I</kbd></h3>
       <p>Chọn <strong>Tệp → Nhập PDF…</strong> hoặc nhấn <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>I</kbd>. MarkForge chuyển đổi bất kỳ tệp PDF nào sang Markdown bằng thư viện <code>pymupdf4llm</code>. Quá trình chuyển đổi thông minh bảo toàn cấu trúc tài liệu:</p>
       <ul>
         <li>Tiêu đề và đoạn văn</li>

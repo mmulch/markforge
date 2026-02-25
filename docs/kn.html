@@ -607,7 +607,7 @@
   <article>
 
     <!-- ─── TITLE ─────────────────────────────────────────────────────────── -->
-    <h1>MarkForge ಬಳಕೆದಾರ ಕೈಪಿಡಿ <span class="version-badge">v1.7.2</span></h1>
+    <h1>MarkForge ಬಳಕೆದಾರ ಕೈಪಿಡಿ <span class="version-badge">v1.8.0</span></h1>
 
     <!-- ═══ 1. INTRODUCTION ═══════════════════════════════════════════════ -->
     <section id="introduction">
@@ -627,6 +627,8 @@
         <div class="feature-card"><strong>ಗಣಿತ ಸೂತ್ರಗಳು</strong><span>MathJax ಬಳಸಿ LaTeX ನೋಟೇಶನ್ ರೆಂಡರ್ ಆಗುತ್ತದೆ</span></div>
         <div class="feature-card"><strong>PDF ಆಮದು</strong><span>ಯಾವುದೇ PDF ಅನ್ನು ಸ್ವಯಂಚಾಲಿತವಾಗಿ Markdown ಗೆ ಪರಿವರ್ತಿಸಿ</span></div>
         <div class="feature-card"><strong>PDF ರಫ್ತು</strong><span>ಯಾವುದೇ ದಾಖಲೆಯಿಂದ ಮುದ್ರಣ-ಅನುಕೂಲ PDF</span></div>
+        <div class="feature-card"><strong>HTML ರಫ್ತು</strong><span>ಇನ್‌ಲೈನ್ CSS ಮತ್ತು ಚಿತ್ರಗಳೊಂದಿಗೆ ಸ್ವಯಂ-ಸಂಪೂರ್ಣ HTML</span></div>
+        <div class="feature-card"><strong>Pandoc ರಫ್ತು</strong><span>pandoc ಮೂಲಕ DOCX, EPUB, LaTeX (ಐಚ್ಛಿಕ)</span></div>
         <div class="feature-card"><strong>ಬಹುಭಾಷಾ</strong><span>ಇಂಗ್ಲಿಷ್ ಮತ್ತು ಜರ್ಮನ್ (Deutsch) ಬಳಕೆದಾರ ಇಂಟರ್‌ಫೇಸ್</span></div>
       </div>
     </section>
@@ -735,7 +737,7 @@ python src/main.py</code></pre>
         <table>
           <thead><tr><th>ಮೆನು</th><th>ವಿಷಯಗಳು</th></tr></thead>
           <tbody>
-            <tr><td><strong>ಫೈಲ್</strong></td><td>ಹೊಸದು, ತೆರೆ, ಫೋಲ್ಡರ್ ತೆರೆ, ಇತ್ತೀಚಿನ ಫೈಲ್‌ಗಳು, PDF ಆಮದು, Git ನಿಂದ ತೆರೆ, Git Squash, ಉಳಿಸಿ, ಹೆಸರಿನಡಿ ಉಳಿಸಿ, PDF ಆಗಿ ರಫ್ತು ಮಾಡಿ, ನಿರ್ಗಮಿಸಿ</td></tr>
+            <tr><td><strong>ಫೈಲ್</strong></td><td>ಹೊಸದು, ತೆರೆ, ಫೋಲ್ಡರ್ ತೆರೆ, ಇತ್ತೀಚಿನ ಫೈಲ್‌ಗಳು, PDF ಆಮದು, Git ನಿಂದ ತೆರೆ, Git Squash, ಉಳಿಸಿ, ಹೆಸರಿನಡಿ ಉಳಿಸಿ, HTML ಆಗಿ ರಫ್ತು ಮಾಡಿ, DOCX ಆಗಿ ರಫ್ತು ಮಾಡಿ (Pandoc), EPUB ಆಗಿ ರಫ್ತು ಮಾಡಿ (Pandoc), LaTeX ಆಗಿ ರಫ್ತು ಮಾಡಿ (Pandoc), PDF ಆಗಿ ರಫ್ತು ಮಾಡಿ, ನಿರ್ಗಮಿಸಿ</td></tr>
             <tr><td><strong>ಸಂಪಾದಿಸಿ</strong></td><td>Undo, Redo, ಕಟ್, ಕಾಪಿ, ಪೇಸ್ಟ್</td></tr>
             <tr><td><strong>ಸೇರಿಸಿ</strong></td><td>ಲಿಂಕ್, ಚಿತ್ರ, PlantUML, Mermaid, ಕೋಷ್ಟಕ</td></tr>
             <tr><td><strong>ನೋಟ</strong></td><td>ಫೈಲ್ ಟ್ರೀ ತೋರಿಸಿ, ರೂಪರೇಖೆ ತೋರಿಸಿ, ಮುನ್ನೋಟ ತೋರಿಸಿ, ಪದ ಮಡಿಕೆ, ಕಾಗುಣಿತ ಪರಿಶೀಲನೆ, ಕಾಗುಣಿತ ಪರಿಶೀಲನೆ ಭಾಷೆ, ಸೆಟ್ಟಿಂಗ್‌ಗಳು</td></tr>
@@ -1139,7 +1141,13 @@ $</code></pre>
         <p>ಅತ್ಯಂತ ಸ್ವಚ್ಛ ಮುದ್ರಣ-ಸಿದ್ಧ ಔಟ್‌ಪುಟ್‌ಗಾಗಿ PDF ಗೆ ರಫ್ತು ಮಾಡುವ ಮೊದಲು ಮುನ್ನೋಟವನ್ನು Light ಥೀಮ್‌ಗೆ ಬದಲಾಯಿಸಿ.</p>
       </div>
 
-      <h3>PDF ಆಮದು <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>I</kbd></h3>
+            <h3>HTML ಆಗಿ ರಫ್ತು ಮಾಡಿ</h3>
+      <p><strong>ಫೈಲ್ → HTML ಆಗಿ ರಫ್ತು ಮಾಡಿ…</strong> ಆಯ್ಕೆ ಮಾಡಿ. MarkForge ಪ್ರಸ್ತುತ ದಾಖಲೆಯನ್ನು ಸ್ವಯಂ-ಸಂಪೂರ್ಣ HTML ಫೈಲ್‌ಗೆ ರೆಂಡರ್ ಮಾಡುತ್ತದೆ — ಎಲ್ಲಾ CSS ಇನ್‌ಲೈನ್ ಮಾಡಲಾಗಿದೆ ಮತ್ತು ಸ್ಥಳೀಯ ಚಿತ್ರಗಳನ್ನು Base64 ಡೇಟಾ URI ಗಳಾಗಿ ಪರಿವರ್ತಿಸಲಾಗಿದೆ.</p>
+
+      <h3>Pandoc ಮೂಲಕ ರಫ್ತು (DOCX, EPUB, LaTeX)</h3>
+      <p><strong>ಫೈಲ್ → DOCX ಆಗಿ ರಫ್ತು ಮಾಡಿ (Pandoc)…</strong>, <strong>EPUB ಆಗಿ ರಫ್ತು ಮಾಡಿ (Pandoc)…</strong>, ಅಥವಾ <strong>LaTeX ಆಗಿ ರಫ್ತು ಮಾಡಿ (Pandoc)…</strong> ಆಯ್ಕೆ ಮಾಡಿ. <a href="https://pandoc.org/installing.html" target="_blank">pandoc</a> ಸ್ಥಾಪಿಸಲಾಗಿದ್ದರೆ ಮತ್ತು PATH ನಲ್ಲಿದ್ದರೆ ಮಾತ್ರ ಈ ಆಯ್ಕೆಗಳು ಕೆಲಸ ಮಾಡುತ್ತವೆ. pandoc ಕಂಡುಬಂದಿಲ್ಲವಾದರೆ ಎಚ್ಚರಿಕೆ ಸಂವಾದ ತೋರಿಸಲಾಗುತ್ತದೆ.</p>
+
+<h3>PDF ಆಮದು <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>I</kbd></h3>
       <p><strong>ಫೈಲ್ → PDF ಆಮದು…</strong> ಆರಿಸಿ ಅಥವಾ <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>I</kbd> ಒತ್ತಿರಿ. MarkForge <code>pymupdf4llm</code> ಲೈಬ್ರರಿ ಬಳಸಿ ಯಾವುದೇ PDF ಫೈಲ್ ಅನ್ನು Markdown ಗೆ ಪರಿವರ್ತಿಸುತ್ತದೆ. ಪರಿವರ್ತನೆ ದಾಖಲೆ ರಚನೆಯನ್ನು ಬುದ್ಧಿವಂತಿಕೆಯಿಂದ ಸಂರಕ್ಷಿಸುತ್ತದೆ:</p>
       <ul>
         <li>ಶೀರ್ಷಿಕೆಗಳು ಮತ್ತು ಪ್ಯಾರಾಗ್ರಾಫ್‌ಗಳು</li>

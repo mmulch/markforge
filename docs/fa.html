@@ -618,7 +618,7 @@
   <article>
 
     <!-- ─── عنوان ─────────────────────────────────────────────────────────── -->
-    <h1>راهنمای کاربر MarkForge <span class="version-badge">v1.7.2</span></h1>
+    <h1>راهنمای کاربر MarkForge <span class="version-badge">v1.8.0</span></h1>
 
     <!-- ═══ ۱. مقدمه ════════════════════════════════════════════════════ -->
     <section id="muqaddima">
@@ -638,6 +638,8 @@
         <div class="feature-card"><strong>فرمول‌های ریاضی</strong><span>نماد LaTeX با MathJax رندر می‌شود</span></div>
         <div class="feature-card"><strong>وارد کردن PDF</strong><span>تبدیل خودکار هر PDF به Markdown</span></div>
         <div class="feature-card"><strong>صادر کردن PDF</strong><span>PDF بهینه‌شده برای چاپ از هر سندی</span></div>
+        <div class="feature-card"><strong>صادر کردن HTML</strong><span>HTML مستقل با CSS و تصاویر تعبیه‌شده</span></div>
+        <div class="feature-card"><strong>صادر کردن Pandoc</strong><span>DOCX، EPUB، LaTeX از طریق pandoc (اختیاری)</span></div>
         <div class="feature-card"><strong>چندزبانه</strong><span>رابط کاربری به زبان‌های انگلیسی و آلمانی</span></div>
       </div>
     </section>
@@ -746,7 +748,7 @@ python src/main.py</code></pre>
         <table>
           <thead><tr><th>منو</th><th>محتوا</th></tr></thead>
           <tbody>
-            <tr><td><strong>فایل</strong></td><td>جدید، باز کردن، باز کردن پوشه، فایل‌های اخیر، وارد کردن PDF، باز کردن از Git، Git Squash، ذخیره، ذخیره به عنوان، صادر کردن به عنوان PDF، خروج</td></tr>
+            <tr><td><strong>فایل</strong></td><td>جدید، باز کردن، باز کردن پوشه، فایل‌های اخیر، وارد کردن PDF، باز کردن از Git، Git Squash، ذخیره، ذخیره به عنوان، صادر کردن به عنوان HTML، صادر کردن به عنوان DOCX (Pandoc)، صادر کردن به عنوان EPUB (Pandoc)، صادر کردن به عنوان LaTeX (Pandoc)، صادر کردن به عنوان PDF، خروج</td></tr>
             <tr><td><strong>ویرایش</strong></td><td>برگشت، بازگشت، برش، کپی، چسباندن</td></tr>
             <tr><td><strong>درج</strong></td><td>پیوند، تصویر، PlantUML، Mermaid، جدول</td></tr>
             <tr><td><strong>نمایش</strong></td><td>نمایش درخت فایل، نمایش ساختار، نمایش پیش‌نمایش، شکستن خط، بررسی غلط‌نما، زبان بررسی غلط‌نما، تنظیمات</td></tr>
@@ -1149,7 +1151,13 @@ $</code></pre>
         <p>قبل از صادر کردن به PDF، پیش‌نمایش را به تم روشن تغییر دهید تا خروجی تمیزترین حالت آماده برای چاپ را داشته باشد.</p>
       </div>
 
-      <h3>وارد کردن PDF <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>I</kbd></h3>
+            <h3>صادر کردن به عنوان HTML</h3>
+      <p><strong>فایل ← صادر کردن به عنوان HTML…</strong> را انتخاب کنید. MarkForge سند جاری را به یک فایل HTML مستقل تبدیل می‌کند که تمام CSS در آن تعبیه شده و تصاویر محلی به URI داده Base64 تبدیل شده‌اند، بنابراین فایل در هر مرورگری بدون اتصال به اینترنت باز می‌شود.</p>
+
+      <h3>صادر کردن از طریق Pandoc (DOCX، EPUB، LaTeX)</h3>
+      <p><strong>فایل ← صادر کردن به عنوان DOCX (Pandoc)…</strong>، <strong>صادر کردن به عنوان EPUB (Pandoc)…</strong> یا <strong>صادر کردن به عنوان LaTeX (Pandoc)…</strong> را انتخاب کنید. این گزینه‌ها نیاز به نصب <a href="https://pandoc.org/installing.html" target="_blank">pandoc</a> و در دسترس بودن آن در PATH دارند. اگر pandoc یافت نشد، یک کادر هشدار نمایش داده می‌شود.</p>
+
+<h3>وارد کردن PDF <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>I</kbd></h3>
       <p><strong>فایل → وارد کردن PDF…</strong> را انتخاب کنید یا <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>I</kbd> فشار دهید. MarkForge هر فایل PDF را با استفاده از کتابخانه <code>pymupdf4llm</code> به Markdown تبدیل می‌کند. تبدیل ساختار سند را به طور هوشمند حفظ می‌کند:</p>
       <ul>
         <li>سرتیترها و پاراگراف‌ها</li>

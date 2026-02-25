@@ -606,7 +606,7 @@
   <article>
 
     <!-- ─── TITEL ─────────────────────────────────────────────────────────── -->
-    <h1>MarkForge Gebruikershandleiding <span class="version-badge">v1.7.2</span></h1>
+    <h1>MarkForge Gebruikershandleiding <span class="version-badge">v1.8.0</span></h1>
 
     <!-- ═══ 1. INLEIDING ══════════════════════════════════════════════════ -->
     <section id="inleiding">
@@ -626,6 +626,8 @@
         <div class="feature-card"><strong>Wiskundige formules</strong><span>LaTeX-notatie weergegeven met MathJax</span></div>
         <div class="feature-card"><strong>PDF importeren</strong><span>Elk PDF automatisch naar Markdown converteren</span></div>
         <div class="feature-card"><strong>PDF exporteren</strong><span>Afdrukgeoptimaliseerde PDF van elk document</span></div>
+        <div class="feature-card"><strong>HTML exporteren</strong><span>Zelfstandige HTML met ingesloten CSS en afbeeldingen</span></div>
+        <div class="feature-card"><strong>Pandoc exporteren</strong><span>DOCX, EPUB, LaTeX via pandoc (optioneel)</span></div>
         <div class="feature-card"><strong>Meertalig</strong><span>Gebruikersinterface in het Engels en Duits</span></div>
       </div>
     </section>
@@ -734,7 +736,7 @@ python src/main.py</code></pre>
         <table>
           <thead><tr><th>Menu</th><th>Inhoud</th></tr></thead>
           <tbody>
-            <tr><td><strong>Bestand</strong></td><td>Nieuw, Openen, Map openen, Recente bestanden, PDF importeren, Bestand openen vanuit Git, Git-branch openen, Git Squash, Opslaan, Opslaan als, Exporteren als PDF, Afsluiten</td></tr>
+            <tr><td><strong>Bestand</strong></td><td>Nieuw, Openen, Map openen, Recente bestanden, PDF importeren, Bestand openen vanuit Git, Git-branch openen, Git Squash, Opslaan, Opslaan als, Exporteren als HTML, Exporteren als DOCX (Pandoc), Exporteren als EPUB (Pandoc), Exporteren als LaTeX (Pandoc), Exporteren als PDF, Afsluiten</td></tr>
             <tr><td><strong>Bewerken</strong></td><td>Ongedaan maken, Opnieuw uitvoeren, Knippen, Kopiëren, Plakken</td></tr>
             <tr><td><strong>Invoegen</strong></td><td>Koppeling, Afbeelding, PlantUML, Mermaid, Tabel</td></tr>
             <tr><td><strong>Beeld</strong></td><td>Bestandsstructuur tonen, Overzicht tonen, Voorvertoning tonen, Tekstterugloop, Spellingcontrole, Spellingcontrole-taal, Instellingen</td></tr>
@@ -1137,7 +1139,13 @@ $</code></pre>
         <p>Schakel de voorvertoning over naar het Licht-thema voordat u naar PDF exporteert voor de schoonste afdrukklare uitvoer.</p>
       </div>
 
-      <h3>PDF importeren <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>I</kbd></h3>
+            <h3>Exporteren als HTML</h3>
+      <p>Kies <strong>Bestand → Exporteren als HTML…</strong>. MarkForge rendert het huidige document naar een zelfstandig HTML-bestand met alle CSS inline en lokale afbeeldingen omgezet naar Base64 data-URI's, zodat het bestand in elke browser kan worden geopend zonder internetverbinding.</p>
+
+      <h3>Exporteren via Pandoc (DOCX, EPUB, LaTeX)</h3>
+      <p>Kies <strong>Bestand → Exporteren als DOCX (Pandoc)…</strong>, <strong>Exporteren als EPUB (Pandoc)…</strong> of <strong>Exporteren als LaTeX (Pandoc)…</strong>. Deze opties vereisen dat <a href="https://pandoc.org/installing.html" target="_blank">pandoc</a> is geïnstalleerd en beschikbaar is in het PATH. Als pandoc niet wordt gevonden, verschijnt er een waarschuwingsdialoog.</p>
+
+<h3>PDF importeren <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>I</kbd></h3>
       <p>Kies <strong>Bestand → PDF importeren…</strong> of druk op <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>I</kbd>. MarkForge converteert elk PDF-bestand naar Markdown met de bibliotheek <code>pymupdf4llm</code>. De conversie behoudt de documentstructuur intelligent:</p>
       <ul>
         <li>Koppen en alinea's</li>

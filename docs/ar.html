@@ -617,7 +617,7 @@
   <article>
 
     <!-- ─── TITLE ─────────────────────────────────────────────────────────── -->
-    <h1>دليل مستخدم MarkForge <span class="version-badge">v1.7.2</span></h1>
+    <h1>دليل مستخدم MarkForge <span class="version-badge">v1.8.0</span></h1>
 
     <!-- ═══ 1. INTRODUCTION ═══════════════════════════════════════════════ -->
     <section id="introduction">
@@ -637,6 +637,8 @@
         <div class="feature-card"><strong>الصيغ الرياضية</strong><span>ترميز LaTeX يُعرض باستخدام MathJax</span></div>
         <div class="feature-card"><strong>استيراد PDF</strong><span>تحويل أي PDF إلى Markdown تلقائياً</span></div>
         <div class="feature-card"><strong>تصدير PDF</strong><span>PDF محسَّن للطباعة من أي مستند</span></div>
+        <div class="feature-card"><strong>تصدير HTML</strong><span>HTML مكتفٍ بذاته مع CSS وصور مضمَّنة</span></div>
+        <div class="feature-card"><strong>تصدير عبر Pandoc</strong><span>DOCX وEPUB وLaTeX عبر pandoc (اختياري)</span></div>
         <div class="feature-card"><strong>متعدد اللغات</strong><span>واجهة مستخدم بـ 14 لغة: EN, DE, ES, FR, IT, NL, PT, AR, FA, VI, SV, UK, KN, HI</span></div>
       </div>
     </section>
@@ -745,7 +747,7 @@ python src/main.py</code></pre>
         <table>
           <thead><tr><th>القائمة</th><th>المحتويات</th></tr></thead>
           <tbody>
-            <tr><td><strong>ملف</strong></td><td>جديد، فتح، فتح مجلد، الملفات الأخيرة، استيراد PDF، فتح من Git، Git Squash، حفظ، حفظ باسم، تصدير كـ PDF، إنهاء</td></tr>
+            <tr><td><strong>ملف</strong></td><td>جديد، فتح، فتح مجلد، الملفات الأخيرة، استيراد PDF، فتح من Git، Git Squash، حفظ، حفظ باسم، تصدير كـ HTML، تصدير كـ DOCX (Pandoc)، تصدير كـ EPUB (Pandoc)، تصدير كـ LaTeX (Pandoc)، تصدير كـ PDF، إنهاء</td></tr>
             <tr><td><strong>تحرير</strong></td><td>تراجع، إعادة، قص، نسخ، لصق</td></tr>
             <tr><td><strong>إدراج</strong></td><td>رابط، صورة، PlantUML، Mermaid، جدول</td></tr>
             <tr><td><strong>عرض</strong></td><td>إظهار شجرة الملفات، إظهار المخطط التفصيلي، إظهار المعاينة، التفاف الكلمات، تدقيق إملائي، لغة التدقيق الإملائي، الإعدادات</td></tr>
@@ -1149,7 +1151,13 @@ $</code></pre>
         <p>بدِّل المعاينة إلى الثيم الفاتح قبل التصدير إلى PDF للحصول على أنظف مخرجات جاهزة للطباعة.</p>
       </div>
 
-      <h3>استيراد PDF <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>I</kbd></h3>
+            <h3>تصدير كـ HTML</h3>
+      <p>اختر <strong>ملف ← تصدير كـ HTML…</strong>. يُصيِّر MarkForge المستند الحالي إلى ملف HTML مكتفٍ بذاته يحتوي على جميع أنماط CSS مضمَّنة وصور محلية محوَّلة إلى بيانات Base64 URI، بحيث يمكن فتح الملف في أي متصفح دون اتصال بالإنترنت.</p>
+
+      <h3>التصدير عبر Pandoc (DOCX وEPUB وLaTeX)</h3>
+      <p>اختر <strong>ملف ← تصدير كـ DOCX (Pandoc)…</strong> أو <strong>تصدير كـ EPUB (Pandoc)…</strong> أو <strong>تصدير كـ LaTeX (Pandoc)…</strong>. تتطلب هذه الخيارات تثبيت <a href="https://pandoc.org/installing.html" target="_blank">pandoc</a> وإتاحته في PATH. يُمرِّر MarkForge نص Markdown المصدر إلى pandoc ويحفظ النتيجة. إذا لم يُعثَر على pandoc، تظهر رسالة تحذير.</p>
+
+<h3>استيراد PDF <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>I</kbd></h3>
       <p>اختر <strong>ملف ← استيراد PDF…</strong> أو اضغط <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>I</kbd>. يُحوِّل MarkForge أي ملف PDF إلى Markdown باستخدام مكتبة <code>pymupdf4llm</code>. يحافظ التحويل بذكاء على هيكل المستند:</p>
       <ul>
         <li>العناوين والفقرات</li>
