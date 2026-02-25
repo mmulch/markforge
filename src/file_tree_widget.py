@@ -54,8 +54,9 @@ class _HideEmptyDirsProxy(QSortFilterProxyModel):
             # Always accept root → mapFromSource always returns a valid index
             if os.path.normpath(model.filePath(idx)) == self._root:
                 return True
-            # All other directories: only show if a descendant matches
-            return False
+            # Accept all subdirectories; setRecursiveFilteringEnabled(True) will
+            # hide any directory whose descendants have no matching files.
+            return True
 
         # Files: QFileSystemModel has already filtered by _NAME_FILTERS
         return True

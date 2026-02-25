@@ -20,14 +20,17 @@ A modern, feature-rich Markdown editor built with Python and PyQt6. Includes a l
 - **Document Outline** — collapsible heading tree in the left panel; click any heading to jump there; toggle via View → Show outline
 - **Recent Files** — File → Recent Files submenu tracks the last 10 opened files, persisted between sessions
 - **Spell check** — underlines misspelled words with a red wavy line; 14 languages (EN, DE, ES, FR, IT, NL, PT, AR, FA via pyspellchecker; VI, SV, UK, KN, HI via enchant/Hunspell); toggle and select language via View menu
-- **File tree** — browse Markdown files and images in the project directory
+- **Image paste** — paste a screenshot or copied image from the clipboard (`Ctrl+V`) directly into the editor; the image is saved as `assets/image_NNN.png` and an `![]()` link is inserted automatically
+- **Drag-and-drop insertion** — drag image files from a file manager onto the editor to insert a relative `![]()` link; drag any other file to insert a `[name](path)` link
+- **File tree** — browse Markdown files and images in the project directory, including subdirectories
+- **Open Git Branch** — clone and browse an entire Git branch as a folder in the file tree; click any file to open it and push changes back (File → Open Git Branch…)
 - **Insert dialogs** — guided dialogs for links, images, tables, PlantUML diagrams, and Mermaid diagrams
 - **PlantUML support** — embed diagrams rendered via the PlantUML online service
 - **Mermaid support** — flowcharts, sequence, class, state, Gantt, pie, ER, git graph, mind map — rendered via kroki.io
 - **Math formulas** — LaTeX notation rendered with MathJax
 - **PDF import** — import any PDF and convert it to Markdown automatically (headings, paragraphs, tables preserved)
 - **PDF export** — export the current document as a PDF
-- **Git integration** — open Markdown files directly from GitHub, GitHub Enterprise, Bitbucket Cloud, or Bitbucket Server; edit and push back without leaving the editor; amend the previous commit or squash multiple commits in one step (see [Git Integration](#git-integration))
+- **Git integration** — open individual files or entire branches directly from GitHub, GitHub Enterprise, Bitbucket Cloud, or Bitbucket Server; edit and push back without leaving the editor; amend the previous commit or squash multiple commits in one step (see [Git Integration](#git-integration))
 - **Word count & cursor position** — always visible in the status bar
 - **Online user manual** — comprehensive documentation in 14 languages: EN, DE, AR, VI, SV, UK, KN, HI, ES, FR, IT, NL, PT, FA (see [User Manual](docs/index.html))
 - **Multilingual** — UI available in 14 languages: English, Deutsch, Español, Français, Italiano, Nederlands, Português, عربي, فارسی, Tiếng Việt, Svenska, Українська, ಕನ್ನಡ, हिंदी
@@ -39,7 +42,7 @@ A modern, feature-rich Markdown editor built with Python and PyQt6. Includes a l
 |---|---|
 | New | `Ctrl+N` |
 | Open | `Ctrl+O` |
-| Open from Git | `Ctrl+Shift+G` |
+| Open File from Git | `Ctrl+Shift+G` |
 | Git Squash | `Ctrl+Shift+Q` |
 | Save | `Ctrl+S` |
 | Save As | `Ctrl+Shift+S` |
@@ -124,7 +127,7 @@ The platform is auto-detected from the URL structure, not the hostname — so an
 
 ### Opening a file
 
-1. **File → Open from Git…** (`Ctrl+Shift+G`)
+1. **File → Open File from Git…** (`Ctrl+Shift+G`)
 2. Paste the URL of any file from one of the supported platforms
 3. MarkForge validates the URL and shows a preview (`platform · owner/repo · path/to/file.md`)
 4. Optionally override the branch in the **Ref** field

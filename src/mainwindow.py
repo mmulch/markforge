@@ -27,7 +27,7 @@ from editor_widget import EditorWidget
 from file_tree_widget import FileTreeWidget
 from find_replace_bar import FindReplaceBar
 from outline_widget import OutlineWidget
-from git_dialogs import GitCommitDialog, GitOpenDialog, GitSquashDialog
+from git_dialogs import GitCommitDialog, GitOpenDialog, GitOpenFolderDialog, GitSquashDialog
 from git_manager import GitFileInfo, CommitSpec  # noqa: F401
 from i18n import LANGUAGES, SPELL_CHECK_LANGUAGES, tr
 from insert_media_dialogs import InsertImageDialog, InsertLinkDialog
@@ -85,6 +85,33 @@ class _GitCloneWorker(QThread):
                 )
             self._info.local_repo_path = tmpdir
             self._info.local_file_path = local_file
+            self.finished.emit(self._info)
+        except Exception as exc:
+            self.failed.emit(str(exc), tmpdir)
+
+    def _on_progress(self, pct: int, msg: str) -> None:
+        self.progress.emit(pct, msg)
+
+
+class _GitCloneFolderWorker(QThread):
+    """Clones a git repo for folder browsing (no specific file required)."""
+
+    finished = pyqtSignal(object)   # GitFileInfo with local_repo_path set
+    failed   = pyqtSignal(str, str) # error message, tmpdir (for cleanup)
+    progress = pyqtSignal(int, str) # percent, status message
+
+    def __init__(self, info: GitFileInfo, settings: QSettings, parent=None) -> None:
+        super().__init__(parent)
+        self._info     = info
+        self._settings = settings
+
+    def run(self) -> None:
+        from git_manager import clone_repo_full
+        tmpdir = ""
+        try:
+            tmpdir = clone_repo_full(self._info, self._settings, self._on_progress)
+            self._info.local_repo_path = tmpdir
+            self._info.local_file_path = ""
             self.finished.emit(self._info)
         except Exception as exc:
             self.failed.emit(str(exc), tmpdir)
@@ -165,8 +192,11 @@ class MainWindow(QMainWindow):
         self._pdf_output_path: str                    = ""
 
         self._git_file_info:      GitFileInfo | None      = None
+        self._git_folder_root:    str                     = ""
         self._git_clone_worker:   _GitCloneWorker | None  = None
         self._git_clone_progress: QProgressDialog | None  = None
+        self._git_clone_folder_worker:   _GitCloneFolderWorker | None = None
+        self._git_clone_folder_progress: QProgressDialog | None      = None
         self._git_push_worker:    _GitPushWorker | None    = None
         self._git_push_progress:  QProgressDialog | None  = None
         self._git_squash_worker:  _GitSquashWorker | None = None
@@ -194,6 +224,7 @@ class MainWindow(QMainWindow):
     def _build_ui(self) -> None:
         self._splitter = QSplitter(Qt.Orientation.Horizontal)
         self._editor   = EditorWidget()
+        self._editor.set_assets_dir_provider(self._get_assets_dir)
         self._preview  = PreviewWidget()
         self._splitter.addWidget(self._editor)
         self._splitter.addWidget(self._preview)
@@ -237,8 +268,9 @@ class MainWindow(QMainWindow):
         self._act_open        = self._mk_action(tr("&Open …"),        QKeySequence.StandardKey.Open, m)
         self._act_open_folder = self._mk_action(tr("Open &Folder …"), "Ctrl+Shift+O",                m)
         self._act_import_pdf  = self._mk_action(tr("&Import PDF …"),  "Ctrl+Shift+I",                m)
-        self._act_open_git    = self._mk_action(tr("Open from &Git …"), "Ctrl+Shift+G",              m)
-        self._act_git_squash  = self._mk_action(tr("Git &Squash …"),   "Ctrl+Shift+Q",              m)
+        self._act_open_git        = self._mk_action(tr("Open &File from Git …"),    "Ctrl+Shift+G", m)
+        self._act_open_git_folder = self._mk_action(tr("Open Git &Branch …"), None, m)
+        self._act_git_squash      = self._mk_action(tr("Git &Squash …"),           "Ctrl+Shift+Q", m)
         self._act_git_squash.setEnabled(False)
         m.addSeparator()
         self._recent_menu = m.addMenu(tr("Recent &Files"))
@@ -376,6 +408,7 @@ class MainWindow(QMainWindow):
         self._act_open_folder.triggered.connect(self._open_folder)
         self._act_import_pdf.triggered.connect(self._import_pdf)
         self._act_open_git.triggered.connect(self._open_from_git)
+        self._act_open_git_folder.triggered.connect(self._open_folder_from_git)
         self._act_git_squash.triggered.connect(self._git_squash)
         self._act_save.triggered.connect(self._save)
         self._act_save_as.triggered.connect(self._save_as)
@@ -439,6 +472,12 @@ class MainWindow(QMainWindow):
         else:
             directory = os.path.abspath(os.getcwd())
         return QUrl.fromLocalFile(directory + "/")
+
+    def _get_assets_dir(self) -> str | None:
+        """Return the assets/ directory next to the current file, or None if no file is open."""
+        if not self._file:
+            return None
+        return os.path.join(os.path.dirname(os.path.abspath(self._file)), "assets")
 
     def _update_pos(self) -> None:
         cur = self._editor.textCursor()
@@ -529,6 +568,7 @@ class MainWindow(QMainWindow):
             return
         path = QFileDialog.getExistingDirectory(self, tr("Open Folder"))
         if path:
+            self._git_folder_root = ""
             self._file_tree.set_root(path)
             self._file_tree.setVisible(True)
             self._act_filetree.setChecked(True)
@@ -651,7 +691,7 @@ class MainWindow(QMainWindow):
         if not user and not token and not key:
             reply = QMessageBox.information(
                 self,
-                tr("Open from Git"),
+                tr("Open File from Git"),
                 tr(
                     "No credentials configured. Public repositories will still work.\n"
                     "Configure credentials in View → Settings."
@@ -661,7 +701,7 @@ class MainWindow(QMainWindow):
             if reply == QMessageBox.StandardButton.Cancel:
                 return
 
-        dlg = GitOpenDialog(self)
+        dlg = GitOpenDialog(s, self)
         if dlg.exec() != QDialog.DialogCode.Accepted:
             return
         info = dlg.get_info()
@@ -671,7 +711,7 @@ class MainWindow(QMainWindow):
         self._git_clone_progress = QProgressDialog(
             tr("Cloning repository …"), tr("Cancel"), 0, 100, self
         )
-        self._git_clone_progress.setWindowTitle(tr("Open from Git"))
+        self._git_clone_progress.setWindowTitle(tr("Open File from Git"))
         self._git_clone_progress.setWindowModality(Qt.WindowModality.ApplicationModal)
         self._git_clone_progress.setAutoClose(False)
         self._git_clone_progress.setAutoReset(False)
@@ -714,7 +754,7 @@ class MainWindow(QMainWindow):
         if tmpdir:
             shutil.rmtree(tmpdir, ignore_errors=True)
         QMessageBox.critical(
-            self, tr("Open from Git"), tr("Clone failed:\n{exc}", exc=msg)
+            self, tr("Open File from Git"), tr("Clone failed:\n{exc}", exc=msg)
         )
 
     def _on_clone_canceled(self) -> None:
@@ -731,6 +771,104 @@ class MainWindow(QMainWindow):
         if self._git_clone_progress is not None:
             self._git_clone_progress.close()
             self._git_clone_progress = None
+
+    # ── Open Folder from Git ──────────────────────────────────────────────────
+
+    def _open_folder_from_git(self) -> None:
+        if self._git_clone_folder_worker is not None:
+            return  # clone already running
+        if not self._maybe_save():
+            return
+
+        s = QSettings("MarkdownEditor", "MarkdownEditor")
+        user  = s.value("git/https_username", "")
+        token = s.value("git/https_token",    "")
+        key   = s.value("git/ssh_key_path",   "")
+        if not user and not token and not key:
+            reply = QMessageBox.information(
+                self,
+                tr("Open Git Branch"),
+                tr(
+                    "No credentials configured. Public repositories will still work.\n"
+                    "Configure credentials in View → Settings."
+                ),
+                QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Cancel,
+            )
+            if reply == QMessageBox.StandardButton.Cancel:
+                return
+
+        dlg = GitOpenFolderDialog(s, self)
+        if dlg.exec() != QDialog.DialogCode.Accepted:
+            return
+        info = dlg.get_info()
+        if info is None:
+            return
+
+        self._git_clone_folder_progress = QProgressDialog(
+            tr("Cloning repository …"), tr("Cancel"), 0, 100, self
+        )
+        self._git_clone_folder_progress.setWindowTitle(tr("Open Git Branch"))
+        self._git_clone_folder_progress.setWindowModality(Qt.WindowModality.ApplicationModal)
+        self._git_clone_folder_progress.setAutoClose(False)
+        self._git_clone_folder_progress.setAutoReset(False)
+        self._git_clone_folder_progress.canceled.connect(self._on_clone_folder_canceled)
+        self._git_clone_folder_progress.show()
+
+        self._git_clone_folder_worker = _GitCloneFolderWorker(info, s, self)
+        self._git_clone_folder_worker.finished.connect(self._on_clone_folder_done)
+        self._git_clone_folder_worker.failed.connect(self._on_clone_folder_failed)
+        self._git_clone_folder_worker.progress.connect(self._on_clone_folder_progress)
+        self._git_clone_folder_worker.start()
+
+    def _on_clone_folder_progress(self, pct: int, msg: str) -> None:
+        dlg = self._git_clone_folder_progress
+        if dlg is not None:
+            dlg.setValue(pct)
+            if msg:
+                dlg.setLabelText(tr("Cloning repository …") + f"\n{msg}")
+
+    def _on_clone_folder_done(self, info: GitFileInfo) -> None:
+        if self._git_clone_folder_progress is not None:
+            self._git_clone_folder_progress.close()
+            self._git_clone_folder_progress = None
+        self._git_clone_folder_worker = None
+        self._git_file_info  = info
+        self._git_folder_root = info.local_repo_path
+        # Reset per-session push tracking
+        self._git_push_count         = 0
+        self._git_last_commit_msg    = ""
+        self._git_pending_commit_msg = ""
+        self._update_squash_action()
+        self._file_tree.set_root(info.local_repo_path)
+        self._file_tree.setVisible(True)
+        self._act_filetree.setChecked(True)
+        self._file_tree.mark_git_root(info.local_repo_path, info.repo)
+
+    def _on_clone_folder_failed(self, msg: str, tmpdir: str) -> None:
+        if self._git_clone_folder_progress is not None:
+            self._git_clone_folder_progress.close()
+            self._git_clone_folder_progress = None
+        self._git_clone_folder_worker = None
+        if tmpdir:
+            shutil.rmtree(tmpdir, ignore_errors=True)
+        QMessageBox.critical(
+            self, tr("Open Git Branch"), tr("Clone failed:\n{exc}", exc=msg)
+        )
+
+    def _on_clone_folder_canceled(self) -> None:
+        if self._git_clone_folder_worker is not None:
+            try:
+                self._git_clone_folder_worker.finished.disconnect(self._on_clone_folder_done)
+                self._git_clone_folder_worker.failed.disconnect(self._on_clone_folder_failed)
+                self._git_clone_folder_worker.progress.disconnect(self._on_clone_folder_progress)
+            except RuntimeError:
+                pass
+            self._git_clone_folder_worker.terminate()
+            self._git_clone_folder_worker.wait()
+            self._git_clone_folder_worker = None
+        if self._git_clone_folder_progress is not None:
+            self._git_clone_folder_progress.close()
+            self._git_clone_folder_progress = None
 
     # ── Git save (commit & push) ───────────────────────────────────────────────
 
@@ -915,7 +1053,8 @@ class MainWindow(QMainWindow):
         # Clear git context if we're loading a file outside the current git repo
         if self._git_file_info is not None:
             if not path.startswith(self._git_file_info.local_repo_path):
-                self._git_file_info = None
+                self._git_file_info  = None
+                self._git_folder_root = ""
                 self._file_tree.clear_git_marker()
                 self._update_squash_action()
 
@@ -932,8 +1071,20 @@ class MainWindow(QMainWindow):
         self._modified   = False
         self._set_editor_active(True)
         self._update_title()
-        self._file_tree.set_root(os.path.dirname(os.path.abspath(path)))
-        self._file_tree.select_file(path)
+
+        # In git-folder mode, keep the tree rooted at the repo root and update
+        # which file the git context is tracking.
+        if self._git_folder_root and path.startswith(self._git_folder_root):
+            rel = os.path.relpath(path, self._git_folder_root).replace("\\", "/")
+            self._git_file_info.file_path       = rel
+            self._git_file_info.local_file_path = path
+            self._file_tree.set_root(self._git_folder_root)
+            self._file_tree.select_file(path)
+            self._file_tree.mark_git_root(self._git_folder_root, self._git_file_info.repo)
+        else:
+            self._file_tree.set_root(os.path.dirname(os.path.abspath(path)))
+            self._file_tree.select_file(path)
+
         self._add_to_recent(path)
         # Defer the preview so the editor becomes visible immediately; the
         # preview (which may fetch remote resources like PlantUML) renders on

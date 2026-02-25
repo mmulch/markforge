@@ -14,6 +14,7 @@ import base64
 import io
 import json
 import os
+import pathlib
 import shutil
 import tempfile
 import urllib.error
@@ -105,9 +106,9 @@ def parse_git_url(url: str) -> GitFileInfo:
         if not file_path:
             raise ValueError("The URL does not point to a file (file path is empty).")
 
-        # Branch from ?at= query param; strip refs/heads/ / refs/tags/ prefix
+        # Branch from ?at= query param; empty string means "detect later"
         qs = parse_qs(parsed.query)
-        at = qs.get("at", ["main"])[0]
+        at = qs.get("at", [""])[0]
         branch = at
         for prefix in ("refs/heads/", "refs/tags/"):
             if branch.startswith(prefix):
@@ -182,12 +183,109 @@ def parse_git_url(url: str) -> GitFileInfo:
     )
 
 
+def parse_git_repo_url(url: str) -> GitFileInfo:
+    """Parse a repository URL (no file path required) into a GitFileInfo.
+
+    Supported patterns:
+      GitHub / GHE:        …/owner/repo   or  …/owner/repo/tree/branch
+      Bitbucket Cloud:     …/owner/repo
+      Bitbucket Server/DC: …/projects/PROJ/repos/repo  (with or without /browse)
+    """
+    url    = url.strip()
+    parsed = urlparse(url)
+    host   = parsed.hostname or ""
+    base_url = f"{parsed.scheme}://{parsed.netloc}"
+    parts    = [p for p in parsed.path.strip("/").split("/") if p]
+
+    # ── Bitbucket Server: /projects/PROJ/repos/REPO[/...] ────────────────────
+    if (
+        len(parts) >= 4
+        and parts[0].lower() == "projects"
+        and parts[2].lower() == "repos"
+    ):
+        project_key = parts[1]
+        repo        = parts[3]
+        qs     = parse_qs(parsed.query)
+        branch = qs.get("at", [""])[0]
+        for prefix in ("refs/heads/", "refs/tags/"):
+            if branch.startswith(prefix):
+                branch = branch[len(prefix):]
+                break
+        clone_url = f"{base_url}/scm/{project_key.lower()}/{repo}.git"
+        return GitFileInfo(
+            platform="bitbucket_server",
+            owner=project_key, repo=repo, branch=branch,
+            file_path="", clone_url=clone_url, base_url=base_url,
+        )
+
+    if len(parts) < 2:
+        raise ValueError(
+            "Could not recognise repository URL. Supported patterns:\n"
+            "  GitHub / GHE:          …/owner/repo  or  …/owner/repo/tree/branch\n"
+            "  Bitbucket Cloud:       …/owner/repo\n"
+            "  Bitbucket Server/DC:   …/projects/PROJ/repos/repo"
+        )
+
+    owner = parts[0]
+    repo  = parts[1]
+    if repo.endswith(".git"):
+        repo = repo[:-4]
+
+    # ── Bitbucket Cloud: bitbucket.org ────────────────────────────────────────
+    if host == "bitbucket.org":
+        clone_url = f"https://bitbucket.org/{owner}/{repo}.git"
+        return GitFileInfo(
+            platform="bitbucket",
+            owner=owner, repo=repo, branch="",
+            file_path="", clone_url=clone_url, base_url=base_url,
+        )
+
+    # ── GitHub / GitHub Enterprise ────────────────────────────────────────────
+    branch = ""
+    if len(parts) >= 4 and parts[2].lower() == "tree":
+        branch = parts[3]
+    clone_url = f"{base_url}/{owner}/{repo}.git"
+    platform  = "github" if host == "github.com" else "github_enterprise"
+    return GitFileInfo(
+        platform=platform,
+        owner=owner, repo=repo, branch=branch,
+        file_path="", clone_url=clone_url, base_url=base_url,
+    )
+
+
 # ── Auth helpers ──────────────────────────────────────────────────────────────
 
 def _build_https_clone_url(base: str, user: str, token: str) -> str:
     """Embed credentials into an HTTPS clone URL."""
     scheme = base.split("://")[0]
     return base.replace(f"{scheme}://", f"{scheme}://{user}:{token}@", 1)
+
+
+def fetch_default_branch(info: GitFileInfo, settings) -> str:
+    """Query the platform API to discover the repository's default branch.
+
+    Returns the branch name, or '' on failure (no credentials, network error, etc.).
+    """
+    headers = _https_headers(settings, info.platform)
+    try:
+        if info.platform in ("github", "github_enterprise"):
+            base = ("https://api.github.com" if info.platform == "github"
+                    else f"{info.base_url}/api/v3")
+            data = json.loads(_http_get(f"{base}/repos/{info.owner}/{info.repo}", headers))
+            return data.get("default_branch") or ""
+        if info.platform == "bitbucket":
+            url = (f"https://api.bitbucket.org/2.0/repositories"
+                   f"/{info.owner}/{info.repo}")
+            data = json.loads(_http_get(url, headers))
+            return (data.get("mainbranch") or {}).get("name") or ""
+        if info.platform == "bitbucket_server":
+            url = (f"{info.base_url}/rest/api/1.0/projects/{info.owner}"
+                   f"/repos/{info.repo}")
+            data = json.loads(_http_get(url, headers))
+            return (data.get("defaultBranch") or {}).get("displayId") or ""
+    except Exception:
+        pass
+    return ""
 
 
 def _ssh_clone_url(info: GitFileInfo) -> str:
@@ -539,20 +637,19 @@ def clone_repo(info: GitFileInfo, settings, progress_cb) -> str:
         clone_url  = _ssh_clone_url(info)
 
         vendor = _make_paramiko_vendor(key_path, passphrase)
+        branch_kw = {"branch": info.branch.encode()} if info.branch else {}
         if vendor is not None:
             import dulwich.client as _dc
             _orig = _dc.get_ssh_vendor
             _dc.get_ssh_vendor = lambda: vendor
             try:
                 porcelain.clone(clone_url, tmpdir,
-                                branch=info.branch.encode(),
-                                errstream=errstream)
+                                errstream=errstream, **branch_kw)
             finally:
                 _dc.get_ssh_vendor = _orig
         else:
             porcelain.clone(clone_url, tmpdir,
-                            branch=info.branch.encode(),
-                            errstream=errstream)
+                            errstream=errstream, **branch_kw)
 
         return tmpdir
 
@@ -581,6 +678,18 @@ def _clone_via_api(info: GitFileInfo, settings, progress_cb) -> str:
         raise
 
 
+def clone_repo_full(info: GitFileInfo, settings, progress_cb) -> str:
+    """Full repository clone for folder browsing.
+
+    Unlike clone_repo(), this always performs a full clone (git binary or SSH)
+    and never uses the API-only path that downloads a single file.
+    """
+    auth_method = settings.value("git/auth_method", "https")
+    if auth_method == "ssh":
+        return _clone_via_ssh(info, settings, progress_cb)
+    return _clone_via_git_binary(info, settings, progress_cb)
+
+
 # ── Git binary helpers ────────────────────────────────────────────────────────
 
 def _git_env(settings) -> dict:
@@ -607,21 +716,84 @@ def _git_env(settings) -> dict:
     return env
 
 
+def _make_isolated_home(repo_path: str, name: str, email: str, env: dict) -> str:
+    """Create a minimal HOME directory inside the temp repo directory.
+
+    The synthetic ~/.gitconfig it contains has credential.helper set to the
+    empty string (which resets the helper list) so that OS keyring daemons
+    (gnome-libsecret, git-credential-manager, …) are NEVER invoked for git
+    operations in this temp repo.  User identity is preserved either from
+    MarkForge settings (name/email args) or read from the real gitconfig
+    before we replace HOME.
+
+    The caller sets env["HOME"] to the returned path and also sets
+    env["GIT_CONFIG_NOSYSTEM"] = "1" to skip /etc/gitconfig.
+    Because repo_path is a temp directory owned by the caller, no explicit
+    cleanup of the synthetic HOME is needed.
+    """
+    import subprocess as _sp
+
+    # Read real identity before we replace HOME, in case it is not in MarkForge settings.
+    if not name:
+        r = _sp.run(["git", "config", "--global", "user.name"],
+                    capture_output=True, text=True, env=env)
+        name = r.stdout.strip()
+    if not email:
+        r = _sp.run(["git", "config", "--global", "user.email"],
+                    capture_output=True, text=True, env=env)
+        email = r.stdout.strip()
+
+    home = os.path.join(repo_path, ".markforge_home")
+    os.makedirs(home, exist_ok=True)
+
+    # Neutralise XDG paths so git cannot find the real ~/.config/git/config
+    # or ~/.local/share/git/credentials.  Point them inside the isolated home.
+    env["XDG_CONFIG_HOME"] = os.path.join(home, ".config")
+    env["XDG_DATA_HOME"]   = os.path.join(home, ".local", "share")
+    # Remove GIT_CONFIG_GLOBAL if set — it would override HOME-based lookup.
+    env.pop("GIT_CONFIG_GLOBAL", None)
+
+    lines = [
+        "[credential]",
+        "\thelper =",    # empty value resets the helper list in gitconfig
+    ]
+    if name or email:
+        lines.append("[user]")
+        if name:
+            lines.append(f"\tname = {name}")
+        if email:
+            lines.append(f"\temail = {email}")
+
+    with open(os.path.join(home, ".gitconfig"), "w", encoding="utf-8") as fh:
+        fh.write("\n".join(lines) + "\n")
+
+    return home
+
+
 def _clone_via_git_binary(info: GitFileInfo, settings, progress_cb) -> str:
     """Full clone via the system git binary over HTTPS."""
     import subprocess
 
-    user  = settings.value("git/https_username", "")
+    user  = settings.value("git/https_username", "") or "x-access-token"
     token = get_secret("git/https_token")
     clone_url = _build_https_clone_url(info.clone_url, user, token)
     env = _git_env(settings)
 
-    tmpdir = tempfile.mkdtemp(prefix="markforge_git_")
+    tmpdir   = tempfile.mkdtemp(prefix="markforge_git_")
+    home_tmp = tempfile.mkdtemp(prefix="markforge_home_")
     try:
+        # Isolate HOME so OS credential helpers cannot interfere.
+        # Must use a separate temp dir — tmpdir must stay empty for git clone.
+        name  = (settings.value("git/user_name",  "") or "").strip()
+        email = (settings.value("git/user_email", "") or "").strip()
+        env["HOME"] = _make_isolated_home(home_tmp, name, email, env)
+        env["GIT_CONFIG_NOSYSTEM"] = "1"
+
         progress_cb(10, "Cloning repository …")
+        branch_args = (["--branch", info.branch, "--single-branch"]
+                       if info.branch else [])
         result = subprocess.run(
-            ["git", "clone", "--branch", info.branch,
-             "--single-branch", "--depth", "1", clone_url, tmpdir],
+            ["git", "clone", *branch_args, "--depth", "1", clone_url, tmpdir],
             env=env, capture_output=True, text=True,
         )
         if result.returncode != 0:
@@ -632,13 +804,17 @@ def _clone_via_git_binary(info: GitFileInfo, settings, progress_cb) -> str:
         progress_cb(100, "Repository cloned.")
         return tmpdir
     except FileNotFoundError:
-        shutil.rmtree(tmpdir, ignore_errors=True)
+        shutil.rmtree(tmpdir,    ignore_errors=True)
+        shutil.rmtree(home_tmp,  ignore_errors=True)
         raise RuntimeError(
             "git executable not found.\nPlease install Git and make sure it is on PATH."
         )
     except Exception:
-        shutil.rmtree(tmpdir, ignore_errors=True)
+        shutil.rmtree(tmpdir,    ignore_errors=True)
+        shutil.rmtree(home_tmp,  ignore_errors=True)
         raise
+    finally:
+        shutil.rmtree(home_tmp, ignore_errors=True)   # always clean up the home tmp
 
 
 def _push_via_git_binary(info: GitFileInfo, spec: CommitSpec,
@@ -646,12 +822,21 @@ def _push_via_git_binary(info: GitFileInfo, spec: CommitSpec,
     """Stage, commit (optionally amend), and push via the system git binary."""
     import subprocess
 
-    user  = settings.value("git/https_username", "")
+    user  = settings.value("git/https_username", "") or "x-access-token"
     token = get_secret("git/https_token")
     name  = (settings.value("git/user_name",  "") or "").strip()
     email = (settings.value("git/user_email", "") or "").strip()
     repo_path = info.local_repo_path
     env = _git_env(settings)
+
+    # Replace HOME with an isolated directory whose .gitconfig disables all
+    # OS credential helpers.  This is the only reliable way to prevent
+    # gnome-libsecret / git-credential-manager from overriding the token we
+    # embed in the push URL — `-c credential.helper=` only *appends* an empty
+    # entry to the multi-value helper list and does not clear earlier entries.
+    isolated_home = _make_isolated_home(repo_path, name, email, env)
+    env["HOME"] = isolated_home
+    env["GIT_CONFIG_NOSYSTEM"] = "1"   # also ignore /etc/gitconfig
 
     def _run(*cmd, step_msg: str) -> None:
         progress_cb(0, step_msg)
@@ -661,32 +846,41 @@ def _push_via_git_binary(info: GitFileInfo, spec: CommitSpec,
             err = (result.stderr or result.stdout).strip()
             if user and token:
                 err = err.replace(f"{user}:{token}@", "")
+            # Append diagnostics for push failures to help debug auth issues.
+            if len(cmd) >= 2 and cmd[1] == "push":
+                tok_hint = (f"ghp_...{token[-4:]}" if token and len(token) > 4
+                            else ("(empty)" if not token else "(short)"))
+                diag = (f"\n[diag] user={user!r}  token={tok_hint}"
+                        f"  HOME={env.get('HOME','?')}"
+                        f"  clone_url={info.clone_url}")
+                err += diag
             raise RuntimeError(f"{cmd[0]} {cmd[1]} failed:\n{err}")
 
-    # Build identity flags for git commit (-c user.name=… -c user.email=…)
-    identity: list[str] = []
-    if name:
-        identity += ["-c", f"user.name={name}"]
-    if email:
-        identity += ["-c", f"user.email={email}"]
+    # Embed credentials in the push URL as a belt-and-suspenders measure.
+    push_url = _build_https_clone_url(info.clone_url, user, token) if token else None
 
-    _run("git", "add", info.file_path, step_msg="Staging …")
-
-    if spec.amend:
-        _run("git", *identity, "commit", "--amend", "-m", spec.message,
-             step_msg="Amending commit …")
-    else:
-        _run("git", *identity, "commit", "-m", spec.message,
-             step_msg="Committing …")
+    # Stage the edited file plus any assets sitting alongside it (e.g. images
+    # inserted via drag-and-drop or clipboard paste that live in assets/).
+    assets_rel = str(pathlib.Path(info.file_path).parent / "assets")
+    _run("git", "add", info.file_path, assets_rel, step_msg="Staging …")
+    _run("git", "commit",
+         *(["--amend"] if spec.amend else []),
+         "-m", spec.message,
+         step_msg=("Amending commit …" if spec.amend else "Committing …"))
 
     if spec.amend:
-        _run("git", "push", "--force-with-lease", step_msg="Force-pushing …")
+        _run("git", "push", "--force-with-lease",
+             *(  [push_url] if push_url else []),
+             step_msg="Force-pushing …")
     elif spec.push_mode == "new_branch" and spec.new_branch:
-        _run("git", "push", "origin",
+        _run("git", "push",
+             *(  [push_url] if push_url else ["origin"]),
              f"HEAD:refs/heads/{spec.new_branch}",
              step_msg="Pushing new branch …")
     else:
-        _run("git", "push", step_msg="Pushing …")
+        _run("git", "push",
+             *(  [push_url] if push_url else []),
+             step_msg="Pushing …")
 
     if spec.create_pr:
         _create_pull_request(info, spec, settings)
@@ -726,13 +920,14 @@ def _branch_commits_git(info: GitFileInfo, settings,
     # Fetch the base-branch tip so origin/<base_branch> exists locally.
     # Errors are silently ignored (e.g. branch does not exist on remote).
     subprocess.run(
-        ["git", "fetch", "origin", f"{base_branch}:refs/remotes/origin/{base_branch}",
+        ["git", "-c", "credential.helper=", "fetch", "origin",
+         f"{base_branch}:refs/remotes/origin/{base_branch}",
          "--depth=1", "--no-tags"],
         cwd=repo_path, env=env, capture_output=True, text=True,
     )
     # Deepen the current branch so the divergence point is reachable.
     subprocess.run(
-        ["git", "fetch", "--deepen=100", "--no-tags"],
+        ["git", "-c", "credential.helper=", "fetch", "--deepen=100", "--no-tags"],
         cwd=repo_path, env=env, capture_output=True, text=True,
     )
 
@@ -817,16 +1012,17 @@ def _squash_via_git_binary(info: GitFileInfo, squash_count: int,
                             message: str, settings, progress_cb) -> None:
     import subprocess
 
-    user  = settings.value("git/https_username", "")
+    user  = settings.value("git/https_username", "") or "x-access-token"
     token = get_secret("git/https_token")
     name  = (settings.value("git/user_name",  "") or "").strip()
     email = (settings.value("git/user_email", "") or "").strip()
 
     repo_path = info.local_repo_path
     env       = _git_env(settings)
-    identity: list[str] = []
-    if name:  identity += ["-c", f"user.name={name}"]
-    if email: identity += ["-c", f"user.email={email}"]
+
+    isolated_home = _make_isolated_home(repo_path, name, email, env)
+    env["HOME"] = isolated_home
+    env["GIT_CONFIG_NOSYSTEM"] = "1"
 
     def _run(*cmd, step_msg: str) -> None:
         progress_cb(0, step_msg)
@@ -838,11 +1034,14 @@ def _squash_via_git_binary(info: GitFileInfo, squash_count: int,
                 err = err.replace(f"{user}:{token}@", "")
             raise RuntimeError(f"{cmd[1]} failed:\n{err}")
 
+    push_url = _build_https_clone_url(info.clone_url, user, token) if token else None
+
     _run("git", "reset", "--soft", f"HEAD~{squash_count}",
          step_msg="Squashing commits …")
-    _run("git", *identity, "commit", "-m", message,
+    _run("git", "commit", "-m", message,
          step_msg="Creating squash commit …")
-    _run("git", "push", "--force-with-lease",
+    _run("git", "push", "--force",
+         *(  [push_url] if push_url else []),
          step_msg="Force-pushing …")
     progress_cb(100, "Done.")
 

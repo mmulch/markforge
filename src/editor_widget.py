@@ -2,20 +2,27 @@
 
 from __future__ import annotations
 
+import os
+from typing import Callable
+
 from PyQt6.QtCore import QRect, QSize, Qt
 from PyQt6.QtGui import (
     QColor,
     QFont,
+    QImage,
+    QKeySequence,
     QPainter,
     QPalette,
     QTextCharFormat,
     QTextFormat,
     QTextOption,
 )
-from PyQt6.QtWidgets import QPlainTextEdit, QTextEdit, QWidget
+from PyQt6.QtWidgets import QApplication, QPlainTextEdit, QTextEdit, QWidget
 
 from highlighter import MarkdownHighlighter
 from themes import EDITOR_THEMES
+
+_IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".gif", ".bmp", ".webp", ".svg", ".tiff", ".ico"}
 
 
 class _LineNumberArea(QWidget):
@@ -41,7 +48,9 @@ class EditorWidget(QPlainTextEdit):
         self._gutter = _LineNumberArea(self)
         self._highlighter = MarkdownHighlighter(self.document())
         self._search_selections: list = []
+        self._get_assets_dir: Callable[[], str | None] = lambda: None
 
+        self.setAcceptDrops(True)
         self._apply_theme()
 
         self.blockCountChanged.connect(self._update_gutter_width)
@@ -90,6 +99,9 @@ class EditorWidget(QPlainTextEdit):
         self.blockSignals(old)
         self._update_extra_selections()
         self._gutter.update()
+
+    def set_assets_dir_provider(self, fn: Callable[[], str | None]) -> None:
+        self._get_assets_dir = fn
 
     def set_spell_check(self, enabled: bool, lang: str) -> None:
         from spell_checker import spell_check as _sc
@@ -177,3 +189,123 @@ class EditorWidget(QPlainTextEdit):
 
     def _highlight_current_line(self) -> None:
         self._update_extra_selections()
+
+    # ── Clipboard paste / drag-and-drop ───────────────────────────────────────
+
+    def keyPressEvent(self, event) -> None:  # type: ignore[override]
+        if event.matches(QKeySequence.StandardKey.Paste):
+            if self._try_paste_image():
+                return
+        super().keyPressEvent(event)
+
+    def dragEnterEvent(self, event) -> None:  # type: ignore[override]
+        if self._has_image_or_file(event.mimeData()):
+            event.acceptProposedAction()
+        else:
+            super().dragEnterEvent(event)
+
+    def dragMoveEvent(self, event) -> None:  # type: ignore[override]
+        if self._has_image_or_file(event.mimeData()):
+            event.acceptProposedAction()
+        else:
+            super().dragMoveEvent(event)
+
+    def dropEvent(self, event) -> None:  # type: ignore[override]
+        if self._has_image_or_file(event.mimeData()):
+            self._handle_drop(event.mimeData())
+            event.acceptProposedAction()
+        else:
+            super().dropEvent(event)
+
+    def _has_image_or_file(self, mime) -> bool:
+        if mime.hasImage():
+            return True
+        if mime.hasUrls():
+            return any(
+                u.isLocalFile() for u in mime.urls()
+            )
+        return False
+
+    def _try_paste_image(self) -> bool:
+        """Check clipboard for image data; save and insert if found. Returns True if handled."""
+        clipboard = QApplication.clipboard()
+        mime = clipboard.mimeData()
+        if not mime or not mime.hasImage():
+            return False
+        assets_dir = self._get_assets_dir()
+        if not assets_dir:
+            self._show_no_file_message()
+            return True
+        image = clipboard.image()
+        if image.isNull():
+            return False
+        rel_path = self._save_image_to_assets(image, "image")
+        if rel_path:
+            self._insert_md_image(rel_path)
+        return True
+
+    def _handle_drop(self, mime) -> None:
+        """Handle dropped files or raw image data."""
+        if mime.hasUrls():
+            for url in mime.urls():
+                if not url.isLocalFile():
+                    continue
+                dropped_path = url.toLocalFile()
+                ext = os.path.splitext(dropped_path)[1].lower()
+                assets_dir = self._get_assets_dir()
+                if not assets_dir:
+                    self._show_no_file_message()
+                    return
+                doc_dir = os.path.dirname(assets_dir)  # assets_dir = doc_dir/assets
+                rel_path = os.path.relpath(dropped_path, start=doc_dir)
+                if ext in _IMAGE_EXTENSIONS:
+                    self._insert_md_image(rel_path)
+                else:
+                    self._insert_md_link(rel_path)
+        elif mime.hasImage():
+            image = mime.imageData()
+            if image is None:
+                return
+            if not isinstance(image, QImage):
+                image = QImage(image)
+            assets_dir = self._get_assets_dir()
+            if not assets_dir:
+                self._show_no_file_message()
+                return
+            rel_path = self._save_image_to_assets(image, "image")
+            if rel_path:
+                self._insert_md_image(rel_path)
+
+    def _save_image_to_assets(self, image: QImage, hint: str) -> str | None:
+        """Save QImage to the assets directory. Returns a relative path like assets/image_001.png."""
+        assets_dir = self._get_assets_dir()
+        if not assets_dir:
+            return None
+        os.makedirs(assets_dir, exist_ok=True)
+        # Find next available filename
+        n = 1
+        while True:
+            filename = f"{hint}_{n:03d}.png"
+            full_path = os.path.join(assets_dir, filename)
+            if not os.path.exists(full_path):
+                break
+            n += 1
+        if not image.save(full_path, "PNG"):
+            return None
+        doc_dir = os.path.dirname(assets_dir)
+        return os.path.relpath(full_path, start=doc_dir)
+
+    def _insert_md_image(self, rel_path: str) -> None:
+        cursor = self.textCursor()
+        cursor.insertText(f"![]({rel_path})")
+
+    def _insert_md_link(self, rel_path: str) -> None:
+        filename = os.path.basename(rel_path)
+        cursor = self.textCursor()
+        cursor.insertText(f"[{filename}]({rel_path})")
+
+    def _show_no_file_message(self) -> None:
+        from i18n import tr
+        win = self.window()
+        if hasattr(win, "statusBar"):
+            win.statusBar().showMessage(tr("Save the file first to paste images."), 4000)
