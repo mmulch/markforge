@@ -573,6 +573,7 @@
           <li><a href="#git-open">Mở tệp</a></li>
           <li><a href="#git-save">Lưu (Commit &amp; Push)</a></li>
           <li><a href="#git-squash">Squash Commit</a></li>
+          <li><a href="#git-branch">Chuyển nhánh</a></li>
           <li><a href="#git-auth">Xác thực</a></li>
           <li><a href="#git-proxy">Proxy</a></li>
           <li><a href="#git-close">Đóng</a></li>
@@ -766,6 +767,15 @@ python src/main.py</code></pre>
 
       <h3>Số dòng</h3>
       <p>Một lề bên trái của trình soạn thảo hiển thị số dòng. Dòng hiện tại được tô sáng bằng màu nền tinh tế để giúp bạn theo dõi vị trí trong các tài liệu dài.</p>
+
+      <h3>Đánh dấu thay đổi trực tiếp</h3>
+      <p>Khi mở tệp được quản lý bởi Git, lề biên tập hiển thị các thanh màu bên cạnh các dòng khác biệt so với phiên bản đã commit cuối cùng:</p>
+      <ul>
+        <li><strong>Xanh lá</strong> — dòng được thêm</li>
+        <li><strong>Cam</strong> — dòng được sửa đổi</li>
+        <li><strong>Đỏ</strong> — khối đã xóa (hiển thị dưới dạng dấu mỏng phía trên vị trí xóa)</li>
+      </ul>
+      <p>Các đánh dấu cập nhật trực tiếp khi bạn gõ và được đặt lại sau mỗi lần commit &amp; push thành công.</p>
 
       <h3>Xuống dòng tự động</h3>
       <p>Xuống dòng tự động được bật theo mặc định. Các dòng dài sẽ xuống dòng vừa với chiều rộng hiển thị của trình soạn thảo. Bật/tắt xuống dòng tự động bất cứ lúc nào qua <strong>Xem → Xuống dòng tự động</strong>. Tùy chọn này được lưu giữa các phiên làm việc.</p>
@@ -1254,6 +1264,17 @@ $</code></pre>
           <li><strong>Squash &amp; Push</strong> — viết lại lịch sử nhánh và force-push lên remote.</li>
         </ul>
         <p>Bạn phải chọn ít nhất 2 commit và chúng phải tạo thành một dải liên tục bắt đầu từ commit gần nhất (HEAD).</p>
+      </section>
+
+      <section id="git-branch">
+        <h3>Chuyển nhánh</h3>
+        <p>Khi mở tệp được quản lý bởi Git, <strong>thanh trạng thái</strong> hiển thị tên nhánh hiện tại màu xanh lá. Nhấn vào đó để mở hộp thoại <strong>Chuyển nhánh</strong>.</p>
+        <ul>
+          <li><strong>Tải bản mới nhất</strong> — tải lại các thay đổi mới nhất cho nhánh hiện tại.</li>
+          <li><strong>Lọc</strong> — gõ để tìm kiếm trong danh sách các nhánh từ xa.</li>
+          <li><strong>Chuyển</strong> — chọn một nhánh khác và nhấn Chuyển (hoặc nhấn đúp) để chuyển sang. Tệp tự động tải lại với nội dung từ nhánh mới.</li>
+        </ul>
+        <p>Cả ba phương thức xác thực đều được hỗ trợ: HTTPS (API), HTTPS (git binary), và SSH.</p>
       </section>
 
       <section id="git-auth">

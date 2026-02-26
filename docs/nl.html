@@ -572,6 +572,7 @@
           <li><a href="#git-openen">Een bestand openen</a></li>
           <li><a href="#git-opslaan">Opslaan (Commit &amp; Push)</a></li>
           <li><a href="#git-squash">Commits samenvoegen</a></li>
+          <li><a href="#git-branch">Branch wisselen</a></li>
           <li><a href="#git-auth">Authenticatie</a></li>
           <li><a href="#git-proxy">Proxy</a></li>
           <li><a href="#git-sluiten">Sluiten</a></li>
@@ -765,6 +766,15 @@ python src/main.py</code></pre>
 
       <h3>Regelnummers</h3>
       <p>Een goot aan de linkerkant van de editor toont regelnummers. De huidige regel is gemarkeerd met een subtiele achtergrondkleur om u te helpen uw positie in lange documenten bij te houden.</p>
+
+      <h3>Inline diff-markeringen</h3>
+      <p>Wanneer een door Git beheerd bestand geopend is, toont de editorgoot gekleurde balken naast regels die verschillen van de laatst gecommitte versie:</p>
+      <ul>
+        <li><strong>Groen</strong> — toegevoegde regels</li>
+        <li><strong>Oranje</strong> — gewijzigde regels</li>
+        <li><strong>Rood</strong> — verwijderde blokken (weergegeven als een dunne markering boven het verwijderpunt)</li>
+      </ul>
+      <p>Markeringen worden live bijgewerkt terwijl je typt en worden gereset na elke succesvolle commit &amp; push.</p>
 
       <h3>Tekstterugloop</h3>
       <p>Tekstterugloop is standaard ingeschakeld. Lange regels lopen terug om in de zichtbare editorbreedte te passen. Schakel tekstterugloop op elk moment in/uit via <strong>Beeld → Tekstterugloop</strong>. De voorkeur wordt opgeslagen tussen sessies.</p>
@@ -1252,6 +1262,17 @@ $</code></pre>
           <li><strong>Samenvoegen &amp; Pushen</strong> — herschrijft de branch-geschiedenis en force-pusht naar de remote.</li>
         </ul>
         <p>U moet ten minste 2 commits selecteren, en ze moeten een aaneengesloten bereik vormen vanaf de meest recente commit (HEAD).</p>
+      </section>
+
+      <section id="git-branch">
+        <h3>Branch wisselen</h3>
+        <p>Wanneer een door Git beheerd bestand geopend is, toont de <strong>statusbalk</strong> de huidige branchnaam in het groen. Klik erop om het dialoogvenster <strong>Branch wisselen</strong> te openen.</p>
+        <ul>
+          <li><strong>Laatste ophalen</strong> — de laatste wijzigingen voor de huidige branch opnieuw downloaden.</li>
+          <li><strong>Filter</strong> — typ om te zoeken in de lijst met remote branches.</li>
+          <li><strong>Wisselen</strong> — selecteer een andere branch en klik op Wisselen (of dubbelklik) om deze uit te checken. Het bestand wordt automatisch herladen met de inhoud van de nieuwe branch.</li>
+        </ul>
+        <p>Alle drie de authenticatiemethoden worden ondersteund: HTTPS (API), HTTPS (git binary) en SSH.</p>
       </section>
 
       <section id="git-auth">

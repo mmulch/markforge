@@ -573,6 +573,7 @@
           <li><a href="#git-open">Apertura di un file</a></li>
           <li><a href="#git-save">Salvataggio (Commit &amp; Push)</a></li>
           <li><a href="#git-squash">Squash dei commit</a></li>
+          <li><a href="#git-branch">Cambio ramo</a></li>
           <li><a href="#git-auth">Autenticazione</a></li>
           <li><a href="#git-proxy">Proxy</a></li>
           <li><a href="#git-close">Chiusura</a></li>
@@ -766,6 +767,15 @@ python src/main.py</code></pre>
 
       <h3>Numeri di riga</h3>
       <p>Un margine sul lato sinistro dell'editor mostra i numeri di riga. La riga corrente è evidenziata con un colore di sfondo sottile per aiutarti a tenere traccia della tua posizione in documenti lunghi.</p>
+
+      <h3>Marcatori diff inline</h3>
+      <p>Quando un file gestito da Git è aperto, il margine dell'editor mostra barre colorate accanto alle righe che differiscono dall'ultima versione committata:</p>
+      <ul>
+        <li><strong>Verde</strong> — righe aggiunte</li>
+        <li><strong>Arancione</strong> — righe modificate</li>
+        <li><strong>Rosso</strong> — blocchi eliminati (mostrati come un segno sottile sopra il punto di eliminazione)</li>
+      </ul>
+      <p>I marcatori si aggiornano in tempo reale durante la digitazione e si reimpostano dopo ogni commit &amp; push riuscito.</p>
 
       <h3>A capo automatico</h3>
       <p>Il ritorno a capo automatico è abilitato per impostazione predefinita. Le righe lunghe vengono adattate alla larghezza visibile dell'editor. Attiva/disattiva il ritorno a capo automatico in qualsiasi momento tramite <strong>Visualizza → A capo automatico</strong>. La preferenza viene salvata tra le sessioni.</p>
@@ -1254,6 +1264,17 @@ $</code></pre>
           <li><strong>Squash &amp; Push</strong> — riscrive la cronologia del branch e fa force-push al remoto.</li>
         </ul>
         <p>È necessario selezionare almeno 2 commit, e devono formare un intervallo contiguo a partire dal commit più recente (HEAD).</p>
+      </section>
+
+      <section id="git-branch">
+        <h3>Cambio ramo</h3>
+        <p>Quando un file gestito da Git è aperto, la <strong>barra di stato</strong> mostra il nome del ramo attuale in verde. Clicca su di esso per aprire il dialogo <strong>Cambio ramo</strong>.</p>
+        <ul>
+          <li><strong>Scarica più recente</strong> — riscaricare le ultime modifiche per il ramo attuale.</li>
+          <li><strong>Filtro</strong> — digita per cercare nell'elenco dei rami remoti.</li>
+          <li><strong>Cambia</strong> — seleziona un ramo diverso e clicca su Cambia (o doppio clic) per attivarlo. Il file si ricarica automaticamente con il contenuto del nuovo ramo.</li>
+        </ul>
+        <p>Tutti e tre i metodi di autenticazione sono supportati: HTTPS (API), HTTPS (git binary) e SSH.</p>
       </section>
 
       <section id="git-auth">

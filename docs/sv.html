@@ -573,6 +573,7 @@
           <li><a href="#git-open">Öppna en fil</a></li>
           <li><a href="#git-save">Spara (commit &amp; push)</a></li>
           <li><a href="#git-squash">Sammanfoga commits</a></li>
+          <li><a href="#git-branch">Byta gren</a></li>
           <li><a href="#git-auth">Autentisering</a></li>
           <li><a href="#git-proxy">Proxy</a></li>
           <li><a href="#git-close">Stänga</a></li>
@@ -766,6 +767,15 @@ python src/main.py</code></pre>
 
       <h3>Radnummer</h3>
       <p>En marginal på redigerarens vänstra sida visar radnummer. Den aktuella raden markeras med en subtil bakgrundsfärg för att hjälpa dig hålla reda på positionen i långa dokument.</p>
+
+      <h3>Inline diff-markeringar</h3>
+      <p>När en git-hanterad fil är öppen visar redigeringsfältet färgade staplar bredvid rader som skiljer sig från den senast committade versionen:</p>
+      <ul>
+        <li><strong>Grön</strong> — tillagda rader</li>
+        <li><strong>Orange</strong> — ändrade rader</li>
+        <li><strong>Röd</strong> — borttagna block (visas som en tunn markering ovanför borttagningspunkten)</li>
+      </ul>
+      <p>Markeringarna uppdateras direkt när du skriver och återställs efter varje lyckad commit &amp; push.</p>
 
       <h3>Radbrytning</h3>
       <p>Radbrytning är aktiverat som standard. Långa rader bryts för att passa den synliga redigerarbredden. Växla radbrytning när som helst via <strong>Visa → Radbrytning</strong>. Inställningen sparas mellan sessioner.</p>
@@ -1254,6 +1264,17 @@ $</code></pre>
           <li><strong>Sammanfoga &amp; pusha</strong> — skriver om grenhistoriken och force-pushar till fjärrarkivet.</li>
         </ul>
         <p>Du måste välja minst 2 commits och de måste bilda ett sammanhängande intervall som börjar från den senaste commiten (HEAD).</p>
+      </section>
+
+      <section id="git-branch">
+        <h3>Byta gren</h3>
+        <p>När en git-hanterad fil är öppen visar <strong>statusfältet</strong> det aktuella grennamnet i grönt. Klicka på det för att öppna dialogrutan <strong>Byt gren</strong>.</p>
+        <ul>
+          <li><strong>Hämta senaste</strong> — ladda ner de senaste ändringarna för den aktuella grenen.</li>
+          <li><strong>Filter</strong> — skriv för att söka bland listan med fjärrgrenar.</li>
+          <li><strong>Byt</strong> — välj en annan gren och klicka på Byt (eller dubbelklicka) för att checka ut den. Filen laddas automatiskt om med innehållet från den nya grenen.</li>
+        </ul>
+        <p>Alla tre autentiseringsmetoder stöds: HTTPS (API), HTTPS (git binary) och SSH.</p>
       </section>
 
       <section id="git-auth">

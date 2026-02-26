@@ -572,6 +572,7 @@
           <li><a href="#git-abrir">Abrir um Ficheiro</a></li>
           <li><a href="#git-guardar">Guardar (Commit &amp; Push)</a></li>
           <li><a href="#git-squash">Squash de Commits</a></li>
+          <li><a href="#git-branch">Trocar branch</a></li>
           <li><a href="#git-auth">Autenticação</a></li>
           <li><a href="#git-proxy">Proxy</a></li>
           <li><a href="#git-fechar">Fechar</a></li>
@@ -765,6 +766,15 @@ python src/main.py</code></pre>
 
       <h3>Números de Linha</h3>
       <p>Uma margem no lado esquerdo do editor mostra números de linha. A linha atual é realçada com uma cor de fundo subtil para ajudá-lo a acompanhar a sua posição em documentos longos.</p>
+
+      <h3>Marcadores de diferenças inline</h3>
+      <p>Quando um arquivo gerenciado pelo Git está aberto, a margem do editor mostra barras coloridas ao lado das linhas que diferem da última versão commitada:</p>
+      <ul>
+        <li><strong>Verde</strong> — linhas adicionadas</li>
+        <li><strong>Laranja</strong> — linhas modificadas</li>
+        <li><strong>Vermelho</strong> — blocos removidos (mostrados como uma marca fina acima do ponto de remoção)</li>
+      </ul>
+      <p>Os marcadores se atualizam em tempo real enquanto você digita e são redefinidos após cada commit &amp; push bem-sucedido.</p>
 
       <h3>Moldagem de Palavras</h3>
       <p>A moldagem de palavras está ativada por padrão. Linhas longas moldam-se para caber na largura visível do editor. Alternar moldagem de palavras a qualquer momento via <strong>Ver → Moldagem de palavras</strong>. A preferência é guardada entre sessões.</p>
@@ -1252,6 +1262,17 @@ $</code></pre>
           <li><strong>Squash &amp; Push</strong> — reescreve o histórico do ramo e faz force-push para o repositório remoto.</li>
         </ul>
         <p>Deve selecionar pelo menos 2 commits, e devem formar um intervalo contíguo a partir do commit mais recente (HEAD).</p>
+      </section>
+
+      <section id="git-branch">
+        <h3>Trocar branch</h3>
+        <p>Quando um arquivo gerenciado pelo Git está aberto, a <strong>barra de status</strong> mostra o nome do branch atual em verde. Clique nele para abrir o diálogo <strong>Trocar branch</strong>.</p>
+        <ul>
+          <li><strong>Obter mais recente</strong> — baixar novamente as últimas alterações para o branch atual.</li>
+          <li><strong>Filtro</strong> — digite para pesquisar na lista de branches remotos.</li>
+          <li><strong>Trocar</strong> — selecione um branch diferente e clique em Trocar (ou clique duplo) para ativá-lo. O arquivo recarrega automaticamente com o conteúdo do novo branch.</li>
+        </ul>
+        <p>Todos os três métodos de autenticação são suportados: HTTPS (API), HTTPS (git binary) e SSH.</p>
       </section>
 
       <section id="git-auth">

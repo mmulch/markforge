@@ -573,6 +573,7 @@
           <li><a href="#git-open">Opening a File</a></li>
           <li><a href="#git-save">Saving (Commit &amp; Push)</a></li>
           <li><a href="#git-squash">Squash Commits</a></li>
+          <li><a href="#git-branch">Branch Switching</a></li>
           <li><a href="#git-auth">Authentication</a></li>
           <li><a href="#git-proxy">Proxy</a></li>
           <li><a href="#git-close">Closing</a></li>
@@ -766,6 +767,15 @@ python src/main.py</code></pre>
 
       <h3>Line Numbers</h3>
       <p>A gutter on the left side of the editor displays line numbers. The current line is highlighted with a subtle background colour to help you track your position in long documents.</p>
+
+      <h3>Inline Diff Markers</h3>
+      <p>When a git-managed file is open, the editor gutter shows coloured bars next to lines that differ from the last committed version:</p>
+      <ul>
+        <li><strong>Green</strong> — added lines</li>
+        <li><strong>Orange</strong> — modified lines</li>
+        <li><strong>Red</strong> — deleted blocks (shown as a thin marker on the line above the deletion)</li>
+      </ul>
+      <p>Markers update live as you type and reset to a clean state after each successful commit &amp; push.</p>
 
       <h3>Word Wrap</h3>
       <p>Word wrap is enabled by default. Long lines wrap to fit the visible editor width. Toggle word wrap at any time via <strong>View → Word wrap</strong>. The preference is saved between sessions.</p>
@@ -1254,6 +1264,17 @@ $</code></pre>
           <li><strong>Squash &amp; Push</strong> — rewrites the branch history and force-pushes to the remote.</li>
         </ul>
         <p>You must select at least 2 commits, and they must form a contiguous range starting from the most recent commit (HEAD).</p>
+      </section>
+
+      <section id="git-branch">
+        <h3>Branch Switching</h3>
+        <p>When a git-managed file is open, the <strong>status bar</strong> shows the current branch name in green. Click it to open the <strong>Switch Branch</strong> dialog.</p>
+        <ul>
+          <li><strong>Pull Latest</strong> — re-download or pull the latest changes for the current branch.</li>
+          <li><strong>Filter</strong> — type to search through the list of remote branches.</li>
+          <li><strong>Switch</strong> — select a different branch and click Switch (or double-click) to check it out. The file reloads automatically with the content from the new branch.</li>
+        </ul>
+        <p>All three authentication methods are supported: HTTPS (API), HTTPS (git binary), and SSH.</p>
       </section>
 
       <section id="git-auth">

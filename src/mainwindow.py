@@ -28,7 +28,8 @@ from editor_widget import EditorWidget
 from file_tree_widget import FileTreeWidget
 from find_replace_bar import FindReplaceBar
 from outline_widget import OutlineWidget
-from git_dialogs import GitCommitDialog, GitOpenDialog, GitOpenFolderDialog, GitSquashDialog
+from git_dialogs import (GitBranchSwitchDialog, GitCommitDialog, GitOpenDialog,
+                         GitOpenFolderDialog, GitSquashDialog)
 from git_manager import GitFileInfo, CommitSpec  # noqa: F401
 from i18n import LANGUAGES, SPELL_CHECK_LANGUAGES, tr
 from insert_media_dialogs import InsertImageDialog, InsertLinkDialog
@@ -180,6 +181,76 @@ class _GitSquashWorker(QThread):
         self.progress.emit(pct, msg)
 
 
+class _GitBranchListWorker(QThread):
+    """Fetches remote branch list in the background."""
+
+    finished = pyqtSignal(list)   # list[str]
+    failed   = pyqtSignal(str)
+
+    def __init__(self, info: GitFileInfo, settings: QSettings, parent=None) -> None:
+        super().__init__(parent)
+        self._info     = info
+        self._settings = settings
+
+    def run(self) -> None:
+        from git_manager import fetch_branches
+        try:
+            self.finished.emit(fetch_branches(self._info, self._settings))
+        except Exception as exc:
+            self.failed.emit(str(exc))
+
+
+class _GitSwitchBranchWorker(QThread):
+    """Switches to a different branch in the background."""
+
+    finished = pyqtSignal(str, str)   # new_branch, local_file_path
+    failed   = pyqtSignal(str)
+    progress = pyqtSignal(int, str)
+
+    def __init__(self, info: GitFileInfo, new_branch: str,
+                 settings: QSettings, parent=None) -> None:
+        super().__init__(parent)
+        self._info       = info
+        self._new_branch = new_branch
+        self._settings   = settings
+
+    def run(self) -> None:
+        from git_manager import switch_branch
+        try:
+            path = switch_branch(self._info, self._new_branch,
+                                 self._settings, self._on_progress)
+            self.finished.emit(self._new_branch, path)
+        except Exception as exc:
+            self.failed.emit(str(exc))
+
+    def _on_progress(self, pct: int, msg: str) -> None:
+        self.progress.emit(pct, msg)
+
+
+class _GitPullWorker(QThread):
+    """Pulls latest changes for the current branch in the background."""
+
+    finished = pyqtSignal()
+    failed   = pyqtSignal(str)
+    progress = pyqtSignal(int, str)
+
+    def __init__(self, info: GitFileInfo, settings: QSettings, parent=None) -> None:
+        super().__init__(parent)
+        self._info     = info
+        self._settings = settings
+
+    def run(self) -> None:
+        from git_manager import pull_latest
+        try:
+            pull_latest(self._info, self._settings, self._on_progress)
+            self.finished.emit()
+        except Exception as exc:
+            self.failed.emit(str(exc))
+
+    def _on_progress(self, pct: int, msg: str) -> None:
+        self.progress.emit(pct, msg)
+
+
 class MainWindow(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
@@ -202,6 +273,10 @@ class MainWindow(QMainWindow):
         self._git_push_progress:  QProgressDialog | None  = None
         self._git_squash_worker:  _GitSquashWorker | None = None
         self._git_squash_progress: QProgressDialog | None = None
+        self._git_switch_worker:  _GitSwitchBranchWorker | None = None
+        self._git_switch_progress: QProgressDialog | None      = None
+        self._git_pull_worker:    _GitPullWorker | None         = None
+        self._git_pull_progress:  QProgressDialog | None       = None
         # Per-session push tracking (reset when a new git file is opened)
         self._git_push_count:        int = 0
         self._git_last_commit_msg:   str = ""
@@ -396,6 +471,14 @@ class MainWindow(QMainWindow):
 
     def _build_statusbar(self) -> None:
         self._lbl_words = QLabel(tr("{n} words", n=0))
+        self._lbl_branch = QLabel("")
+        self._lbl_branch.setStyleSheet(
+            "color: #4caf50; padding: 0 6px;"
+        )
+        self._lbl_branch.setCursor(Qt.CursorShape.PointingHandCursor)
+        self._lbl_branch.setToolTip(tr("Click to switch branch"))
+        self._lbl_branch.hide()
+        self._lbl_branch.mousePressEvent = lambda _ev: self._show_branch_switcher()
         self._lbl_pos   = QLabel(tr("Line {line}, Col {col}", line=1, col=1))
         self._bar_goal  = QProgressBar()
         self._bar_goal.setFixedWidth(100)
@@ -406,6 +489,7 @@ class MainWindow(QMainWindow):
         sb = self.statusBar()
         sb.addPermanentWidget(self._lbl_words)
         sb.addPermanentWidget(self._bar_goal)
+        sb.addPermanentWidget(self._lbl_branch)
         sb.addPermanentWidget(self._lbl_pos)
 
     # ── Helpers ───────────────────────────────────────────────────────────────
@@ -945,6 +1029,7 @@ class MainWindow(QMainWindow):
         self._load(info.local_file_path)
         # Re-apply git marker (set_root inside _load clears it)
         self._file_tree.mark_git_root(info.local_repo_path, info.repo)
+        self._update_branch_label()
 
     def _on_clone_failed(self, msg: str, tmpdir: str) -> None:
         if self._git_clone_progress is not None:
@@ -1043,6 +1128,7 @@ class MainWindow(QMainWindow):
         self._file_tree.setVisible(True)
         self._act_filetree.setChecked(True)
         self._file_tree.mark_git_root(info.local_repo_path, info.repo)
+        self._update_branch_label()
 
     def _on_clone_folder_failed(self, msg: str, tmpdir: str) -> None:
         if self._git_clone_folder_progress is not None:
@@ -1252,6 +1338,196 @@ class MainWindow(QMainWindow):
             self._git_squash_progress.close()
             self._git_squash_progress = None
 
+    # ── Branch switcher ──────────────────────────────────────────────────────
+
+    def _update_branch_label(self) -> None:
+        """Show/hide the branch label in the status bar."""
+        if self._git_file_info is not None and self._git_file_info.branch:
+            self._lbl_branch.setText(self._git_file_info.branch)
+            self._lbl_branch.setToolTip(
+                tr("Branch: {branch}\nClick to switch",
+                   branch=self._git_file_info.branch)
+            )
+            self._lbl_branch.show()
+        else:
+            self._lbl_branch.hide()
+
+    def _show_branch_switcher(self) -> None:
+        if self._git_file_info is None:
+            return
+        s = QSettings("MarkdownEditor", "MarkdownEditor")
+        dlg = GitBranchSwitchDialog(self._git_file_info, s, self)
+        if dlg.exec() != QDialog.DialogCode.Accepted:
+            return
+        action, branch = dlg.get_result()
+        if action == "switch":
+            self._git_switch_to(branch)
+        elif action == "pull":
+            self._git_pull_branch()
+
+    def _git_switch_to(self, new_branch: str) -> None:
+        if self._git_switch_worker is not None:
+            return
+        s = QSettings("MarkdownEditor", "MarkdownEditor")
+
+        self._git_switch_progress = QProgressDialog(
+            tr("Switching to branch '{branch}' …", branch=new_branch),
+            tr("Cancel"), 0, 100, self,
+        )
+        self._git_switch_progress.setWindowTitle(tr("Switch Branch"))
+        self._git_switch_progress.setWindowModality(Qt.WindowModality.ApplicationModal)
+        self._git_switch_progress.setAutoClose(False)
+        self._git_switch_progress.setAutoReset(False)
+        self._git_switch_progress.canceled.connect(self._on_switch_canceled)
+        self._git_switch_progress.show()
+
+        self._git_switch_worker = _GitSwitchBranchWorker(
+            self._git_file_info, new_branch, s, self
+        )
+        self._git_switch_worker.finished.connect(self._on_switch_done)
+        self._git_switch_worker.failed.connect(self._on_switch_failed)
+        self._git_switch_worker.progress.connect(self._on_switch_progress)
+        self._git_switch_worker.start()
+
+    def _on_switch_progress(self, pct: int, msg: str) -> None:
+        dlg = self._git_switch_progress
+        if dlg is not None:
+            dlg.setValue(pct)
+            if msg:
+                dlg.setLabelText(
+                    tr("Switching to branch '{branch}' …",
+                       branch=self._git_file_info.branch) + f"\n{msg}"
+                )
+
+    def _on_switch_done(self, new_branch: str, local_path: str) -> None:
+        if self._git_switch_progress is not None:
+            self._git_switch_progress.close()
+            self._git_switch_progress = None
+        self._git_switch_worker = None
+        # Reset push tracking for new branch
+        self._git_push_count         = 0
+        self._git_last_commit_msg    = ""
+        self._git_pending_commit_msg = ""
+        self._update_squash_action()
+        self._update_branch_label()
+        # Reload the file
+        if self._git_folder_root:
+            # Folder mode — refresh tree and load file if it exists
+            self._file_tree.set_root(self._git_file_info.local_repo_path)
+            self._file_tree.mark_git_root(
+                self._git_file_info.local_repo_path, self._git_file_info.repo
+            )
+            if os.path.isfile(local_path):
+                self._git_file_info.local_file_path = local_path
+                self._load(local_path)
+        else:
+            self._git_file_info.local_file_path = local_path
+            self._load(local_path)
+            self._file_tree.mark_git_root(
+                self._git_file_info.local_repo_path, self._git_file_info.repo
+            )
+        self.statusBar().showMessage(
+            tr("Switched to branch '{branch}'.", branch=new_branch), 4000
+        )
+        QTimer.singleShot(200, self._update_diff_base)
+
+    def _on_switch_failed(self, msg: str) -> None:
+        if self._git_switch_progress is not None:
+            self._git_switch_progress.close()
+            self._git_switch_progress = None
+        self._git_switch_worker = None
+        QMessageBox.critical(
+            self, tr("Switch Branch"),
+            tr("Branch switch failed:\n{exc}", exc=msg),
+        )
+
+    def _on_switch_canceled(self) -> None:
+        if self._git_switch_worker is not None:
+            try:
+                self._git_switch_worker.finished.disconnect(self._on_switch_done)
+                self._git_switch_worker.failed.disconnect(self._on_switch_failed)
+                self._git_switch_worker.progress.disconnect(self._on_switch_progress)
+            except RuntimeError:
+                pass
+            self._git_switch_worker.terminate()
+            self._git_switch_worker.wait()
+            self._git_switch_worker = None
+        if self._git_switch_progress is not None:
+            self._git_switch_progress.close()
+            self._git_switch_progress = None
+
+    def _git_pull_branch(self) -> None:
+        if self._git_pull_worker is not None:
+            return
+        if self._git_file_info is None:
+            return
+        s = QSettings("MarkdownEditor", "MarkdownEditor")
+
+        self._git_pull_progress = QProgressDialog(
+            tr("Pulling latest changes …"), tr("Cancel"), 0, 100, self,
+        )
+        self._git_pull_progress.setWindowTitle(tr("Git Pull"))
+        self._git_pull_progress.setWindowModality(Qt.WindowModality.ApplicationModal)
+        self._git_pull_progress.setAutoClose(False)
+        self._git_pull_progress.setAutoReset(False)
+        self._git_pull_progress.canceled.connect(self._on_pull_canceled)
+        self._git_pull_progress.show()
+
+        self._git_pull_worker = _GitPullWorker(self._git_file_info, s, self)
+        self._git_pull_worker.finished.connect(self._on_pull_done)
+        self._git_pull_worker.failed.connect(self._on_pull_failed)
+        self._git_pull_worker.progress.connect(self._on_pull_progress)
+        self._git_pull_worker.start()
+
+    def _on_pull_progress(self, pct: int, msg: str) -> None:
+        dlg = self._git_pull_progress
+        if dlg is not None:
+            dlg.setValue(pct)
+            if msg:
+                dlg.setLabelText(tr("Pulling latest changes …") + f"\n{msg}")
+
+    def _on_pull_done(self) -> None:
+        if self._git_pull_progress is not None:
+            self._git_pull_progress.close()
+            self._git_pull_progress = None
+        self._git_pull_worker = None
+        # Reload the current file from disk
+        if self._file and os.path.isfile(self._file):
+            self._load(self._file)
+            if self._git_file_info:
+                self._file_tree.mark_git_root(
+                    self._git_file_info.local_repo_path, self._git_file_info.repo
+                )
+        self.statusBar().showMessage(tr("Pull complete."), 4000)
+        QTimer.singleShot(200, self._update_diff_base)
+
+    def _on_pull_failed(self, msg: str) -> None:
+        if self._git_pull_progress is not None:
+            self._git_pull_progress.close()
+            self._git_pull_progress = None
+        self._git_pull_worker = None
+        QMessageBox.critical(
+            self, tr("Git Pull"),
+            tr("Git pull failed:\n{exc}", exc=msg),
+        )
+
+    def _on_pull_canceled(self) -> None:
+        if self._git_pull_worker is not None:
+            try:
+                self._git_pull_worker.finished.disconnect(self._on_pull_done)
+                self._git_pull_worker.failed.disconnect(self._on_pull_failed)
+                self._git_pull_worker.progress.disconnect(self._on_pull_progress)
+            except RuntimeError:
+                pass
+            self._git_pull_worker.terminate()
+            self._git_pull_worker.wait()
+            self._git_pull_worker = None
+        if self._git_pull_progress is not None:
+            self._git_pull_progress.close()
+            self._git_pull_progress = None
+
+    # ── Load / save ──────────────────────────────────────────────────────────
+
     def _load(self, path: str) -> None:
         # Clear git context if we're loading a file outside the current git repo
         if self._git_file_info is not None:
@@ -1260,6 +1536,7 @@ class MainWindow(QMainWindow):
                 self._git_folder_root = ""
                 self._file_tree.clear_git_marker()
                 self._update_squash_action()
+                self._update_branch_label()
 
         try:
             with open(path, encoding="utf-8") as fh:
@@ -1627,6 +1904,12 @@ class MainWindow(QMainWindow):
         if self._git_push_worker is not None:
             self._git_push_worker.terminate()
             self._git_push_worker.wait()
+        if self._git_switch_worker is not None:
+            self._git_switch_worker.terminate()
+            self._git_switch_worker.wait()
+        if self._git_pull_worker is not None:
+            self._git_pull_worker.terminate()
+            self._git_pull_worker.wait()
 
         # Offer to delete the temporary git clone
         if self._git_file_info is not None:

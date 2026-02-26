@@ -1333,3 +1333,292 @@ def _create_pull_request(info: GitFileInfo, spec: CommitSpec, settings) -> None:
         if exc.code == 401:
             raise RuntimeError("Authentication failed (HTTP 401). Check your token.") from exc
         raise RuntimeError(f"PR creation failed (HTTP {exc.code}): {exc.reason}") from exc
+
+
+# ── Branch listing & switching ────────────────────────────────────────────────
+
+def fetch_branches(info: GitFileInfo, settings) -> list[str]:
+    """Query the platform REST API for remote branch names (paginated).
+
+    Returns a sorted list of branch names, or raises on error.
+    """
+    _apply_proxy(settings)
+    h = _https_headers(settings, info.platform)
+    branches: list[str] = []
+
+    if info.platform in ("github", "github_enterprise"):
+        base = ("https://api.github.com" if info.platform == "github"
+                else f"{info.base_url}/api/v3")
+        page = 1
+        while True:
+            url = (f"{base}/repos/{info.owner}/{info.repo}"
+                   f"/branches?per_page=100&page={page}")
+            data = json.loads(_http_get(url, h))
+            if not data:
+                break
+            branches.extend(b["name"] for b in data)
+            if len(data) < 100:
+                break
+            page += 1
+
+    elif info.platform == "bitbucket":
+        url = (f"https://api.bitbucket.org/2.0/repositories"
+               f"/{info.owner}/{info.repo}/refs/branches?pagelen=100")
+        while url:
+            data = json.loads(_http_get(url, h))
+            branches.extend(b["name"] for b in data.get("values", []))
+            url = data.get("next", "")
+
+    elif info.platform == "bitbucket_server":
+        start = 0
+        while True:
+            url = (f"{info.base_url}/rest/api/1.0/projects/{info.owner}"
+                   f"/repos/{info.repo}/branches?limit=100&start={start}")
+            data = json.loads(_http_get(url, h))
+            branches.extend(b["displayId"] for b in data.get("values", []))
+            if data.get("isLastPage", True):
+                break
+            start = data.get("nextPageStart", start + 100)
+
+    else:
+        raise ValueError(f"Unknown platform: {info.platform!r}")
+
+    branches.sort(key=str.lower)
+    return branches
+
+
+def switch_branch(info: GitFileInfo, new_branch: str,
+                  settings, progress_cb) -> str:
+    """Switch the working copy to *new_branch*.
+
+    Returns the path to the (possibly new) local file.
+
+    HTTPS API:  re-download the file for the new branch.
+    git binary: fetch + checkout the new branch.
+    SSH/dulwich: fetch + update refs + rebuild index.
+    """
+    auth_method = settings.value("git/auth_method", "https")
+
+    if auth_method == "git":
+        return _switch_via_git_binary(info, new_branch, settings, progress_cb)
+
+    if auth_method == "ssh":
+        return _switch_via_ssh(info, new_branch, settings, progress_cb)
+
+    # HTTPS API path — re-download the single file
+    return _switch_via_api(info, new_branch, settings, progress_cb)
+
+
+def _switch_via_api(info: GitFileInfo, new_branch: str,
+                    settings, progress_cb) -> str:
+    """Switch by re-downloading the file from the new branch via REST API."""
+    _apply_proxy(settings)
+    old_branch = info.branch
+    info.branch = new_branch
+    progress_cb(20, "Downloading file …")
+    try:
+        content, sha = _download_file(info, settings)
+    except Exception:
+        info.branch = old_branch
+        raise
+    info.file_sha = sha
+    local_path = info.local_file_path
+    os.makedirs(os.path.dirname(local_path), exist_ok=True)
+    with open(local_path, "wb") as f:
+        f.write(content)
+    progress_cb(100, "File downloaded.")
+    return local_path
+
+
+def _switch_via_git_binary(info: GitFileInfo, new_branch: str,
+                           settings, progress_cb) -> str:
+    """Switch via git fetch + git checkout."""
+    import subprocess
+
+    user  = settings.value("git/https_username", "") or "x-access-token"
+    token = get_secret("git/https_token")
+    name  = (settings.value("git/user_name",  "") or "").strip()
+    email = (settings.value("git/user_email", "") or "").strip()
+    repo_path = info.local_repo_path
+    env = _git_env(settings)
+
+    isolated_home = _make_isolated_home(repo_path, name, email, env)
+    env["HOME"] = isolated_home
+    env["GIT_CONFIG_NOSYSTEM"] = "1"
+
+    fetch_url = _build_https_clone_url(info.clone_url, user, token) if token else "origin"
+
+    def _run(*cmd, step_msg: str) -> None:
+        progress_cb(0, step_msg)
+        result = subprocess.run(list(cmd), cwd=repo_path, env=env,
+                                capture_output=True, text=True)
+        if result.returncode != 0:
+            err = (result.stderr or result.stdout).strip()
+            if user and token:
+                err = err.replace(f"{user}:{token}@", "")
+            raise RuntimeError(f"{cmd[1]} failed:\n{err}")
+
+    _run("git", "fetch", fetch_url,
+         f"+refs/heads/{new_branch}:refs/remotes/origin/{new_branch}",
+         step_msg="Fetching branch …")
+    _run("git", "checkout", "-B", new_branch, f"origin/{new_branch}",
+         step_msg="Switching branch …")
+
+    info.branch = new_branch
+    local_path = os.path.join(repo_path, info.file_path)
+    if not os.path.isfile(local_path):
+        raise FileNotFoundError(f"File not found on branch '{new_branch}'.")
+    progress_cb(100, "Branch switched.")
+    return local_path
+
+
+def _switch_via_ssh(info: GitFileInfo, new_branch: str,
+                    settings, progress_cb) -> str:
+    """Switch via dulwich fetch + index rebuild."""
+    from dulwich import porcelain
+    from dulwich.index import build_index_from_tree
+    from dulwich.repo import Repo
+
+    repo_path  = info.local_repo_path
+    errstream  = _ProgressStream(progress_cb)
+    key_path   = settings.value("git/ssh_key_path", "")
+    passphrase = get_secret("git/ssh_passphrase")
+    fetch_url  = _ssh_clone_url(info)
+
+    progress_cb(20, "Fetching branch …")
+    vendor = _make_paramiko_vendor(key_path, passphrase)
+    if vendor is not None:
+        import dulwich.client as _dc
+        _orig = _dc.get_ssh_vendor
+        _dc.get_ssh_vendor = lambda: vendor
+        try:
+            porcelain.fetch(repo_path, remote_location=fetch_url,
+                            errstream=errstream)
+        finally:
+            _dc.get_ssh_vendor = _orig
+    else:
+        porcelain.fetch(repo_path, remote_location=fetch_url,
+                        errstream=errstream)
+
+    progress_cb(60, "Switching branch …")
+    with Repo(repo_path) as repo:
+        remote_ref = b"refs/remotes/origin/" + new_branch.encode()
+        if remote_ref not in repo.refs:
+            raise RuntimeError(f"Branch '{new_branch}' not found in remote refs.")
+        target_sha = repo.refs[remote_ref]
+        local_ref  = b"refs/heads/" + new_branch.encode()
+        repo.refs[local_ref] = target_sha
+        repo.refs.set_symbolic_ref(b"HEAD", local_ref)
+        commit_obj = repo[target_sha]
+        build_index_from_tree(repo.path, repo.index_path(),
+                              repo.object_store, commit_obj.tree)
+
+    info.branch = new_branch
+    local_path = os.path.join(repo_path, info.file_path)
+    if not os.path.isfile(local_path):
+        raise FileNotFoundError(f"File not found on branch '{new_branch}'.")
+    progress_cb(100, "Branch switched.")
+    return local_path
+
+
+def pull_latest(info: GitFileInfo, settings, progress_cb) -> None:
+    """Pull latest changes for the current branch.
+
+    HTTPS API:  re-download the file.
+    git binary: git pull --ff-only.
+    SSH/dulwich: fetch + fast-forward + rebuild index.
+    """
+    auth_method = settings.value("git/auth_method", "https")
+
+    if auth_method == "git":
+        _pull_via_git_binary(info, settings, progress_cb)
+    elif auth_method == "ssh":
+        _pull_via_ssh(info, settings, progress_cb)
+    else:
+        _pull_via_api(info, settings, progress_cb)
+
+
+def _pull_via_api(info: GitFileInfo, settings, progress_cb) -> None:
+    """Pull by re-downloading the file via REST API."""
+    _apply_proxy(settings)
+    progress_cb(20, "Downloading latest …")
+    content, sha = _download_file(info, settings)
+    info.file_sha = sha
+    with open(info.local_file_path, "wb") as f:
+        f.write(content)
+    progress_cb(100, "Done.")
+
+
+def _pull_via_git_binary(info: GitFileInfo, settings, progress_cb) -> None:
+    """Pull via git fetch + git reset --hard origin/branch."""
+    import subprocess
+
+    user  = settings.value("git/https_username", "") or "x-access-token"
+    token = get_secret("git/https_token")
+    name  = (settings.value("git/user_name",  "") or "").strip()
+    email = (settings.value("git/user_email", "") or "").strip()
+    repo_path = info.local_repo_path
+    env = _git_env(settings)
+
+    isolated_home = _make_isolated_home(repo_path, name, email, env)
+    env["HOME"] = isolated_home
+    env["GIT_CONFIG_NOSYSTEM"] = "1"
+
+    fetch_url = _build_https_clone_url(info.clone_url, user, token) if token else "origin"
+
+    def _run(*cmd, step_msg: str) -> None:
+        progress_cb(0, step_msg)
+        result = subprocess.run(list(cmd), cwd=repo_path, env=env,
+                                capture_output=True, text=True)
+        if result.returncode != 0:
+            err = (result.stderr or result.stdout).strip()
+            if user and token:
+                err = err.replace(f"{user}:{token}@", "")
+            raise RuntimeError(f"{cmd[1]} failed:\n{err}")
+
+    _run("git", "fetch", fetch_url,
+         f"+refs/heads/{info.branch}:refs/remotes/origin/{info.branch}",
+         step_msg="Fetching latest …")
+    _run("git", "reset", "--hard", f"origin/{info.branch}",
+         step_msg="Updating working copy …")
+    progress_cb(100, "Done.")
+
+
+def _pull_via_ssh(info: GitFileInfo, settings, progress_cb) -> None:
+    """Pull via dulwich fetch + fast-forward + index rebuild."""
+    from dulwich import porcelain
+    from dulwich.index import build_index_from_tree
+    from dulwich.repo import Repo
+
+    repo_path  = info.local_repo_path
+    errstream  = _ProgressStream(progress_cb)
+    key_path   = settings.value("git/ssh_key_path", "")
+    passphrase = get_secret("git/ssh_passphrase")
+    fetch_url  = _ssh_clone_url(info)
+
+    progress_cb(20, "Fetching latest …")
+    vendor = _make_paramiko_vendor(key_path, passphrase)
+    if vendor is not None:
+        import dulwich.client as _dc
+        _orig = _dc.get_ssh_vendor
+        _dc.get_ssh_vendor = lambda: vendor
+        try:
+            porcelain.fetch(repo_path, remote_location=fetch_url,
+                            errstream=errstream)
+        finally:
+            _dc.get_ssh_vendor = _orig
+    else:
+        porcelain.fetch(repo_path, remote_location=fetch_url,
+                        errstream=errstream)
+
+    progress_cb(60, "Updating working copy …")
+    with Repo(repo_path) as repo:
+        remote_ref = b"refs/remotes/origin/" + info.branch.encode()
+        if remote_ref in repo.refs:
+            target_sha = repo.refs[remote_ref]
+            local_ref  = b"refs/heads/" + info.branch.encode()
+            repo.refs[local_ref] = target_sha
+            commit_obj = repo[target_sha]
+            build_index_from_tree(repo.path, repo.index_path(),
+                                  repo.object_store, commit_obj.tree)
+    progress_cb(100, "Done.")

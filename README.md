@@ -34,6 +34,7 @@ A modern, feature-rich Markdown editor built with Python and PyQt6. Includes a l
 - **Pandoc export** *(optional)* — DOCX, EPUB, LaTeX via `pandoc` if installed on PATH (File → Export as DOCX/EPUB/LaTeX)
 - **Git integration** — open individual files or entire branches directly from GitHub, GitHub Enterprise, Bitbucket Cloud, or Bitbucket Server; edit and push back without leaving the editor; amend the previous commit or squash multiple commits in one step (see [Git Integration](#git-integration))
 - **Inline diff view** — when a git-managed file is open, the gutter shows coloured bars next to changed lines: green for added, orange for modified, and red for deleted blocks; markers update live as you type and reset to clean after each commit & push
+- **Branch switcher** — when a git-managed file is open, the status bar shows the current branch name; click it to open a dialog where you can switch to any remote branch or pull the latest changes for the current branch
 - **Focus mode** — hide the file tree, preview, and status bar with a single `F11` keypress for distraction-free writing; all panels restore to their previous state when you press `F11` again (View → Focus Mode)
 - **Word count & reading time** — word count and estimated reading time always visible in the status bar; set an optional target word count (View → Set Word Goal) to show a compact progress bar toward your goal
 - **Online user manual** — comprehensive documentation in 14 languages: EN, DE, AR, VI, SV, UK, KN, HI, ES, FR, IT, NL, PT, FA (see [User Manual](docs/index.html))
@@ -160,6 +161,16 @@ Opens a dialog showing all commits on the current branch that are not yet in a c
 
 - **Base branch** field: change the reference branch (e.g. `main`, `master`, `develop`) and click **Reload** to refresh the list
 - **Select all new commits**: checks all commits in the list at once
+
+### Branch switching
+
+When a git-managed file is open, the status bar shows the **current branch name** in green. Click it to open the **Switch Branch** dialog:
+
+- **Pull Latest** — re-download (HTTPS API) or `git pull` (SSH/git binary) the latest changes for the current branch
+- **Filter** — type to search through the list of remote branches
+- **Switch** — select a branch and click Switch (or double-click) to check out that branch; the file reloads automatically
+
+All three authentication methods are supported: HTTPS (API), HTTPS (git binary), and SSH.
 
 ### Closing
 

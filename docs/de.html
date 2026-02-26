@@ -572,6 +572,7 @@
           <li><a href="#git-oeffnen">Datei öffnen</a></li>
           <li><a href="#git-speichern">Speichern (Commit &amp; Push)</a></li>
           <li><a href="#git-squash">Commits zusammenführen</a></li>
+          <li><a href="#git-branch">Branch-Wechsel</a></li>
           <li><a href="#git-auth">Authentifizierung</a></li>
           <li><a href="#git-proxy">Proxy</a></li>
           <li><a href="#git-schliessen">Schliessen</a></li>
@@ -765,6 +766,15 @@ python src/main.py</code></pre>
 
       <h3>Zeilennummern</h3>
       <p>Ein Randbereich auf der linken Seite des Editors zeigt Zeilennummern an. Die aktuelle Zeile ist mit einem subtilen Hintergrund hervorgehoben, damit Sie Ihre Position in langen Dokumenten leichter verfolgen können.</p>
+
+      <h3>Inline-Diff-Markierungen</h3>
+      <p>Wenn eine git-verwaltete Datei geöffnet ist, zeigt der Editor-Rand farbige Balken neben Zeilen an, die von der letzten festgeschriebenen Version abweichen:</p>
+      <ul>
+        <li><strong>Grün</strong> — hinzugefügte Zeilen</li>
+        <li><strong>Orange</strong> — geänderte Zeilen</li>
+        <li><strong>Rot</strong> — gelöschte Blöcke (als dünne Markierung über der Löschstelle)</li>
+      </ul>
+      <p>Die Markierungen aktualisieren sich beim Tippen und werden nach jedem erfolgreichen Commit &amp; Push zurückgesetzt.</p>
 
       <h3>Zeilenumbruch</h3>
       <p>Der Zeilenumbruch ist standardmäßig aktiviert. Lange Zeilen werden umgebrochen, um in die sichtbare Editorbreite zu passen. Schalten Sie den Zeilenumbruch jederzeit über <strong>Ansicht → Zeilenumbruch</strong> um. Diese Einstellung wird sitzungsübergreifend gespeichert.</p>
@@ -1253,6 +1263,17 @@ $</code></pre>
           <li><strong>Zusammenführen &amp; Pushen</strong> — schreibt die Branch-History neu und pusht mit Force zum Remote.</li>
         </ul>
         <p>Es müssen mindestens 2 Commits ausgewählt werden, und diese müssen eine zusammenhängende Reihe ab dem neuesten Commit (HEAD) bilden.</p>
+      </section>
+
+      <section id="git-branch">
+        <h3>Branch-Wechsel</h3>
+        <p>Wenn eine git-verwaltete Datei geöffnet ist, zeigt die <strong>Statusleiste</strong> den aktuellen Branch-Namen in Grün an. Klicken Sie darauf, um den Dialog <strong>Branch wechseln</strong> zu öffnen.</p>
+        <ul>
+          <li><strong>Neueste Änderungen abrufen</strong> — Laden Sie die neuesten Änderungen für den aktuellen Branch herunter.</li>
+          <li><strong>Filter</strong> — Tippen Sie, um die Liste der Remote-Branches zu durchsuchen.</li>
+          <li><strong>Wechseln</strong> — Wählen Sie einen anderen Branch und klicken Sie auf Wechseln (oder Doppelklick), um ihn auszuchecken. Die Datei wird automatisch mit dem Inhalt des neuen Branches neu geladen.</li>
+        </ul>
+        <p>Alle drei Authentifizierungsmethoden werden unterstützt: HTTPS (API), HTTPS (Git-Binary) und SSH.</p>
       </section>
 
       <section id="git-auth">

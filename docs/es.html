@@ -573,6 +573,7 @@
           <li><a href="#git-open">Abrir un archivo</a></li>
           <li><a href="#git-save">Guardar (Commit &amp; Push)</a></li>
           <li><a href="#git-squash">Squash de commits</a></li>
+          <li><a href="#git-branch">Cambiar rama</a></li>
           <li><a href="#git-auth">Autenticación</a></li>
           <li><a href="#git-proxy">Proxy</a></li>
           <li><a href="#git-close">Cerrar</a></li>
@@ -766,6 +767,15 @@ python src/main.py</code></pre>
 
       <h3>Números de línea</h3>
       <p>Un margen en el lado izquierdo del editor muestra los números de línea. La línea actual se resalta con un color de fondo sutil para ayudarle a rastrear su posición en documentos largos.</p>
+
+      <h3>Marcadores de diferencias en línea</h3>
+      <p>Cuando un archivo gestionado por Git está abierto, el margen del editor muestra barras de colores junto a las líneas que difieren de la última versión confirmada:</p>
+      <ul>
+        <li><strong>Verde</strong> — líneas añadidas</li>
+        <li><strong>Naranja</strong> — líneas modificadas</li>
+        <li><strong>Rojo</strong> — bloques eliminados (se muestra como una marca delgada sobre el punto de eliminación)</li>
+      </ul>
+      <p>Los marcadores se actualizan en tiempo real mientras escribes y se restablecen después de cada commit &amp; push exitoso.</p>
 
       <h3>Ajuste de línea</h3>
       <p>El ajuste de línea está habilitado de forma predeterminada. Las líneas largas se ajustan para encajar en el ancho visible del editor. Active/desactive el ajuste de línea en cualquier momento mediante <strong>Ver → Ajuste de línea</strong>. La preferencia se guarda entre sesiones.</p>
@@ -1254,6 +1264,17 @@ $</code></pre>
           <li><strong>Squash &amp; Push</strong> — reescribe el historial de la rama y hace force-push al remoto.</li>
         </ul>
         <p>Debe seleccionar al menos 2 commits, y deben formar un rango contiguo comenzando desde el commit más reciente (HEAD).</p>
+      </section>
+
+      <section id="git-branch">
+        <h3>Cambiar rama</h3>
+        <p>Cuando un archivo gestionado por Git está abierto, la <strong>barra de estado</strong> muestra el nombre de la rama actual en verde. Haz clic en él para abrir el diálogo <strong>Cambiar rama</strong>.</p>
+        <ul>
+          <li><strong>Obtener más reciente</strong> — volver a descargar los últimos cambios para la rama actual.</li>
+          <li><strong>Filtro</strong> — escribe para buscar en la lista de ramas remotas.</li>
+          <li><strong>Cambiar</strong> — selecciona una rama diferente y haz clic en Cambiar (o doble clic) para activarla. El archivo se recarga automáticamente con el contenido de la nueva rama.</li>
+        </ul>
+        <p>Se admiten los tres métodos de autenticación: HTTPS (API), HTTPS (git binary) y SSH.</p>
       </section>
 
       <section id="git-auth">

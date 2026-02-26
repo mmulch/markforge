@@ -381,6 +381,28 @@ _DE: dict[str, str] = {
     "Word Goal":                   "Wortziel",
     "Target word count (0 to disable):": "Ziel-Wortanzahl (0 zum Deaktivieren):",
 
+    # ── Branch switcher ───────────────────────────────────────────────────────
+    "Click to switch branch":                    "Klicken, um Branch zu wechseln",
+    "Branch: {branch}\nClick to switch":         "Branch: {branch}\nKlicken zum Wechseln",
+    "Switch Branch":                             "Branch wechseln",
+    "Current branch: <b>{branch}</b>":           "Aktueller Branch: <b>{branch}</b>",
+    "Pull Latest":                               "Neueste Änderungen abrufen",
+    "Pull latest changes for '{branch}'":        "Neueste Änderungen für '{branch}' abrufen",
+    "Switch to branch:":                         "Zu Branch wechseln:",
+    "Filter branches …":                         "Branches filtern …",
+    "Switch":                                    "Wechseln",
+    "Cancel":                                    "Abbrechen",
+    "current":                                   "aktuell",
+    "{n} branches found":                        "{n} Branches gefunden",
+    "Switching to branch '{branch}' …":          "Wechsle zu Branch '{branch}' …",
+    "Switched to branch '{branch}'.":            "Zu Branch '{branch}' gewechselt.",
+    "Branch switch failed:\n{exc}":              "Branch-Wechsel fehlgeschlagen:\n{exc}",
+    "File not found on branch '{branch}'.":      "Datei auf Branch '{branch}' nicht gefunden.",
+    "Pulling latest changes …":                  "Neueste Änderungen werden abgerufen …",
+    "Git Pull":                                  "Git Pull",
+    "Pull complete.":                            "Pull abgeschlossen.",
+    "Git pull failed:\n{exc}":                   "Git Pull fehlgeschlagen:\n{exc}",
+
 
 }
 
@@ -720,6 +742,28 @@ _AR: dict[str, str] = {
     "Set Word Goal …":             "تعيين هدف الكلمات …",
     "Word Goal":                   "هدف الكلمات",
     "Target word count (0 to disable):": "عدد الكلمات المستهدف (0 للتعطيل):",
+
+    # ── Branch switcher ───────────────────────────────────────────────────────
+    "Click to switch branch":                    "انقر لتبديل الفرع",
+    "Branch: {branch}\nClick to switch":         "الفرع: {branch}\nانقر للتبديل",
+    "Switch Branch":                             "تبديل الفرع",
+    "Current branch: <b>{branch}</b>":           "الفرع الحالي: <b>{branch}</b>",
+    "Pull Latest":                               "سحب أحدث التغييرات",
+    "Pull latest changes for '{branch}'":        "سحب أحدث التغييرات لـ '{branch}'",
+    "Switch to branch:":                         "التبديل إلى فرع:",
+    "Filter branches …":                         "تصفية الفروع …",
+    "Switch":                                    "تبديل",
+    "Cancel":                                    "إلغاء",
+    "current":                                   "حالي",
+    "{n} branches found":                        "تم العثور على {n} فروع",
+    "Switching to branch '{branch}' …":          "جاري التبديل إلى الفرع '{branch}' …",
+    "Switched to branch '{branch}'.":            "تم التبديل إلى الفرع '{branch}'.",
+    "Branch switch failed:\n{exc}":              "فشل تبديل الفرع:\n{exc}",
+    "File not found on branch '{branch}'.":      "الملف غير موجود في الفرع '{branch}'.",
+    "Pulling latest changes …":                  "جاري سحب أحدث التغييرات …",
+    "Git Pull":                                  "Git Pull",
+    "Pull complete.":                            "اكتمل السحب.",
+    "Git pull failed:\n{exc}":                   "فشل السحب:\n{exc}",
 
 
 }
@@ -1062,6 +1106,28 @@ _VI: dict[str, str] = {
     "Word Goal":                   "Mục tiêu từ",
     "Target word count (0 to disable):": "Số từ mục tiêu (0 để tắt):",
 
+    # ── Branch switcher ───────────────────────────────────────────────────────
+    "Click to switch branch":                    "Nhấn để chuyển nhánh",
+    "Branch: {branch}\nClick to switch":         "Nhánh: {branch}\nNhấn để chuyển",
+    "Switch Branch":                             "Chuyển nhánh",
+    "Current branch: <b>{branch}</b>":           "Nhánh hiện tại: <b>{branch}</b>",
+    "Pull Latest":                               "Tải bản mới nhất",
+    "Pull latest changes for '{branch}'":        "Tải các thay đổi mới nhất cho '{branch}'",
+    "Switch to branch:":                         "Chuyển sang nhánh:",
+    "Filter branches …":                         "Lọc nhánh …",
+    "Switch":                                    "Chuyển",
+    "Cancel":                                    "Hủy",
+    "current":                                   "hiện tại",
+    "{n} branches found":                        "Tìm thấy {n} nhánh",
+    "Switching to branch '{branch}' …":          "Đang chuyển sang nhánh '{branch}' …",
+    "Switched to branch '{branch}'.":            "Đã chuyển sang nhánh '{branch}'.",
+    "Branch switch failed:\n{exc}":              "Chuyển nhánh thất bại:\n{exc}",
+    "File not found on branch '{branch}'.":      "Không tìm thấy tệp trên nhánh '{branch}'.",
+    "Pulling latest changes …":                  "Đang tải các thay đổi mới nhất …",
+    "Git Pull":                                  "Git Pull",
+    "Pull complete.":                            "Tải hoàn tất.",
+    "Git pull failed:\n{exc}":                   "Tải thất bại:\n{exc}",
+
 
 }
 
@@ -1402,6 +1468,28 @@ _SV: dict[str, str] = {
     "Set Word Goal …":             "Sätt ordmål …",
     "Word Goal":                   "Ordmål",
     "Target word count (0 to disable):": "Målantal ord (0 för att inaktivera):",
+
+    # ── Branch switcher ───────────────────────────────────────────────────────
+    "Click to switch branch":                    "Klicka för att byta gren",
+    "Branch: {branch}\nClick to switch":         "Gren: {branch}\nKlicka för att byta",
+    "Switch Branch":                             "Byt gren",
+    "Current branch: <b>{branch}</b>":           "Nuvarande gren: <b>{branch}</b>",
+    "Pull Latest":                               "Hämta senaste",
+    "Pull latest changes for '{branch}'":        "Hämta senaste ändringar för '{branch}'",
+    "Switch to branch:":                         "Byt till gren:",
+    "Filter branches …":                         "Filtrera grenar …",
+    "Switch":                                    "Byt",
+    "Cancel":                                    "Avbryt",
+    "current":                                   "nuvarande",
+    "{n} branches found":                        "{n} grenar hittades",
+    "Switching to branch '{branch}' …":          "Byter till gren '{branch}' …",
+    "Switched to branch '{branch}'.":            "Bytte till gren '{branch}'.",
+    "Branch switch failed:\n{exc}":              "Grenbyte misslyckades:\n{exc}",
+    "File not found on branch '{branch}'.":      "Filen hittades inte på grenen '{branch}'.",
+    "Pulling latest changes …":                  "Hämtar senaste ändringar …",
+    "Git Pull":                                  "Git Pull",
+    "Pull complete.":                            "Hämtning klar.",
+    "Git pull failed:\n{exc}":                   "Git pull misslyckades:\n{exc}",
 
 
 }
@@ -1744,6 +1832,28 @@ _UK: dict[str, str] = {
     "Word Goal":                   "Мета слів",
     "Target word count (0 to disable):": "Цільова кількість слів (0 для вимкнення):",
 
+    # ── Branch switcher ───────────────────────────────────────────────────────
+    "Click to switch branch":                    "Натисніть, щоб змінити гілку",
+    "Branch: {branch}\nClick to switch":         "Гілка: {branch}\nНатисніть для зміни",
+    "Switch Branch":                             "Змінити гілку",
+    "Current branch: <b>{branch}</b>":           "Поточна гілка: <b>{branch}</b>",
+    "Pull Latest":                               "Завантажити останні зміни",
+    "Pull latest changes for '{branch}'":        "Завантажити останні зміни для '{branch}'",
+    "Switch to branch:":                         "Перейти на гілку:",
+    "Filter branches …":                         "Фільтрувати гілки …",
+    "Switch":                                    "Перейти",
+    "Cancel":                                    "Скасувати",
+    "current":                                   "поточна",
+    "{n} branches found":                        "Знайдено {n} гілок",
+    "Switching to branch '{branch}' …":          "Перехід на гілку '{branch}' …",
+    "Switched to branch '{branch}'.":            "Перейшли на гілку '{branch}'.",
+    "Branch switch failed:\n{exc}":              "Зміна гілки не вдалася:\n{exc}",
+    "File not found on branch '{branch}'.":      "Файл не знайдено на гілці '{branch}'.",
+    "Pulling latest changes …":                  "Завантаження останніх змін …",
+    "Git Pull":                                  "Git Pull",
+    "Pull complete.":                            "Завантаження завершено.",
+    "Git pull failed:\n{exc}":                   "Git pull не вдався:\n{exc}",
+
 
 }
 
@@ -2084,6 +2194,28 @@ _KN: dict[str, str] = {
     "Set Word Goal …":             "ಪದ ಗುರಿ ಹೊಂದಿಸಿ …",
     "Word Goal":                   "ಪದ ಗುರಿ",
     "Target word count (0 to disable):": "ಗುರಿ ಪದ ಸಂಖ್ಯೆ (0 ನಿಷ್ಕ್ರಿಯಗೊಳಿಸಲು):",
+
+    # ── Branch switcher ───────────────────────────────────────────────────────
+    "Click to switch branch":                    "ಶಾಖೆ ಬದಲಿಸಲು ಕ್ಲಿಕ್ ಮಾಡಿ",
+    "Branch: {branch}\nClick to switch":         "ಶಾಖೆ: {branch}\nಬದಲಿಸಲು ಕ್ಲಿಕ್ ಮಾಡಿ",
+    "Switch Branch":                             "ಶಾಖೆ ಬದಲಿಸಿ",
+    "Current branch: <b>{branch}</b>":           "ಪ್ರಸ್ತುತ ಶಾಖೆ: <b>{branch}</b>",
+    "Pull Latest":                               "ಇತ್ತೀಚಿನದನ್ನು ಪಡೆಯಿರಿ",
+    "Pull latest changes for '{branch}'":        "'{branch}' ಗಾಗಿ ಇತ್ತೀಚಿನ ಬದಲಾವಣೆಗಳನ್ನು ಪಡೆಯಿರಿ",
+    "Switch to branch:":                         "ಶಾಖೆಗೆ ಬದಲಿಸಿ:",
+    "Filter branches …":                         "ಶಾಖೆಗಳನ್ನು ಫಿಲ್ಟರ್ ಮಾಡಿ …",
+    "Switch":                                    "ಬದಲಿಸಿ",
+    "Cancel":                                    "ರದ್ದು",
+    "current":                                   "ಪ್ರಸ್ತುತ",
+    "{n} branches found":                        "{n} ಶಾಖೆಗಳು ಕಂಡುಬಂದಿವೆ",
+    "Switching to branch '{branch}' …":          "ಶಾಖೆ '{branch}' ಗೆ ಬದಲಿಸಲಾಗುತ್ತಿದೆ …",
+    "Switched to branch '{branch}'.":            "ಶಾಖೆ '{branch}' ಗೆ ಬದಲಿಸಲಾಗಿದೆ.",
+    "Branch switch failed:\n{exc}":              "ಶಾಖೆ ಬದಲಾವಣೆ ವಿಫಲವಾಯಿತು:\n{exc}",
+    "File not found on branch '{branch}'.":      "ಶಾಖೆ '{branch}' ನಲ್ಲಿ ಫೈಲ್ ಕಂಡುಬಂದಿಲ್ಲ.",
+    "Pulling latest changes …":                  "ಇತ್ತೀಚಿನ ಬದಲಾವಣೆಗಳನ್ನು ಪಡೆಯಲಾಗುತ್ತಿದೆ …",
+    "Git Pull":                                  "Git Pull",
+    "Pull complete.":                            "ಪಡೆಯುವಿಕೆ ಪೂರ್ಣ.",
+    "Git pull failed:\n{exc}":                   "Git pull ವಿಫಲವಾಯಿತು:\n{exc}",
 
 
 }
@@ -2426,6 +2558,28 @@ _HI: dict[str, str] = {
     "Word Goal":                   "शब्द लक्ष्य",
     "Target word count (0 to disable):": "लक्ष्य शब्द संख्या (0 अक्षम करने के लिए):",
 
+    # ── Branch switcher ───────────────────────────────────────────────────────
+    "Click to switch branch":                    "शाखा बदलने के लिए क्लिक करें",
+    "Branch: {branch}\nClick to switch":         "शाखा: {branch}\nबदलने के लिए क्लिक करें",
+    "Switch Branch":                             "शाखा बदलें",
+    "Current branch: <b>{branch}</b>":           "वर्तमान शाखा: <b>{branch}</b>",
+    "Pull Latest":                               "नवीनतम प्राप्त करें",
+    "Pull latest changes for '{branch}'":        "'{branch}' के लिए नवीनतम परिवर्तन प्राप्त करें",
+    "Switch to branch:":                         "शाखा पर जाएं:",
+    "Filter branches …":                         "शाखाएं फ़िल्टर करें …",
+    "Switch":                                    "बदलें",
+    "Cancel":                                    "रद्द करें",
+    "current":                                   "वर्तमान",
+    "{n} branches found":                        "{n} शाखाएं मिलीं",
+    "Switching to branch '{branch}' …":          "शाखा '{branch}' पर जा रहे हैं …",
+    "Switched to branch '{branch}'.":            "शाखा '{branch}' पर बदला गया.",
+    "Branch switch failed:\n{exc}":              "शाखा बदलना विफल:\n{exc}",
+    "File not found on branch '{branch}'.":      "शाखा '{branch}' पर फ़ाइल नहीं मिली.",
+    "Pulling latest changes …":                  "नवीनतम परिवर्तन प्राप्त किए जा रहे हैं …",
+    "Git Pull":                                  "Git Pull",
+    "Pull complete.":                            "Pull पूर्ण.",
+    "Git pull failed:\n{exc}":                   "Git pull विफल:\n{exc}",
+
 
 }
 
@@ -2740,6 +2894,28 @@ _ES: dict[str, str] = {
     "Set Word Goal …":             "Establecer meta de palabras …",
     "Word Goal":                   "Meta de palabras",
     "Target word count (0 to disable):": "Recuento de palabras objetivo (0 para desactivar):",
+
+    # ── Branch switcher ───────────────────────────────────────────────────────
+    "Click to switch branch":                    "Clic para cambiar rama",
+    "Branch: {branch}\nClick to switch":         "Rama: {branch}\nClic para cambiar",
+    "Switch Branch":                             "Cambiar rama",
+    "Current branch: <b>{branch}</b>":           "Rama actual: <b>{branch}</b>",
+    "Pull Latest":                               "Obtener más reciente",
+    "Pull latest changes for '{branch}'":        "Obtener los últimos cambios de '{branch}'",
+    "Switch to branch:":                         "Cambiar a rama:",
+    "Filter branches …":                         "Filtrar ramas …",
+    "Switch":                                    "Cambiar",
+    "Cancel":                                    "Cancelar",
+    "current":                                   "actual",
+    "{n} branches found":                        "{n} ramas encontradas",
+    "Switching to branch '{branch}' …":          "Cambiando a la rama '{branch}' …",
+    "Switched to branch '{branch}'.":            "Cambiado a la rama '{branch}'.",
+    "Branch switch failed:\n{exc}":              "Error al cambiar de rama:\n{exc}",
+    "File not found on branch '{branch}'.":      "Archivo no encontrado en la rama '{branch}'.",
+    "Pulling latest changes …":                  "Obteniendo los últimos cambios …",
+    "Git Pull":                                  "Git Pull",
+    "Pull complete.":                            "Pull completado.",
+    "Git pull failed:\n{exc}":                   "Git pull falló:\n{exc}",
 
 
 }
@@ -3057,6 +3233,28 @@ _FR: dict[str, str] = {
     "Word Goal":                   "Objectif de mots",
     "Target word count (0 to disable):": "Nombre de mots cible (0 pour désactiver) :",
 
+    # ── Branch switcher ───────────────────────────────────────────────────────
+    "Click to switch branch":                    "Cliquez pour changer de branche",
+    "Branch: {branch}\nClick to switch":         "Branche : {branch}\nCliquez pour changer",
+    "Switch Branch":                             "Changer de branche",
+    "Current branch: <b>{branch}</b>":           "Branche actuelle : <b>{branch}</b>",
+    "Pull Latest":                               "Récupérer le dernier",
+    "Pull latest changes for '{branch}'":        "Récupérer les dernières modifications de '{branch}'",
+    "Switch to branch:":                         "Changer vers la branche :",
+    "Filter branches …":                         "Filtrer les branches …",
+    "Switch":                                    "Changer",
+    "Cancel":                                    "Annuler",
+    "current":                                   "actuelle",
+    "{n} branches found":                        "{n} branches trouvées",
+    "Switching to branch '{branch}' …":          "Changement vers la branche '{branch}' …",
+    "Switched to branch '{branch}'.":            "Changé vers la branche '{branch}'.",
+    "Branch switch failed:\n{exc}":              "Échec du changement de branche :\n{exc}",
+    "File not found on branch '{branch}'.":      "Fichier introuvable sur la branche '{branch}'.",
+    "Pulling latest changes …":                  "Récupération des dernières modifications …",
+    "Git Pull":                                  "Git Pull",
+    "Pull complete.":                            "Récupération terminée.",
+    "Git pull failed:\n{exc}":                   "Git pull a échoué :\n{exc}",
+
 
 }
 
@@ -3372,6 +3570,28 @@ _IT: dict[str, str] = {
     "Set Word Goal …":             "Imposta obiettivo parole …",
     "Word Goal":                   "Obiettivo parole",
     "Target word count (0 to disable):": "Numero di parole obiettivo (0 per disattivare):",
+
+    # ── Branch switcher ───────────────────────────────────────────────────────
+    "Click to switch branch":                    "Clicca per cambiare ramo",
+    "Branch: {branch}\nClick to switch":         "Ramo: {branch}\nClicca per cambiare",
+    "Switch Branch":                             "Cambia ramo",
+    "Current branch: <b>{branch}</b>":           "Ramo attuale: <b>{branch}</b>",
+    "Pull Latest":                               "Scarica più recente",
+    "Pull latest changes for '{branch}'":        "Scarica le ultime modifiche per '{branch}'",
+    "Switch to branch:":                         "Passa al ramo:",
+    "Filter branches …":                         "Filtra rami …",
+    "Switch":                                    "Cambia",
+    "Cancel":                                    "Annulla",
+    "current":                                   "attuale",
+    "{n} branches found":                        "{n} rami trovati",
+    "Switching to branch '{branch}' …":          "Passaggio al ramo '{branch}' …",
+    "Switched to branch '{branch}'.":            "Passato al ramo '{branch}'.",
+    "Branch switch failed:\n{exc}":              "Cambio ramo fallito:\n{exc}",
+    "File not found on branch '{branch}'.":      "File non trovato nel ramo '{branch}'.",
+    "Pulling latest changes …":                  "Scaricamento delle ultime modifiche …",
+    "Git Pull":                                  "Git Pull",
+    "Pull complete.":                            "Scaricamento completato.",
+    "Git pull failed:\n{exc}":                   "Git pull fallito:\n{exc}",
 
 
 }
@@ -3689,6 +3909,28 @@ _NL: dict[str, str] = {
     "Word Goal":                   "Woorddoel",
     "Target word count (0 to disable):": "Doelaantal woorden (0 om uit te schakelen):",
 
+    # ── Branch switcher ───────────────────────────────────────────────────────
+    "Click to switch branch":                    "Klik om van branch te wisselen",
+    "Branch: {branch}\nClick to switch":         "Branch: {branch}\nKlik om te wisselen",
+    "Switch Branch":                             "Wissel branch",
+    "Current branch: <b>{branch}</b>":           "Huidige branch: <b>{branch}</b>",
+    "Pull Latest":                               "Laatste ophalen",
+    "Pull latest changes for '{branch}'":        "Laatste wijzigingen ophalen voor '{branch}'",
+    "Switch to branch:":                         "Wissel naar branch:",
+    "Filter branches …":                         "Branches filteren …",
+    "Switch":                                    "Wisselen",
+    "Cancel":                                    "Annuleren",
+    "current":                                   "huidig",
+    "{n} branches found":                        "{n} branches gevonden",
+    "Switching to branch '{branch}' …":          "Wisselen naar branch '{branch}' …",
+    "Switched to branch '{branch}'.":            "Gewisseld naar branch '{branch}'.",
+    "Branch switch failed:\n{exc}":              "Branch wisselen mislukt:\n{exc}",
+    "File not found on branch '{branch}'.":      "Bestand niet gevonden op branch '{branch}'.",
+    "Pulling latest changes …":                  "Laatste wijzigingen ophalen …",
+    "Git Pull":                                  "Git Pull",
+    "Pull complete.":                            "Pull voltooid.",
+    "Git pull failed:\n{exc}":                   "Git pull mislukt:\n{exc}",
+
 
 }
 
@@ -4005,6 +4247,28 @@ _PT: dict[str, str] = {
     "Word Goal":                   "Meta de palavras",
     "Target word count (0 to disable):": "Contagem de palavras alvo (0 para desativar):",
 
+    # ── Branch switcher ───────────────────────────────────────────────────────
+    "Click to switch branch":                    "Clique para trocar branch",
+    "Branch: {branch}\nClick to switch":         "Branch: {branch}\nClique para trocar",
+    "Switch Branch":                             "Trocar branch",
+    "Current branch: <b>{branch}</b>":           "Branch atual: <b>{branch}</b>",
+    "Pull Latest":                               "Obter mais recente",
+    "Pull latest changes for '{branch}'":        "Obter as últimas alterações de '{branch}'",
+    "Switch to branch:":                         "Trocar para branch:",
+    "Filter branches …":                         "Filtrar branches …",
+    "Switch":                                    "Trocar",
+    "Cancel":                                    "Cancelar",
+    "current":                                   "atual",
+    "{n} branches found":                        "{n} branches encontrados",
+    "Switching to branch '{branch}' …":          "Trocando para branch '{branch}' …",
+    "Switched to branch '{branch}'.":            "Trocado para branch '{branch}'.",
+    "Branch switch failed:\n{exc}":              "Falha ao trocar branch:\n{exc}",
+    "File not found on branch '{branch}'.":      "Arquivo não encontrado no branch '{branch}'.",
+    "Pulling latest changes …":                  "Obtendo as últimas alterações …",
+    "Git Pull":                                  "Git Pull",
+    "Pull complete.":                            "Pull concluído.",
+    "Git pull failed:\n{exc}":                   "Git pull falhou:\n{exc}",
+
 
 }
 
@@ -4320,6 +4584,28 @@ _FA: dict[str, str] = {
     "Set Word Goal …":             "تنظیم هدف کلمه …",
     "Word Goal":                   "هدف کلمه",
     "Target word count (0 to disable):": "تعداد کلمه هدف (۰ برای غیرفعال‌سازی):",
+
+    # ── Branch switcher ───────────────────────────────────────────────────────
+    "Click to switch branch":                    "برای تغییر شاخه کلیک کنید",
+    "Branch: {branch}\nClick to switch":         "شاخه: {branch}\nبرای تغییر کلیک کنید",
+    "Switch Branch":                             "تغییر شاخه",
+    "Current branch: <b>{branch}</b>":           "شاخه فعلی: <b>{branch}</b>",
+    "Pull Latest":                               "دریافت آخرین تغییرات",
+    "Pull latest changes for '{branch}'":        "دریافت آخرین تغییرات برای '{branch}'",
+    "Switch to branch:":                         "تغییر به شاخه:",
+    "Filter branches …":                         "فیلتر شاخه‌ها …",
+    "Switch":                                    "تغییر",
+    "Cancel":                                    "لغو",
+    "current":                                   "فعلی",
+    "{n} branches found":                        "{n} شاخه یافت شد",
+    "Switching to branch '{branch}' …":          "در حال تغییر به شاخه '{branch}' …",
+    "Switched to branch '{branch}'.":            "به شاخه '{branch}' تغییر یافت.",
+    "Branch switch failed:\n{exc}":              "تغییر شاخه ناموفق:\n{exc}",
+    "File not found on branch '{branch}'.":      "فایل در شاخه '{branch}' یافت نشد.",
+    "Pulling latest changes …":                  "در حال دریافت آخرین تغییرات …",
+    "Git Pull":                                  "Git Pull",
+    "Pull complete.":                            "دریافت کامل شد.",
+    "Git pull failed:\n{exc}":                   "Git pull ناموفق:\n{exc}",
 
 }
 

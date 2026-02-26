@@ -573,6 +573,7 @@
           <li><a href="#git-open">Ouvrir un fichier</a></li>
           <li><a href="#git-save">Enregistrer (Commit &amp; Push)</a></li>
           <li><a href="#git-squash">Squash de commits</a></li>
+          <li><a href="#git-branch">Changer de branche</a></li>
           <li><a href="#git-auth">Authentification</a></li>
           <li><a href="#git-proxy">Proxy</a></li>
           <li><a href="#git-close">Fermer</a></li>
@@ -766,6 +767,15 @@ python src/main.py</code></pre>
 
       <h3>Numéros de ligne</h3>
       <p>Une marge sur le côté gauche de l'éditeur affiche les numéros de ligne. La ligne courante est mise en surbrillance avec une couleur de fond subtile pour vous aider à suivre votre position dans les longs documents.</p>
+
+      <h3>Marqueurs de différences en ligne</h3>
+      <p>Lorsqu'un fichier géré par Git est ouvert, la gouttière de l'éditeur affiche des barres colorées à côté des lignes qui diffèrent de la dernière version validée :</p>
+      <ul>
+        <li><strong>Vert</strong> — lignes ajoutées</li>
+        <li><strong>Orange</strong> — lignes modifiées</li>
+        <li><strong>Rouge</strong> — blocs supprimés (affichés comme un fin marqueur au-dessus du point de suppression)</li>
+      </ul>
+      <p>Les marqueurs se mettent à jour en temps réel pendant la saisie et se réinitialisent après chaque commit &amp; push réussi.</p>
 
       <h3>Retour à la ligne</h3>
       <p>Le retour à la ligne est activé par défaut. Les longues lignes sont ajustées à la largeur visible de l'éditeur. Activez/désactivez le retour à la ligne à tout moment via <strong>Affichage → Retour à la ligne</strong>. La préférence est sauvegardée entre les sessions.</p>
@@ -1254,6 +1264,17 @@ $</code></pre>
           <li><strong>Squash &amp; Push</strong> — réécrit l'historique de la branche et effectue un force-push vers le distant.</li>
         </ul>
         <p>Vous devez sélectionner au moins 2 commits, et ils doivent former une plage contiguë commençant par le commit le plus récent (HEAD).</p>
+      </section>
+
+      <section id="git-branch">
+        <h3>Changer de branche</h3>
+        <p>Lorsqu'un fichier géré par Git est ouvert, la <strong>barre d'état</strong> affiche le nom de la branche actuelle en vert. Cliquez dessus pour ouvrir le dialogue <strong>Changer de branche</strong>.</p>
+        <ul>
+          <li><strong>Récupérer le dernier</strong> — retélécharger les dernières modifications pour la branche actuelle.</li>
+          <li><strong>Filtre</strong> — tapez pour rechercher dans la liste des branches distantes.</li>
+          <li><strong>Changer</strong> — sélectionnez une branche différente et cliquez sur Changer (ou double-cliquez) pour l'activer. Le fichier se recharge automatiquement avec le contenu de la nouvelle branche.</li>
+        </ul>
+        <p>Les trois méthodes d'authentification sont prises en charge : HTTPS (API), HTTPS (git binary) et SSH.</p>
       </section>
 
       <section id="git-auth">

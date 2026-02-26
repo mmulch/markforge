@@ -23,7 +23,8 @@ from PyQt6.QtWidgets import (
 )
 
 from git_manager import (CommitInfo, CommitSpec, GitFileInfo,
-                         fetch_default_branch, parse_git_url, parse_git_repo_url)
+                         fetch_default_branch, fetch_branches,
+                         parse_git_url, parse_git_repo_url)
 from i18n import tr
 
 
@@ -663,3 +664,172 @@ class GitSquashDialog(QDialog):
         uses HEAD~squash_count as the target parent.
         """
         return len(self._checked_rows()), self._msg_edit.toPlainText().strip()
+
+
+class _BranchListWorker(QThread):
+    """Background thread that fetches the list of remote branches."""
+    finished = pyqtSignal(list)   # list[str]
+    failed   = pyqtSignal(str)
+
+    def __init__(self, info: GitFileInfo, settings, parent=None) -> None:
+        super().__init__(parent)
+        self._info     = info
+        self._settings = settings
+
+    def run(self) -> None:
+        try:
+            branches = fetch_branches(self._info, self._settings)
+            self.finished.emit(branches)
+        except Exception as exc:
+            self.failed.emit(str(exc))
+
+
+class GitBranchSwitchDialog(QDialog):
+    """Dialog for switching branches or pulling latest changes."""
+
+    def __init__(self, info: GitFileInfo, settings, parent=None) -> None:
+        super().__init__(parent)
+        self._info     = info
+        self._settings = settings
+        self._action:  str = ""       # "switch" or "pull"
+        self._branch:  str = ""
+        self._worker: _BranchListWorker | None = None
+        self.setWindowTitle(tr("Switch Branch"))
+        self.setMinimumWidth(420)
+        self.setMinimumHeight(360)
+        self._build_ui()
+        self._load_branches()
+
+    def _build_ui(self) -> None:
+        layout = QVBoxLayout(self)
+        layout.setSpacing(8)
+
+        # Current branch header
+        self._lbl_current = QLabel(
+            tr("Current branch: <b>{branch}</b>", branch=self._info.branch)
+        )
+        layout.addWidget(self._lbl_current)
+
+        # Pull Latest button
+        self._pull_btn = QPushButton(tr("Pull Latest"))
+        self._pull_btn.setToolTip(
+            tr("Pull latest changes for '{branch}'", branch=self._info.branch)
+        )
+        self._pull_btn.clicked.connect(self._on_pull)
+        layout.addWidget(self._pull_btn)
+
+        # Filter
+        self._filter_edit = QLineEdit()
+        self._filter_edit.setPlaceholderText(tr("Filter branches …"))
+        self._filter_edit.textChanged.connect(self._apply_filter)
+        layout.addWidget(self._filter_edit)
+
+        # Branch list
+        from PyQt6.QtWidgets import QListWidget, QListWidgetItem
+        self._list = QListWidget()
+        self._list.itemDoubleClicked.connect(self._on_double_click)
+        layout.addWidget(self._list)
+
+        # Status
+        self._status_lbl = QLabel("")
+        self._status_lbl.setStyleSheet("color: #888; font-size: 12px;")
+        layout.addWidget(self._status_lbl)
+
+        # Buttons
+        btn_layout = QHBoxLayout()
+        self._switch_btn = QPushButton(tr("Switch"))
+        self._switch_btn.setDefault(True)
+        self._switch_btn.setEnabled(False)
+        self._switch_btn.clicked.connect(self._on_switch)
+        cancel_btn = QPushButton(tr("Cancel"))
+        cancel_btn.clicked.connect(self.reject)
+        btn_layout.addStretch()
+        btn_layout.addWidget(self._switch_btn)
+        btn_layout.addWidget(cancel_btn)
+        layout.addLayout(btn_layout)
+
+        self._list.currentItemChanged.connect(self._on_selection_changed)
+
+    def _load_branches(self) -> None:
+        self._status_lbl.setStyleSheet("color: #888; font-size: 12px;")
+        self._status_lbl.setText(tr("Loading …"))
+        self._worker = _BranchListWorker(self._info, self._settings, self)
+        self._worker.finished.connect(self._on_branches_loaded)
+        self._worker.failed.connect(self._on_branches_failed)
+        self._worker.start()
+
+    def _on_branches_loaded(self, branches: list) -> None:
+        self._worker = None
+        self._all_branches = branches
+        self._populate(branches)
+        self._status_lbl.setStyleSheet("color: #888; font-size: 12px;")
+        self._status_lbl.setText(
+            tr("{n} branches found", n=len(branches))
+        )
+
+    def _on_branches_failed(self, msg: str) -> None:
+        self._worker = None
+        self._status_lbl.setStyleSheet("color: #e57373; font-size: 12px;")
+        self._status_lbl.setText(msg)
+
+    def _populate(self, branches: list[str]) -> None:
+        from PyQt6.QtWidgets import QListWidgetItem
+        from PyQt6.QtGui import QFont
+        self._list.clear()
+        for name in branches:
+            if name == self._info.branch:
+                label = f"{name}  ({tr('current')})"
+            else:
+                label = name
+            item = QListWidgetItem(label)
+            item.setData(Qt.ItemDataRole.UserRole, name)
+            if name == self._info.branch:
+                font = item.font()
+                font.setBold(True)
+                item.setFont(font)
+            self._list.addItem(item)
+
+    def _apply_filter(self, text: str) -> None:
+        text = text.strip().lower()
+        if not hasattr(self, "_all_branches"):
+            return
+        if not text:
+            self._populate(self._all_branches)
+        else:
+            filtered = [b for b in self._all_branches if text in b.lower()]
+            self._populate(filtered)
+
+    def _on_selection_changed(self) -> None:
+        item = self._list.currentItem()
+        if item is None:
+            self._switch_btn.setEnabled(False)
+            return
+        branch = item.data(Qt.ItemDataRole.UserRole)
+        self._switch_btn.setEnabled(branch != self._info.branch)
+
+    def _on_double_click(self, item) -> None:
+        branch = item.data(Qt.ItemDataRole.UserRole)
+        if branch and branch != self._info.branch:
+            self._action = "switch"
+            self._branch = branch
+            self.accept()
+
+    def _on_switch(self) -> None:
+        item = self._list.currentItem()
+        if item is None:
+            return
+        branch = item.data(Qt.ItemDataRole.UserRole)
+        if branch == self._info.branch:
+            return
+        self._action = "switch"
+        self._branch = branch
+        self.accept()
+
+    def _on_pull(self) -> None:
+        self._action = "pull"
+        self._branch = self._info.branch
+        self.accept()
+
+    def get_result(self) -> tuple[str, str]:
+        """Return (action, branch).  action is 'switch' or 'pull'."""
+        return self._action, self._branch
