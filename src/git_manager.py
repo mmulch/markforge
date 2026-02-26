@@ -862,7 +862,11 @@ def _push_via_git_binary(info: GitFileInfo, spec: CommitSpec,
     # Stage the edited file plus any assets sitting alongside it (e.g. images
     # inserted via drag-and-drop or clipboard paste that live in assets/).
     assets_rel = str(pathlib.Path(info.file_path).parent / "assets")
-    _run("git", "add", info.file_path, assets_rel, step_msg="Staging …")
+    assets_abs = os.path.join(info.local_repo_path, assets_rel)
+    add_args = ["git", "add", info.file_path]
+    if os.path.isdir(assets_abs):
+        add_args.append(assets_rel)
+    _run(*add_args, step_msg="Staging …")
     _run("git", "commit",
          *(["--amend"] if spec.amend else []),
          "-m", spec.message,
