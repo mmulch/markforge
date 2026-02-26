@@ -688,27 +688,55 @@ class MainWindow(QMainWindow):
     # ── Git diff gutter ───────────────────────────────────────────────────────
 
     def _update_diff_base(self) -> None:
-        """Fetch the HEAD version of the current git-managed file and store it."""
-        if self._git_file_info is None or not self._git_file_info.local_repo_path:
-            self._diff_base_lines = []
-            self._editor.set_diff_markers({})
-            return
-        try:
-            from dulwich.repo import Repo
-            from dulwich.object_store import tree_lookup_path as _tlp
-            with Repo(self._git_file_info.local_repo_path) as repo:
-                commit     = repo[repo.head()]
-                root_tree  = repo[commit.tree]
-                file_bytes = self._git_file_info.file_path.encode("utf-8")
-                _, blob_sha = _tlp(repo.__getitem__, root_tree, file_bytes)
-                blob = repo[blob_sha]
-                content = blob.data.decode("utf-8", errors="replace")
-            self._diff_base_lines = content.splitlines(keepends=True)
-        except Exception:
-            self._diff_base_lines = []
-            self._editor.set_diff_markers({})
-            return
-        self._refresh_diff()
+        """Fetch the HEAD version of the current file and store it.
+
+        Works for:
+        1. Files opened via "Open File from Git" (_git_file_info is set)
+        2. Any local file inside a git repository (auto-detected via dulwich)
+        """
+        # Path 1: file opened via git integration
+        if self._git_file_info is not None and self._git_file_info.local_repo_path:
+            try:
+                from dulwich.repo import Repo
+                from dulwich.object_store import tree_lookup_path as _tlp
+                with Repo(self._git_file_info.local_repo_path) as repo:
+                    commit     = repo[repo.head()]
+                    root_tree  = repo[commit.tree]
+                    file_bytes = self._git_file_info.file_path.encode("utf-8")
+                    _, blob_sha = _tlp(repo.__getitem__, root_tree, file_bytes)
+                    blob = repo[blob_sha]
+                    content = blob.data.decode("utf-8", errors="replace")
+                self._diff_base_lines = content.splitlines(keepends=True)
+                self._refresh_diff()
+                return
+            except Exception:
+                pass
+
+        # Path 2: local file — walk up to find a .git directory
+        if self._file:
+            try:
+                from dulwich.repo import Repo
+                from dulwich.object_store import tree_lookup_path as _tlp
+                abs_path = os.path.abspath(self._file)
+                with Repo.discover(os.path.dirname(abs_path)) as repo:
+                    commit   = repo[repo.head()]
+                    rel_path = os.path.relpath(
+                        abs_path, repo.path
+                    ).replace("\\", "/")
+                    _, blob_sha = _tlp(
+                        repo.__getitem__, commit.tree, rel_path.encode("utf-8")
+                    )
+                    blob = repo[blob_sha]
+                    content = blob.data.decode("utf-8", errors="replace")
+                self._diff_base_lines = content.splitlines(keepends=True)
+                self._refresh_diff()
+                return
+            except Exception:
+                pass
+
+        # No git context available
+        self._diff_base_lines = []
+        self._editor.set_diff_markers({})
 
     def _refresh_diff(self) -> None:
         """Recompute diff markers from current editor content vs the stored base."""
