@@ -222,6 +222,7 @@ class MainWindow(QMainWindow):
         self._connect_signals()
         self._restore_settings()
 
+        self.setAcceptDrops(True)
         self.resize(1280, 800)
         self._update_title()
         self._set_editor_active(False)
@@ -705,6 +706,37 @@ class MainWindow(QMainWindow):
             self._file_tree.setVisible(True)
             self._act_filetree.setChecked(True)
 
+    # ── Drag-and-drop fallback (for when editor is disabled) ────────────────
+
+    def dragEnterEvent(self, event) -> None:  # type: ignore[override]
+        if event.mimeData().hasUrls():
+            for url in event.mimeData().urls():
+                if url.isLocalFile():
+                    ext = os.path.splitext(url.toLocalFile())[1].lower()
+                    if ext in {".md", ".markdown", ".pdf"}:
+                        event.acceptProposedAction()
+                        return
+        super().dragEnterEvent(event)
+
+    def dropEvent(self, event) -> None:  # type: ignore[override]
+        if event.mimeData().hasUrls():
+            for url in event.mimeData().urls():
+                if not url.isLocalFile():
+                    continue
+                path = url.toLocalFile()
+                ext = os.path.splitext(path)[1].lower()
+                if ext in {".md", ".markdown"}:
+                    self._load(path)
+                    event.acceptProposedAction()
+                    return
+                elif ext == ".pdf":
+                    self._import_pdf_drop(path)
+                    event.acceptProposedAction()
+                    return
+        super().dropEvent(event)
+
+    # ── PDF import ────────────────────────────────────────────────────────────
+
     def _import_pdf(self) -> None:
         if self._pdf_worker is not None:
             return  # import already running
@@ -739,32 +771,35 @@ class MainWindow(QMainWindow):
         # ── Step 3: show progress dialog and start worker ─────────────────
         self._start_pdf_import(pdf_path, self._pdf_output_path)
 
-    def _import_pdf_dropped(self, pdf_path: str, output_dir: str | None = None) -> None:
-        """Start PDF import with a pre-set input path (called from drag & drop)."""
+    def _import_pdf_drop(self, pdf_path: str) -> None:
+        """Show a dialog for dropped PDF: same folder / choose folder / cancel."""
         if self._pdf_worker is not None:
             return
         if not self._maybe_save():
             return
-        if output_dir is not None:
-            draft_name = os.path.splitext(os.path.basename(pdf_path))[0] + ".md"
-            output_path = os.path.join(output_dir, draft_name)
-        else:
-            save_dir = (
-                os.path.dirname(os.path.abspath(self._file)) if self._file
-                else self._file_tree._root_dir or os.path.dirname(pdf_path)
-            )
-            draft_name = os.path.splitext(os.path.basename(pdf_path))[0] + ".md"
-            name, ok = QInputDialog.getText(
-                self, tr("Import PDF"),
-                tr("File name:\nFolder: {path}", path=save_dir),
-                text=draft_name,
-            )
-            if not ok or not name.strip():
+        fname = os.path.basename(pdf_path)
+        draft_name = os.path.splitext(fname)[0] + ".md"
+
+        msg = QMessageBox(self)
+        msg.setWindowTitle(tr("Import PDF"))
+        msg.setIcon(QMessageBox.Icon.Question)
+        msg.setText(tr("What would you like to do with <b>{name}</b>?", name=fname))
+        btn_same   = msg.addButton(tr("Same folder"),    QMessageBox.ButtonRole.AcceptRole)
+        btn_choose = msg.addButton(tr("Choose folder…"), QMessageBox.ButtonRole.ActionRole)
+        msg.addButton(QMessageBox.StandardButton.Cancel)
+        msg.setDefaultButton(btn_same)
+        msg.exec()
+
+        clicked = msg.clickedButton()
+        if clicked == btn_same:
+            output_path = os.path.join(os.path.dirname(pdf_path), draft_name)
+        elif clicked == btn_choose:
+            chosen = QFileDialog.getExistingDirectory(self, tr("Choose folder…"))
+            if not chosen:
                 return
-            name = name.strip()
-            if "." not in name:
-                name += ".md"
-            output_path = os.path.join(save_dir, name)
+            output_path = os.path.join(chosen, draft_name)
+        else:
+            return
         self._start_pdf_import(pdf_path, output_path)
 
     def _start_pdf_import(self, pdf_path: str, output_path: str) -> None:

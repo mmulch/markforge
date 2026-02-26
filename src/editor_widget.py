@@ -371,31 +371,10 @@ class EditorWidget(QPlainTextEdit):
                 win._load(dest)
 
     def _handle_dropped_pdf_file(self, dropped_path: str) -> None:
-        """Dialog: import PDF with save dialog, or auto-import to current working folder."""
-        from i18n import tr
-        fname = os.path.basename(dropped_path)
-        msg = QMessageBox(self)
-        msg.setWindowTitle(tr("Import PDF"))
-        msg.setIcon(QMessageBox.Icon.Question)
-        msg.setText(tr("What would you like to do with <b>{name}</b>?", name=fname))
-        btn_import = msg.addButton(tr("Import …"),        QMessageBox.ButtonRole.AcceptRole)
-        btn_folder = msg.addButton(tr("Import to folder"), QMessageBox.ButtonRole.ActionRole)
-        msg.addButton(QMessageBox.StandardButton.Cancel)
-        msg.setDefaultButton(btn_import)
-        msg.exec()
-        clicked = msg.clickedButton()
+        """Delegate PDF drop handling to MainWindow."""
         win = self.window()
-        if clicked == btn_import:
-            if hasattr(win, "_import_pdf_dropped"):
-                win._import_pdf_dropped(dropped_path)
-        elif clicked == btn_folder:
-            assets_dir = self._get_assets_dir()
-            if not assets_dir:
-                self._show_no_file_message()
-                return
-            doc_dir = os.path.dirname(assets_dir)
-            if hasattr(win, "_import_pdf_dropped"):
-                win._import_pdf_dropped(dropped_path, output_dir=doc_dir)
+        if hasattr(win, "_import_pdf_drop"):
+            win._import_pdf_drop(dropped_path)
 
     def _copy_to_dir(self, src_path: str, dest_dir: str) -> str | None:
         """Copy src_path into dest_dir, preserving filename (adds suffix on collision)."""
