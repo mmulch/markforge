@@ -210,6 +210,7 @@ class MainWindow(QMainWindow):
         self._recent_files: list[str] = []
         self._word_goal: int = 0
         self._pre_focus: dict = {}
+        self._diff_base_lines: list[str] = []
 
         self._autosave_timer = QTimer(self)
         self._autosave_timer.timeout.connect(self._autosave)
@@ -482,6 +483,8 @@ class MainWindow(QMainWindow):
         text = self._editor.toPlainText()
         self._preview.set_markdown(text, self._doc_base_url())
         self._outline.refresh(text)
+        if self._diff_base_lines:
+            self._refresh_diff()
 
     def _jump_to_outline_line(self, lineno: int) -> None:
         """Move the editor cursor to the heading at the given 0-based line."""
@@ -596,6 +599,56 @@ class MainWindow(QMainWindow):
         )
         mod  = "*" if self._modified else ""
         self.setWindowTitle(f"{mod}{name} — MarkForge")
+
+    # ── Git diff gutter ───────────────────────────────────────────────────────
+
+    def _update_diff_base(self) -> None:
+        """Fetch the HEAD version of the current git-managed file and store it."""
+        if self._git_file_info is None or not self._git_file_info.local_repo_path:
+            self._diff_base_lines = []
+            self._editor.set_diff_markers({})
+            return
+        try:
+            from dulwich.repo import Repo
+            from dulwich.object_store import tree_lookup_path as _tlp
+            with Repo(self._git_file_info.local_repo_path) as repo:
+                commit     = repo[repo.head()]
+                root_tree  = repo[commit.tree]
+                file_bytes = self._git_file_info.file_path.encode("utf-8")
+                _, blob_sha = _tlp(repo.__getitem__, root_tree, file_bytes)
+                blob = repo[blob_sha]
+                content = blob.data.decode("utf-8", errors="replace")
+            self._diff_base_lines = content.splitlines(keepends=True)
+        except Exception:
+            self._diff_base_lines = []
+            self._editor.set_diff_markers({})
+            return
+        self._refresh_diff()
+
+    def _refresh_diff(self) -> None:
+        """Recompute diff markers from current editor content vs the stored base."""
+        if not self._diff_base_lines:
+            return
+        import difflib
+        current_lines = self._editor.toPlainText().splitlines(keepends=True)
+        markers: dict[int, str] = {}
+        for tag, i1, i2, j1, j2 in difflib.SequenceMatcher(
+            None, self._diff_base_lines, current_lines, autojunk=False
+        ).get_opcodes():
+            if tag == "equal":
+                continue
+            if tag == "insert":
+                for j in range(j1, j2):
+                    markers[j + 1] = "added"
+            elif tag == "replace":
+                for j in range(j1, j2):
+                    markers[j + 1] = "modified"
+            elif tag == "delete":
+                # Mark the nearest current line with a deletion-above indicator
+                line = max(1, j1)
+                if line not in markers:
+                    markers[line] = "removed_above"
+        self._editor.set_diff_markers(markers)
 
     # ── File operations ───────────────────────────────────────────────────────
 
@@ -1038,6 +1091,8 @@ class MainWindow(QMainWindow):
         self._git_last_commit_msg   = self._git_pending_commit_msg
         self._git_pending_commit_msg = ""
         self.statusBar().showMessage(tr("Pushed to remote."), 4000)
+        # After commit+push the working copy matches HEAD → clear diff markers
+        QTimer.singleShot(200, self._update_diff_base)
 
     def _on_push_failed(self, msg: str) -> None:
         if self._git_push_progress is not None:
@@ -1135,6 +1190,7 @@ class MainWindow(QMainWindow):
         self._git_push_count      = 1
         self._git_last_commit_msg = ""
         self.statusBar().showMessage(tr("Squash complete."), 4000)
+        QTimer.singleShot(200, self._update_diff_base)
 
     def _on_squash_failed(self, msg: str) -> None:
         if self._git_squash_progress is not None:
@@ -1198,6 +1254,8 @@ class MainWindow(QMainWindow):
             self._file_tree.select_file(path)
 
         self._add_to_recent(path)
+        # Update diff base (non-blocking; clears markers if not a git file)
+        QTimer.singleShot(0, self._update_diff_base)
         # Defer the preview so the editor becomes visible immediately; the
         # preview (which may fetch remote resources like PlantUML) renders on
         # the next event-loop iteration.

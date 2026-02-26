@@ -33,6 +33,7 @@ A modern, feature-rich Markdown editor built with Python and PyQt6. Includes a l
 - **HTML export** — single-file self-contained HTML with inline CSS and images, preserving syntax highlighting and theme (File → Export as HTML)
 - **Pandoc export** *(optional)* — DOCX, EPUB, LaTeX via `pandoc` if installed on PATH (File → Export as DOCX/EPUB/LaTeX)
 - **Git integration** — open individual files or entire branches directly from GitHub, GitHub Enterprise, Bitbucket Cloud, or Bitbucket Server; edit and push back without leaving the editor; amend the previous commit or squash multiple commits in one step (see [Git Integration](#git-integration))
+- **Inline diff view** — when a git-managed file is open, the gutter shows coloured bars next to changed lines: green for added, orange for modified, and red for deleted blocks; markers update live as you type and reset to clean after each commit & push
 - **Focus mode** — hide the file tree, preview, and status bar with a single `F11` keypress for distraction-free writing; all panels restore to their previous state when you press `F11` again (View → Focus Mode)
 - **Word count & reading time** — word count and estimated reading time always visible in the status bar; set an optional target word count (View → Set Word Goal) to show a compact progress bar toward your goal
 - **Online user manual** — comprehensive documentation in 14 languages: EN, DE, AR, VI, SV, UK, KN, HI, ES, FR, IT, NL, PT, FA (see [User Manual](docs/index.html))

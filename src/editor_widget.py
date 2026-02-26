@@ -42,6 +42,11 @@ class _LineNumberArea(QWidget):
 class EditorWidget(QPlainTextEdit):
     """Plain-text editor with line numbers, current-line highlight, and Markdown syntax highlighting."""
 
+    # Diff marker types
+    _DIFF_ADDED    = QColor(80,  200, 100)
+    _DIFF_MODIFIED = QColor(220, 150,  30)
+    _DIFF_REMOVED  = QColor(210,  70,  70)
+
     def __init__(self) -> None:
         super().__init__()
         self._theme_name = "VS Code Dark"
@@ -49,6 +54,7 @@ class EditorWidget(QPlainTextEdit):
         self._highlighter = MarkdownHighlighter(self.document())
         self._search_selections: list = []
         self._get_assets_dir: Callable[[], str | None] = lambda: None
+        self._diff_markers: dict[int, str] = {}  # 1-based line → "added"|"modified"|"removed_above"
 
         self.setAcceptDrops(True)
         self._apply_theme()
@@ -103,6 +109,12 @@ class EditorWidget(QPlainTextEdit):
     def set_assets_dir_provider(self, fn: Callable[[], str | None]) -> None:
         self._get_assets_dir = fn
 
+    def set_diff_markers(self, markers: dict[int, str]) -> None:
+        """Update gutter diff markers. Keys are 1-based line numbers."""
+        self._diff_markers = markers
+        self._update_gutter_width(0)
+        self._gutter.update()
+
     def set_spell_check(self, enabled: bool, lang: str) -> None:
         from spell_checker import spell_check as _sc
         sc = _sc()
@@ -117,9 +129,12 @@ class EditorWidget(QPlainTextEdit):
 
     # ── Line numbers ──────────────────────────────────────────────────────────
 
+    _DIFF_BAR_W = 4  # px width of the diff colour bar in the gutter
+
     def line_number_area_width(self) -> int:
         digits = max(1, len(str(self.blockCount())))
-        return 16 + self.fontMetrics().horizontalAdvance("9") * digits
+        extra = self._DIFF_BAR_W if self._diff_markers else 0
+        return 16 + extra + self.fontMetrics().horizontalAdvance("9") * digits
 
     def _update_gutter_width(self, _: int) -> None:
         self.setViewportMargins(self.line_number_area_width(), 0, 0, 0)
@@ -153,8 +168,24 @@ class EditorWidget(QPlainTextEdit):
         )
         bot = top + round(self.blockBoundingRect(block).height())
 
+        has_diff = bool(self._diff_markers)
         while block.isValid() and top <= event.rect().bottom():
             if block.isVisible() and bot >= event.rect().top():
+                # ── diff colour bar ─────────────────────────────────────────
+                if has_diff:
+                    marker = self._diff_markers.get(num + 1)
+                    if marker == "added":
+                        painter.fillRect(0, top, self._DIFF_BAR_W, bot - top,
+                                         self._DIFF_ADDED)
+                    elif marker == "modified":
+                        painter.fillRect(0, top, self._DIFF_BAR_W, bot - top,
+                                         self._DIFF_MODIFIED)
+                    elif marker == "removed_above":
+                        # Small triangle pointing right at the top of this row
+                        h = min(8, bot - top)
+                        painter.fillRect(0, top, self._DIFF_BAR_W, h,
+                                         self._DIFF_REMOVED)
+                # ── line number ─────────────────────────────────────────────
                 painter.drawText(
                     0,
                     top,
